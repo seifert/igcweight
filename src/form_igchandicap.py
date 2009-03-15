@@ -16,32 +16,52 @@ class IgcHandicapList(forms.DialogModel):
 
         self.SetTitle( _("IGC handicap list") )
         
+        # Pop-up menu
+        self.menu_popup = wx.Menu()
+        self.menu_new = wx.MenuItem(self.menu_popup, wx.NewId(), _("&New...\tInsert"))
+        self.menu_popup.AppendItem(self.menu_new)
+        self.menu_properties = wx.MenuItem(self.menu_popup, wx.NewId(), _("&Properties...\tEnter"))
+        self.menu_popup.AppendItem(self.menu_properties)
+        self.menu_delete = wx.MenuItem(self.menu_popup, wx.NewId(), _("&Delete\tCtrl+Delete"))
+        self.menu_popup.AppendItem(self.menu_delete)
+        # Hot keys
+        self.SetAcceleratorTable( wx.AcceleratorTable(
+            [( wx.ACCEL_NORMAL, wx.WXK_INSERT, self.button_new.GetId() ),
+             ( wx.ACCEL_NORMAL, wx.WXK_RETURN, self.button_properties.GetId() ),
+             ( wx.ACCEL_CTRL, wx.WXK_DELETE, self.button_delete.GetId() ),
+            ]
+        ) )
+
+        # Set grid columns
         self.list_ctrl.InsertColumn(0, _("Name"), 'name', proportion=2)
         self.list_ctrl.InsertColumn(1, _("Coefficient"), 'coefficient', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         self.list_ctrl.InsertColumn(2, _("Non lifting w."), 'weight_non_lifting', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         self.list_ctrl.InsertColumn(3, _("Without water"), 'mtow_without_water', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         self.list_ctrl.InsertColumn(4, _("MTOW"), 'mtow', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         self.list_ctrl.InsertColumn(5, _("Referential w."), 'weight_referential', format=wx.LIST_FORMAT_RIGHT, proportion=1)
-
+        
+        # Open data source
         self.list_ctrl.datasource = session.query( GliderType ).order_by( GliderType.name ).all()
         count = len(self.list_ctrl.datasource)
         if count > 0:            
             self.list_ctrl.SetItemCount(count)
             self.list_ctrl.Select(0)
             self.list_ctrl.Focus(0)
-
         self.__set_enabled_disabled()
-        self.__bind_events()
         
         self.SetSize( (750, 450) )
         self.SetMinSize( self.GetSize() )
         self.CenterOnParent()
 
-    def __bind_events(self):
+        # Bind_events
+        self.list_ctrl.Bind(wx.EVT_CONTEXT_MENU, self.__on_popup_menu)
         self.Bind(wx.EVT_BUTTON, self.Exit, self.button_close)
         self.Bind(wx.EVT_BUTTON, self.New, self.button_new)
-        self.Bind(wx.EVT_BUTTON, self.Edit, self.button_properties)
+        self.Bind(wx.EVT_BUTTON, self.Properties, self.button_properties)
         self.Bind(wx.EVT_BUTTON, self.Delete, self.button_delete)
+        self.Bind(wx.EVT_MENU, self.New, self.menu_new)
+        self.Bind(wx.EVT_MENU, self.Properties, self.menu_properties)
+        self.Bind(wx.EVT_MENU, self.Delete, self.menu_delete)
 
     def __set_enabled_disabled(self):
         " __set_enabled_disabled(self) - enable or disable controls "
@@ -54,17 +74,24 @@ class IgcHandicapList(forms.DialogModel):
             self.button_new.Enable(True)
             self.button_properties.Enable(False)
             self.button_delete.Enable(False)
+    
+    def __on_popup_menu(self, evt):
+        " __on_popup_menu(self, evt) - show pop-up menu "
+        self.menu_new.Enable( self.button_new.IsEnabled() )
+        self.menu_properties.Enable( self.button_properties.IsEnabled() )
+        self.menu_delete.Enable( self.button_delete.IsEnabled() )
+        pos = evt.GetPosition()
+        pos = self.ScreenToClient(pos)
+        self.PopupMenu( self.menu_popup, pos )
 
     def Exit(self, evt):
         " Exit(self, evt) - hide and leave dialog "
         self.Close()
 
-    def RefreshDataSource(self):
-        " RefreshData(self) - refresh data in grid "
-        pass
-    
     def New(self, evt):
         " New(self, evt) - add new glider type "
+        if not self.button_new.IsEnabled():
+            return
         dlg = IgcHandicapForm(self)
         try:
             while True:
@@ -86,8 +113,10 @@ class IgcHandicapList(forms.DialogModel):
         finally:
             dlg.Destroy()
 
-    def Edit(self, evt):
-        " Edit(self, evt) - edit glider type "
+    def Properties(self, evt):
+        " Properties(self, evt) - edit glider type "
+        if not self.button_properties.IsEnabled():
+            return
         item = self.list_ctrl.current_item
         dlg = IgcHandicapForm(self)
         try:
@@ -107,6 +136,8 @@ class IgcHandicapList(forms.DialogModel):
 
     def Delete(self, evt):
         " Delete(self, evt) - delete glider type "
+        if not self.button_delete.IsEnabled():
+            return
         item = self.list_ctrl.current_item
         if wx.MessageDialog(self,
                             _("Are you sure to delete %s?") % item.name,

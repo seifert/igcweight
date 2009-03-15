@@ -40,6 +40,9 @@ class Organization(Base):
     def __repr__(self):
         return "<Organization: #%s, '%s'>" % ( str(self.id), self.name )
     
+    def __str__(self):
+        return self.name
+
     def GetDescription(self, length=50):
         return __get_short_destcription(self.description, length)
 
@@ -67,6 +70,9 @@ class Pilot(Base):
     
     def __repr__(self):
         return "<Pilot: #%s, '%s'>" % ( str(self.id), self.fullname )
+    
+    def __str__(self):
+        return self.fullname
     
     @property
     def fullname(self):
@@ -105,6 +111,9 @@ class GliderType(Base):
     def __repr__(self):
         return "<GliderType: #%s, '%s'>" % ( str(self.id), self.name )
     
+    def __repr__(self):
+        return self.name
+
     def column_as_str(self, columnname):
         " column_as_str(self, columnname) - return column value as string "
         value = getattr( self, columnname )

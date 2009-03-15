@@ -26,6 +26,7 @@ class VirtualListCtrl(wx.ListCtrl):
         self.__scroll_w = scroll.GetSize().width
         scroll.Destroy()
         
+        # Bind_events
         self.Bind(wx.EVT_SIZE, self.__OnResize)
     
     def InsertColumn(self, col, heading, fieldname, format=wx.LIST_FORMAT_LEFT, proportion=1):

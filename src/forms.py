@@ -111,10 +111,14 @@ class DialogModel(wx.Dialog):
         # begin wxGlade: DialogModel.__set_properties
         self.SetTitle(_("Model"))
         self.list_ctrl.SetFocus()
+        self.button_new.SetToolTipString(_("Add new item"))
         self.button_new.Enable(False)
+        self.button_properties.SetToolTipString(_("Edit item"))
         self.button_properties.Enable(False)
+        self.button_delete.SetToolTipString(_("Delete item"))
         self.button_delete.Enable(False)
         self.panel_space.Enable(False)
+        self.button_close.SetToolTipString(_("Close window"))
         # end wxGlade
 
     def __do_layout(self):
