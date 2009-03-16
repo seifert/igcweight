@@ -136,8 +136,8 @@ class DialogModel(forms.DialogModel):
                             self.__set_enabled_disabled()
                     break
                 except Exception, e:
-                    error_message_dialog( self, self.message_insert_error, e )
                     session.rollback()
+                    error_message_dialog( self, self.message_insert_error, e )
         finally:
             dlg.Destroy()
 
@@ -161,8 +161,8 @@ class DialogModel(forms.DialogModel):
                         self.list_ctrl.RefreshItem( self.list_ctrl.GetFocusedItem() )
                     break
                 except Exception, e:
-                    error_message_dialog( self, self.message_edit_error, e )
                     session.rollback()
+                    error_message_dialog( self, self.message_edit_error, e )
         finally:
             dlg.Destroy()
 
@@ -194,5 +194,5 @@ class DialogModel(forms.DialogModel):
                 finally:
                     self.__set_enabled_disabled()
             except Exception, e:
-                error_message_dialog( self, self.message_delete_error, e )
                 session.rollback()
+                error_message_dialog( self, self.message_delete_error, e )
