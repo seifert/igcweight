@@ -4,6 +4,8 @@ import wx
 from wx import GetTranslation as _
 
 import forms
+import settings
+
 from form_igchandicap import IgcHandicapList
 
 class Main(forms.Main):
@@ -29,7 +31,7 @@ class Main(forms.Main):
         " About(self, evt) - show about dialog window "
         about = wx.AboutDialogInfo()
         about.SetName( "IGC Weight" )
-        about.SetVersion( "0.1" )
+        about.SetVersion( settings.VERSION )
         about.SetCopyright( _("This program is licensed under GNU General Public License version 2") )
         about.SetDevelopers( ("Jan Seifert, jan.seifert@fotkyzcest.net",) )
         wx.AboutBox(about)

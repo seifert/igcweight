@@ -66,5 +66,4 @@ class VirtualListCtrl(wx.ListCtrl):
     @property
     def current_item(self):
         " current_item(self) - return currently selected item "
-        i = self.GetFocusedItem()
-        return i > -1 and self.datasource[i] or None
+        return self.GetSelectedItemCount()==1 and self.datasource[ self.GetFocusedItem() ] or None

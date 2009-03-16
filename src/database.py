@@ -15,5 +15,5 @@ if settings.DB_DATABASE != '': __engine_url['database'] = settings.DB_DATABASE
 
 engine = create_engine( URL(**__engine_url), echo=settings.DEBUG, convert_unicode=True )
 
-Session = sessionmaker(bind=engine, autoflush=True, transactional=True)
+Session = sessionmaker(bind=engine, autoflush=True)
 session = Session()

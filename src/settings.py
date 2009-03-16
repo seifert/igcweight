@@ -21,3 +21,5 @@ DB_DATABASE = join( BASE_DIR, 'data', 'igcweight.db' )
 DB_USERNAME = ''
 DB_PASSWORD = ''
 DB_ARGS     = {}
+
+VERSION = '0.2'

@@ -3,35 +3,18 @@
 import wx
 from wx import GetTranslation as _
 
-import forms
+import form_dialogmodel
 
 from database import session
 from models import GliderType
-from widgets import error_message_dialog
 
-class IgcHandicapList(forms.DialogModel):
+class IgcHandicapList(form_dialogmodel.DialogModel):
     " IGC handicap list dialog "
     def __init__(self, *args, **kwargs):
-        forms.DialogModel.__init__(self, *args, **kwargs)
+        form_dialogmodel.DialogModel.__init__(self, *args, **kwargs)
 
         self.SetTitle( _("IGC handicap list") )
         
-        # Pop-up menu
-        self.menu_popup = wx.Menu()
-        self.menu_new = wx.MenuItem(self.menu_popup, wx.NewId(), _("&New...\tInsert"))
-        self.menu_popup.AppendItem(self.menu_new)
-        self.menu_properties = wx.MenuItem(self.menu_popup, wx.NewId(), _("&Properties...\tEnter"))
-        self.menu_popup.AppendItem(self.menu_properties)
-        self.menu_delete = wx.MenuItem(self.menu_popup, wx.NewId(), _("&Delete\tCtrl+Delete"))
-        self.menu_popup.AppendItem(self.menu_delete)
-        # Hot keys
-        self.SetAcceleratorTable( wx.AcceleratorTable(
-            [( wx.ACCEL_NORMAL, wx.WXK_INSERT, self.button_new.GetId() ),
-             ( wx.ACCEL_NORMAL, wx.WXK_RETURN, self.button_properties.GetId() ),
-             ( wx.ACCEL_CTRL, wx.WXK_DELETE, self.button_delete.GetId() ),
-            ]
-        ) )
-
         # Set grid columns
         self.list_ctrl.InsertColumn(0, _("Name"), 'name', proportion=2)
         self.list_ctrl.InsertColumn(1, _("Coefficient"), 'coefficient', format=wx.LIST_FORMAT_RIGHT, proportion=1)
@@ -41,123 +24,17 @@ class IgcHandicapList(forms.DialogModel):
         self.list_ctrl.InsertColumn(5, _("Referential w."), 'weight_referential', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         
         # Open data source
-        self.list_ctrl.datasource = session.query( GliderType ).order_by( GliderType.name ).all()
-        count = len(self.list_ctrl.datasource)
-        if count > 0:            
-            self.list_ctrl.SetItemCount(count)
-            self.list_ctrl.Select(0)
-            self.list_ctrl.Focus(0)
-        self.__set_enabled_disabled()
-        
+        self.datasource = session.query( GliderType ).order_by( GliderType.name ).all()
+        # Assign edit dialog
+        self.edit_dialog = IgcHandicapForm
+        # Assign error messages
+        self.message_insert_error = _("Glider type insert error")
+        self.message_edit_error   = _("Glider type edit error")
+        self.message_delete_error = _("Glider type delete error")
+
         self.SetSize( (750, 450) )
         self.SetMinSize( self.GetSize() )
         self.CenterOnParent()
-
-        # Bind_events
-        self.list_ctrl.Bind(wx.EVT_CONTEXT_MENU, self.__on_popup_menu)
-        self.Bind(wx.EVT_BUTTON, self.Exit, self.button_close)
-        self.Bind(wx.EVT_BUTTON, self.New, self.button_new)
-        self.Bind(wx.EVT_BUTTON, self.Properties, self.button_properties)
-        self.Bind(wx.EVT_BUTTON, self.Delete, self.button_delete)
-        self.Bind(wx.EVT_MENU, self.New, self.menu_new)
-        self.Bind(wx.EVT_MENU, self.Properties, self.menu_properties)
-        self.Bind(wx.EVT_MENU, self.Delete, self.menu_delete)
-
-    def __set_enabled_disabled(self):
-        " __set_enabled_disabled(self) - enable or disable controls "
-        count = len(self.list_ctrl.datasource)
-        if count > 0:            
-            self.button_new.Enable(True)
-            self.button_properties.Enable(True)
-            self.button_delete.Enable(True)
-        else:
-            self.button_new.Enable(True)
-            self.button_properties.Enable(False)
-            self.button_delete.Enable(False)
-    
-    def __on_popup_menu(self, evt):
-        " __on_popup_menu(self, evt) - show pop-up menu "
-        self.menu_new.Enable( self.button_new.IsEnabled() )
-        self.menu_properties.Enable( self.button_properties.IsEnabled() )
-        self.menu_delete.Enable( self.button_delete.IsEnabled() )
-        pos = evt.GetPosition()
-        pos = self.ScreenToClient(pos)
-        self.PopupMenu( self.menu_popup, pos )
-
-    def Exit(self, evt):
-        " Exit(self, evt) - hide and leave dialog "
-        self.Close()
-
-    def New(self, evt):
-        " New(self, evt) - add new glider type "
-        if not self.button_new.IsEnabled():
-            return
-        dlg = IgcHandicapForm(self)
-        try:
-            while True:
-                try:
-                    if dlg.ShowModal() == wx.ID_OK:
-                        glider_type = dlg.GetData()
-                        session.add(glider_type)
-                        session.commit()
-                        self.list_ctrl.datasource.append(glider_type)
-                        self.__set_enabled_disabled()
-                        count = len(self.list_ctrl.datasource)
-                        self.list_ctrl.SetItemCount(count)
-                        self.list_ctrl.Select(count-1)
-                        self.list_ctrl.Focus(count-1)
-                    break
-                except Exception, e:
-                    error_message_dialog( self, _("Glider type insert error"), e )
-                    session.rollback()
-        finally:
-            dlg.Destroy()
-
-    def Properties(self, evt):
-        " Properties(self, evt) - edit glider type "
-        if not self.button_properties.IsEnabled():
-            return
-        item = self.list_ctrl.current_item
-        dlg = IgcHandicapForm(self)
-        try:
-            dlg.SetData(item)
-            while True:
-                try:
-                    if dlg.ShowModal() == wx.ID_OK:
-                        item = dlg.GetData()
-                        session.commit()
-                        self.list_ctrl.RefreshItem( self.list_ctrl.GetFocusedItem() )
-                    break
-                except Exception, e:
-                    error_message_dialog( self, _("Glider type edit error"), e )
-                    session.rollback()
-        finally:
-            dlg.Destroy()
-
-    def Delete(self, evt):
-        " Delete(self, evt) - delete glider type "
-        if not self.button_delete.IsEnabled():
-            return
-        item = self.list_ctrl.current_item
-        if wx.MessageDialog(self,
-                            _("Are you sure to delete %s?") % item.name,
-                            _("Delete %s?") % item.name,
-                            wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
-                           ).ShowModal() == wx.ID_YES:
-            try:
-                i = self.list_ctrl.datasource.index(item)
-                session.delete(item)
-                session.commit()
-                del( self.list_ctrl.datasource[i] )
-                self.__set_enabled_disabled()
-                i = i - 1
-                i = i >= 0 and i or 0
-                self.list_ctrl.SetItemCount( len(self.list_ctrl.datasource) )
-                self.list_ctrl.Select(i)
-                self.list_ctrl.Focus(i)
-            except Exception, e:
-                error_message_dialog( self, _("Glider type delete error"), e )
-                session.rollback()
     
 class IgcHandicapForm(wx.Dialog):
     " IGC handicat insert/edit dialog "
