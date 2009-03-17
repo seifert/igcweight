@@ -22,4 +22,4 @@ DB_USERNAME = ''
 DB_PASSWORD = ''
 DB_ARGS     = {}
 
-VERSION = '0.2'
+VERSION = '0.3'

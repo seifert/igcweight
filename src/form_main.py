@@ -22,6 +22,7 @@ class Main(forms.Main):
         self.SetSize( (900, 700) )
 
         # Bind events
+        self.Bind(wx.EVT_CLOSE, self.Exit, self)
         self.Bind(wx.EVT_MENU, self.Exit, self.menu_exit)
         self.Bind(wx.EVT_MENU, self.About, self.menu_about)
         self.Bind(wx.EVT_MENU, self.IgcHandicapList, self.menu_coefficients)
@@ -30,7 +31,16 @@ class Main(forms.Main):
     
     def Exit(self, evt):
         " Exit(self, Event evt) - exit application event handler "
-        wx.Exit()
+        if settings.DEBUG:
+            evt.Skip()
+            return
+        
+        dlg = wx.MessageDialog(self, _("Exit application?"), _("Exit?"), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+        try:
+            if dlg.ShowModal() == wx.ID_YES:
+                wx.GetApp().Exit()
+        finally:
+            dlg.Destroy()
     
     def About(self, evt):
         " About(self, Event evt) - show about dialog window event handler "
