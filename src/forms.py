@@ -8,6 +8,76 @@ from widgets import VirtualListCtrl
 # end wxGlade
 
 
+class PilotForm(wx.Dialog):
+    def __init__(self, *args, **kwds):
+        # begin wxGlade: PilotForm.__init__
+        kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
+        wx.Dialog.__init__(self, *args, **kwds)
+        self.label_degree = wx.StaticText(self, -1, _("Degree"))
+        self.label_firstname = wx.StaticText(self, -1, _("Name"))
+        self.label_surname = wx.StaticText(self, -1, _("Surname"))
+        self.text_degree = wx.TextCtrl(self, -1, "")
+        self.text_name = wx.TextCtrl(self, -1, "")
+        self.text_surname = wx.TextCtrl(self, -1, "")
+        self.label_year_of_birth = wx.StaticText(self, -1, _("Year of birth"))
+        self.label_sex = wx.StaticText(self, -1, _("Sex"))
+        self.text_year_of_birth = wx.TextCtrl(self, -1, "")
+        self.text_sex = wx.TextCtrl(self, -1, "")
+        self.label_description = wx.StaticText(self, -1, _("Description"))
+        self.text_description = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE|wx.TE_WORDWRAP)
+        self.button_ok = wx.Button(self, wx.ID_OK, "")
+        self.button_cancel = wx.Button(self, wx.ID_CANCEL, "")
+
+        self.__set_properties()
+        self.__do_layout()
+        # end wxGlade
+
+    def __set_properties(self):
+        # begin wxGlade: PilotForm.__set_properties
+        self.SetTitle(_("Pilot"))
+        self.label_firstname.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
+        self.label_surname.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
+        self.button_ok.SetDefault()
+        # end wxGlade
+
+    def __do_layout(self):
+        # begin wxGlade: PilotForm.__do_layout
+        sizer_main = wx.BoxSizer(wx.VERTICAL)
+        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        grid_sizer = wx.FlexGridSizer(6, 8, 2, 2)
+        grid_sizer.Add(self.label_degree, 0, wx.RIGHT|wx.EXPAND, 2)
+        grid_sizer.Add(self.label_firstname, 0, wx.LEFT|wx.RIGHT|wx.EXPAND, 2)
+        grid_sizer.Add(self.label_surname, 0, wx.LEFT|wx.EXPAND, 2)
+        grid_sizer.Add(self.text_degree, 0, wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        grid_sizer.Add(self.text_name, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        grid_sizer.Add(self.text_surname, 0, wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        grid_sizer.Add(self.label_year_of_birth, 0, wx.RIGHT|wx.EXPAND, 2)
+        grid_sizer.Add(self.label_sex, 0, wx.LEFT|wx.RIGHT|wx.EXPAND, 2)
+        grid_sizer.Add(self.text_year_of_birth, 0, wx.RIGHT|wx.BOTTOM|wx.EXPAND, 0)
+        grid_sizer.Add(self.text_sex, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.EXPAND, 0)
+        grid_sizer.Add(self.label_description, 0, wx.RIGHT|wx.EXPAND, 2)
+        grid_sizer.Add(self.text_description, 0, wx.BOTTOM|wx.EXPAND, 2)
+        grid_sizer.AddGrowableRow(5)
+        grid_sizer.AddGrowableCol(0)
+        grid_sizer.AddGrowableCol(1)
+        grid_sizer.AddGrowableCol(2)
+        grid_sizer.AddGrowableCol(3)
+        grid_sizer.AddGrowableCol(4)
+        grid_sizer.AddGrowableCol(5)
+        grid_sizer.AddGrowableCol(6)
+        grid_sizer.AddGrowableCol(7)
+        sizer_main.Add(grid_sizer, 1, wx.ALL|wx.EXPAND, 4)
+        sizer_buttons.Add(self.button_ok, 0, wx.RIGHT, 2)
+        sizer_buttons.Add(self.button_cancel, 0, wx.LEFT, 2)
+        sizer_main.Add(sizer_buttons, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.ALIGN_RIGHT, 4)
+        self.SetSizer(sizer_main)
+        sizer_main.Fit(self)
+        self.Layout()
+        # end wxGlade
+
+# end of class PilotForm
+
+
 class Main(wx.Frame):
     def __init__(self, *args, **kwds):
         # begin wxGlade: Main.__init__

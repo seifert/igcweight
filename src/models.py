@@ -10,11 +10,16 @@ from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstra
 from sqlalchemy.orm import relation, backref
 
 
-def __get_short_destcription(description, length):
+def get_short_description(description, length):
+    " get_short_description(str description, int length) -> str - get short description "
+    if description == None:
+        return None
+    l = len(description)
+    if l <= 3:
+        return description
     if length-3 <= 0:
         return '...'
-    else:
-        return len(description) > length and '%s...' % description[0:length-3] or description
+    return l > length and '%s...' % description[0:length-3] or description
 
 
 Base = declarative_base()
@@ -32,7 +37,7 @@ class Organization(Base):
     )
     
     def __init__(self, **kwargs):
-        " Organization(self, name=None, description=None "
+        " Organization(self, str name=None, str description=None "
         for key in kwargs.keys():
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
@@ -42,27 +47,31 @@ class Organization(Base):
     def __repr__(self):
         return "<Organization: #%s, '%s'>" % ( str(self.id), self.name )
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     def column_as_str(self, columnname):
-        " column_as_str(self, columnname) - return column value as string "
+        " column_as_str(self, str columnname) -> str - return column value as string "
         value = getattr( self, columnname )
         
         if value == None:
             return ''
         else:
-            return str(value)
+            return value
     
     def str_to_column(self, columnname, value):
-        " str_to_column(self, columnname, value) - convert str value and store it in the columnt "
+        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
         if value == '':
             value = None
         setattr( self, columnname, value )
 
     def GetDescription(self, length=50):
-        " GetDescription(self, length=50) - get short description, default length is 50 characters "
-        return __get_short_destcription(self.description, length)
+        " GetDescription(self, int length=50) -: str - get short description "
+        return get_short_description(self.description, length)
+    
+    @property
+    def short_description(self):
+        return self.GetDescription()
 
 
 class Pilot(Base):
@@ -71,7 +80,7 @@ class Pilot(Base):
         Column( 'degree', String(15) ),
         Column( 'firstname', String(24), nullable=False ),
         Column( 'surname', String(35), nullable=False ),
-        Column( 'age', SmallInteger ),
+        Column( 'year_of_birth', SmallInteger ),
         Column( 'sex', CHAR(1) ),
         Column( 'description', Text ),
         PrimaryKeyConstraint( 'id', name='pk_pilot' ),
@@ -79,7 +88,8 @@ class Pilot(Base):
     )
     
     def __init__(self, **kwargs):
-        " Pilot(self, degree=None, firstname=None, surname=None, age=None, sex=None, description=None "
+        """ Pilot(self, str degree=None, str firstname=None, str surname=None,
+        int year_of_birth=None, str sex=None, str description=None """
         for key in kwargs.keys():
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
@@ -89,22 +99,22 @@ class Pilot(Base):
     def __repr__(self):
         return "<Pilot: #%s, '%s'>" % ( str(self.id), self.fullname )
     
-    def __str__(self):
+    def __unicode__(self):
         return self.fullname
 
     def column_as_str(self, columnname):
-        " column_as_str(self, columnname) - return column value as string "
+        " column_as_str(self, str columnname) -> str - return column value as string "
         value = getattr( self, columnname )
         
         if value == None:
             return ''
-        elif columnname in ('age',):
+        elif columnname in ('year_of_birth',):
             return locale.format("%d", value)
         else:
-            return str(value)
+            return value
     
     def str_to_column(self, columnname, value):
-        " str_to_column(self, columnname, value) - convert str value and store it in the columnt "
+        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
         if value == '':
             value = None
         elif columnname in ('age',):
@@ -113,15 +123,19 @@ class Pilot(Base):
     
     @property
     def fullname(self):
-        " fullname(self) - get fullname (Degree Firstname Surname) "
+        " fullname(self) -> str - get fullname Degree Firstname Surname "
         if self.degree != None:
             return "%s %s %s" % (self.degree, self.firstname, self.surname)
         else:
             return "%s %s" % (self.firstname, self.surname)
 
     def GetDescription(self, length=50):
-        " GetDescription(self, length=50) - get short description, default length is 50 characters "
-        return __get_short_destcription(self.description, length)
+        " GetDescription(self, int length=50) -: str - get short description "
+        return get_short_description(self.description, length)
+    
+    @property
+    def short_description(self):
+        return self.GetDescription()
 
 
 class GliderType(Base):
@@ -139,8 +153,8 @@ class GliderType(Base):
     )
     
     def __init__(self, **kwargs):
-        """ GliderType(self, name=None, coefficient=None, weight_non_lifting=None,
-        mtow_without_water=None, mtow=None, weight_referential=None, description=None """
+        """ GliderType(self, str name=None, Decimal coefficient=None, int weight_non_lifting=None,
+        int mtow_without_water=None, int mtow=None, int weight_referential=None, str description=None """
         for key in kwargs.keys():
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
@@ -150,11 +164,11 @@ class GliderType(Base):
     def __repr__(self):
         return "<GliderType: #%s, '%s'>" % ( str(self.id), self.name )
     
-    def __repr__(self):
+    def __unicode__(self):
         return self.name
 
     def column_as_str(self, columnname):
-        " column_as_str(self, columnname) - return column value as string "
+        " column_as_str(self, str columnname) -> str - return column value as string "
         value = getattr( self, columnname )
         
         if value == None:
@@ -164,10 +178,10 @@ class GliderType(Base):
         if columnname == 'coefficient':
             return locale.format("%.2f", value)
         else:
-            return str(value)
+            return value
     
     def str_to_column(self, columnname, value):
-        " str_to_column(self, columnname, value) - convert str value and store it in the columnt "
+        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
         if value == '':
             value = None
         elif columnname in ('weight_non_lifting', 'mtow_without_water', 'mtow', 'weight_referential'):
@@ -178,8 +192,12 @@ class GliderType(Base):
         setattr( self, columnname, value )
     
     def GetDescription(self, length=50):
-        " GetDescription(self, length=50) - get short description, default length is 50 characters "
-        return __get_short_destcription(self.description, length)
+        " GetDescription(self, int length=50) -: str - get short description "
+        return get_short_description(self.description, length)
+    
+    @property
+    def short_description(self):
+        return self.GetDescription()
 
 
 #class Glider(Base):
@@ -198,7 +216,8 @@ class GliderType(Base):
 #    glider_type = relation( GliderType, order_by=GliderType.name, backref='glider_type' )
 #
 #    def __init__(self, **kwargs):
-#        " Glider(self, registration=None, competition_number=None, glider_type=None, description=None) "
+#        """ Glider(self, str registration=None, str competition_number=None,
+#        GliderType glider_type=None, str description=None) """
 #        for key in kwargs.keys():
 #            if hasattr(self, key):
 #                setattr(self, key, kwargs[key])
@@ -209,8 +228,12 @@ class GliderType(Base):
 #        return "<Glider: #%s, '%s'>" % ( str(self.id), self.registration )
 #    
 #    def GetDescription(self, length=50):
-#        " GetDescription(self, length=50) - get short description, default length is 50 characters "
+#        " GetDescription(self, int length=50) -: str - get short description "
 #        return __get_short_destcription(self.description, length)
+#    
+#    @property
+#    def short_description(self):
+#        return self.GetDescription()
 
 
 from database import engine

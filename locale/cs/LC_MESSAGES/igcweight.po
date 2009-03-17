@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGC Weight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-16 15:07+0100\n"
-"PO-Revision-Date: 2009-03-16 15:09+0100\n"
+"POT-Creation-Date: 2009-03-17 16:47+0100\n"
+"PO-Revision-Date: 2009-03-17 16:48+0100\n"
 "Last-Translator: Jan Seifert <jan.seifert@centrumholdings.com>\n"
 "Language-Team: JS <jan.seifert@fotkyzcest.net>\n"
 "MIME-Version: 1.0\n"
@@ -18,216 +18,295 @@ msgstr ""
 "X-Poedit-Country: CZECH REPUBLIC\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:18
+#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:19
 msgid "Insert error"
 msgstr "Došlo k chybě při vkládání nového záznamu"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:19
+#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:20
 msgid "Edit error"
 msgstr "Došlo k chybě při změně záznamu"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:20
+#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:21
 msgid "Delete error"
 msgstr "Došlo k chybě při mazání záznamu"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:24
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:34
+#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:25
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:104
 msgid "&New...\tInsert"
 msgstr "&Nový...\tInsert"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:26
+#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:27
 msgid "&Properties...\tEnter"
 msgstr "&Vlastnosti...\tEnter"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:28
+#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:29
 msgid "&Delete\tCtrl+Delete"
 msgstr "&Smazat\tCtrl+Delete"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:177
+#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:180
 #, python-format
 msgid "Are you sure to delete %s?"
 msgstr "Chcete opravdu smazat %s?"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:178
+#: /home/seifert/zdrojaky/python/igcweight/src/form_dialogmodel.py:181
 #, python-format
 msgid "Delete %s?"
 msgstr "Smazat %s?"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:16
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:17
 msgid "IGC handicap list"
 msgstr "IGC seznam koeficientů"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:19
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:44
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:152
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:20
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:46
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:20
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:43
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:21
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:46
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:17
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:222
 msgid "Name"
 msgstr "Jméno"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:20
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:45
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:153
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:21
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:47
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:223
 msgid "Coefficient"
 msgstr "Koeficient"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:21
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:22
 msgid "Non lifting w."
 msgstr "Nevztlakové části"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:22
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:23
 msgid "Without water"
 msgstr "Bez vody"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:23
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:50
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:158
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:24
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:52
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:228
 msgid "MTOW"
 msgstr "MTOW"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:24
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:25
 msgid "Referential w."
 msgstr "Ref. hmotnost"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:31
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:32
 msgid "Glider type insert error"
 msgstr "Došlo k chybě při vkládání nového typu kluzáku"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:32
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:33
 msgid "Glider type edit error"
 msgstr "Došlo k chybě při editaci typu kluzáku"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:33
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:34
 msgid "Glider type delete error"
 msgstr "Došlo k chybě při mazání typu kluzáku"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:48
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:156
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:50
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:226
 msgid "Weight non-lifting"
 msgstr "Hmotnost nevztlakových částí"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:49
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:157
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:51
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:227
 msgid "MTOW without water"
 msgstr "MTOW bez vody"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:51
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:159
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:53
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:229
 msgid "Weight referential"
 msgstr "Referenční hmotnost"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:56
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:164
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:58
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:22
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:47
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:55
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:26
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:234
 msgid "Description"
 msgstr "Popis"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:68
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:175
+#: /home/seifert/zdrojaky/python/igcweight/src/form_igchandicap.py:70
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:245
 msgid "Glider type"
 msgstr "Typ kluzáku"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/form_main.py:33
+#: /home/seifert/zdrojaky/python/igcweight/src/form_main.py:40
 msgid "This program is licensed under GNU General Public License version 2"
 msgstr "Tento program je šířen za podmínek GNU General Public License verze 2"
 
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:17
+msgid "Organizations or countries"
+msgstr "Organizace/země"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:21
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:44
+msgid "Code"
+msgstr "Kód"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:29
+msgid "Organization insert error"
+msgstr "Došlo k chybě při vkládání nové organizace/země"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:30
+msgid "Organization edit error"
+msgstr "Došlo k chybě při změně organizace/země"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:31
+msgid "Organization delete error"
+msgstr "Došlo k chybě při mazání organizace/země"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_organizations.py:59
+msgid "Organization/Country"
+msgstr "Organizace/země"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:17
+msgid "Pilots"
+msgstr "Piloti"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:20
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:45
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:16
+msgid "Degree"
+msgstr "Titul"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:22
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:47
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:18
+msgid "Surname"
+msgstr "Příjmení"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:23
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:51
 #: /home/seifert/zdrojaky/python/igcweight/src/forms.py:22
+msgid "Year of birth"
+msgstr "Rok narození"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:24
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:52
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:23
+msgid "Sex"
+msgstr "Pohlaví"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:31
+msgid "Pilot insert error"
+msgstr "Došlo k chybě při vkládání nového pilota"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:32
+msgid "Pilot edit error"
+msgstr "Došlo k chybě při změně pilota"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:33
+msgid "Pilot delete error"
+msgstr "Došlo k chybě při mazání pilota"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/form_pilots.py:67
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:37
+msgid "Pilot"
+msgstr "Pilot"
+
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:92
 msgid "E&xit\tAlt-F4"
 msgstr "&Konec\tAlt-F4"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:22
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:92
 msgid "Exit application"
 msgstr "Ukončit aplikaci"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:24
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:94
 msgid "&File"
 msgstr "&Soubor"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:26
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:96
 msgid "&IGC handicap list..."
 msgstr "IGC &koeficienty..."
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:26
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:96
 msgid "Edit gliders and IGC handicap list"
 msgstr "Editovat IGC seznam koeficientů"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:28
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:98
 msgid "&Pilots..."
 msgstr "&Piloti..."
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:28
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:98
 msgid "Edit pilots list"
 msgstr "Editovat seznam pilotů"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:30
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:100
 msgid "&Organizations or countries..."
 msgstr "&Organizace/země..."
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:30
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:100
 msgid "Edit organizations or coutries list"
 msgstr "Editovat seznam organizací nebo zemí"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:32
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:102
 msgid "&Edit"
 msgstr "Ú&pravy"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:34
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:67
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:104
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:137
 msgid "Add new glider"
 msgstr "Přidat nový kluzák"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:36
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:106
 msgid "&Properties..."
 msgstr "&Vlastnosti..."
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:36
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:68
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:106
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:138
 msgid "Edit glider properties"
 msgstr "Editovat kluzák"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:38
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:108
 msgid "&Delete"
 msgstr "&Smazat"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:38
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:69
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:108
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:139
 msgid "Delete glider"
 msgstr "Smazat kluzák"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:40
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:110
 msgid "&Gliders"
 msgstr "&Kluzáky"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:42
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:112
 msgid "&About\tF1"
 msgstr "&O aplikaci\tF1"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:42
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:112
 msgid "About this application"
 msgstr "Informace o aplikaci 'IGC Weight'"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:44
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:114
 msgid "&Help"
 msgstr "&Nápověda"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:61
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:131
 msgid "IGC Weight"
 msgstr ""
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:112
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:182
 msgid "Model"
 msgstr ""
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:114
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:184
 msgid "Add new item"
 msgstr "Přidat nový záznam"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:116
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:186
 msgid "Edit item"
 msgstr "Editovat záznam"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:118
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:188
 msgid "Delete item"
 msgstr "Smazat záznam"
 
-#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:121
+#: /home/seifert/zdrojaky/python/igcweight/src/forms.py:191
 msgid "Close window"
 msgstr "Zavřít okno"
 

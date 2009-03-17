@@ -8,13 +8,13 @@ from wx import GetTranslation as _
 import settings
 
 def error_message_dialog(parent, message, exception=None):
-    " error_message_dialog(parent, message, exception=None) - show error message dialog "
+    " error_message_dialog(Window parent, str message, Exception exception=None) - show error message dialog "
     if settings.DEBUG and exception != None:
-        message += "\n\n%s" % str(exception)
+        message += "\n\n%s" % exception
     wx.MessageBox( message, _("Error"), wx.OK | wx.ICON_ERROR, parent )
 
 class VirtualListCtrl(wx.ListCtrl):
-    " VirtualListCtrl(self, parent, id) "
+    " VirtualListCtrl(self, Window parent, int id=-1) "
     def __init__(self, parent, id):
         wx.ListCtrl.__init__(self, parent=parent, id=id, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_SINGLE_SEL|wx.SUNKEN_BORDER)
         
@@ -30,7 +30,7 @@ class VirtualListCtrl(wx.ListCtrl):
         self.Bind(wx.EVT_SIZE, self.__OnResize)
     
     def InsertColumn(self, col, heading, fieldname, format=wx.LIST_FORMAT_LEFT, proportion=1):
-        " InsertColumn(self, col, heading, fieldname, format=wx.LIST_FORMAT_LEFT, proportion=0) "
+        " InsertColumn(self, long col, str heading, str fieldname, int format=wx.LIST_FORMAT_LEFT, int proportion=0) "
         if proportion < 1:
             raise ValueError("'width' attribute must be least then 0")
         self.__columns[col] = { 'proportion': proportion, 'fieldname': fieldname }
@@ -40,7 +40,7 @@ class VirtualListCtrl(wx.ListCtrl):
         self.GetEventHandler().ProcessEvent( wx.SizeEvent( self.GetSize() ) )
     
     def __OnResize(self, evt):
-        " Re-count grid columns size "
+        " __OnResize(self, Event evt) - re-count grid columns size "
         if self.__column_sum > 0:
             # Get client size
             client_w = self.GetClientSize().width
@@ -60,10 +60,10 @@ class VirtualListCtrl(wx.ListCtrl):
         evt.Skip()
 
     def OnGetItemText(self, item, col):
-        " Get column data from datasource "
+        " OnGetItemText(self, int item, int col) -> str - get column data from datasource "
         return self.datasource[item].column_as_str( self.__columns[col]['fieldname'] )
     
     @property
     def current_item(self):
-        " current_item(self) - return currently selected item "
+        " current_item(self) -> db item - return currently selected item "
         return self.GetSelectedItemCount()==1 and self.datasource[ self.GetFocusedItem() ] or None

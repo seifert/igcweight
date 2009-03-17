@@ -12,6 +12,7 @@ from widgets import error_message_dialog
 class DialogModel(forms.DialogModel):
     " IGC handicap list dialog "
     def __init__(self, *args, **kwargs):
+        " __init__(self, Window parent, int id=-1) "
         forms.DialogModel.__init__(self, *args, **kwargs)
         
         self.__edit_dialog = None
@@ -49,11 +50,11 @@ class DialogModel(forms.DialogModel):
     
     @property
     def datasource(self):
-        " datasource(self) - get datasource "
+        " datasource(self) -> list of db items (SQLAlchemy query) "
         return getattr(self.list_ctrl, 'datasource', None)
     @datasource.setter
     def datasource(self, value):
-        " datasource(self, value) - set datasource "
+        " datasource(self, list value) - set datasource, value is SQLAlchemy query "
         self.list_ctrl.datasource = value
         count = len(self.datasource)
         if count > 0:            
@@ -64,11 +65,11 @@ class DialogModel(forms.DialogModel):
     
     @property
     def edit_dialog(self):
-        " edit_dialog(self) - get edit dialog class "
+        " edit_dialog(self) -> Window class - get edit dialog class "
         return self.__edit_dialog
     @edit_dialog.setter
     def edit_dialog(self, value):
-        " edit_dialog(self, value) - set edit dialog class "
+        " edit_dialog(self, Window class value) - set edit dialog class "
         self.__edit_dialog = value
         self.__set_enabled_disabled()
 
@@ -89,7 +90,7 @@ class DialogModel(forms.DialogModel):
             self.button_delete.Enable(False)
     
     def __popup_menu(self, evt):
-        " __on_popup_menu(self, evt) - show pop-up menu "
+        " __on_popup_menu(self, Event evt) - show pop-up menu "
         self.menu_new.Enable( self.button_new.IsEnabled() )
         self.menu_properties.Enable( self.button_properties.IsEnabled() )
         self.menu_delete.Enable( self.button_delete.IsEnabled() )
@@ -98,12 +99,12 @@ class DialogModel(forms.DialogModel):
         self.PopupMenu( self.menu_popup, pos )
     
     def __list_ctrl_left_click(self, evt):
-        " __list_ctrl_left_click(self, evt) "
+        " __list_ctrl_left_click(self, Event evt) "
         self.__set_enabled_disabled()
         evt.Skip()
 
     def __exit(self, evt):
-        " Exit(self, evt) - close button event handler "
+        " Exit(self, Event evt) - close button event handler "
         self.OnExit()
 
     def OnExit(self):
@@ -111,7 +112,7 @@ class DialogModel(forms.DialogModel):
         self.Close()
 
     def __new(self, evt):
-        " __new(self, evt) - new button event handler "
+        " __new(self, Event evt) - new button event handler "
         self.OnNew()
 
     def OnNew(self):
@@ -142,7 +143,7 @@ class DialogModel(forms.DialogModel):
             dlg.Destroy()
 
     def __properties(self, evt):
-        " __properties(self, evt) - properties button event handler "
+        " __properties(self, Event evt) - properties button event handler "
         self.OnProperties()
 
     def OnProperties(self):
@@ -167,7 +168,7 @@ class DialogModel(forms.DialogModel):
             dlg.Destroy()
 
     def __delete(self, evt):
-        " __delete(self, evt) - delete button event handler "
+        " __delete(self, Event evt) - delete button event handler "
         self.OnDelete()
 
     def OnDelete(self):
@@ -176,8 +177,8 @@ class DialogModel(forms.DialogModel):
             return
         record = self.list_ctrl.current_item
         if wx.MessageDialog(self,
-                            _("Are you sure to delete %s?") % record.name,
-                            _("Delete %s?") % record.name,
+                            _("Are you sure to delete %s?") % record,
+                            _("Delete %s?") % record,
                             wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
                            ).ShowModal() == wx.ID_YES:
             try:

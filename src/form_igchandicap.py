@@ -11,6 +11,7 @@ from models import GliderType
 class IgcHandicapList(form_dialogmodel.DialogModel):
     " IGC handicap list dialog "
     def __init__(self, *args, **kwargs):
+        " __init__(self, Window parent, int id=-1) "
         form_dialogmodel.DialogModel.__init__(self, *args, **kwargs)
 
         self.SetTitle( _("IGC handicap list") )
@@ -39,6 +40,7 @@ class IgcHandicapList(form_dialogmodel.DialogModel):
 class IgcHandicapForm(wx.Dialog):
     " IGC handicat insert/edit dialog "
     def __init__(self, *args, **kwds):
+        " __init__(self, Window parent, int id=-1) "
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
         wx.Dialog.__init__(self, *args, **kwds)
         self.label_name = wx.StaticText(self, -1, _("Name"))
@@ -109,7 +111,7 @@ class IgcHandicapForm(wx.Dialog):
         self.Layout()
     
     def GetData(self):
-        " Get cleaned form data "
+        " GetData(self) -> GliderType - get cleaned form data "
         if hasattr(self, 'glidertype'):
             glidertype = self.glidertype
         else:
@@ -124,7 +126,7 @@ class IgcHandicapForm(wx.Dialog):
         return glidertype
     
     def SetData(self, glidertype):
-        " Set form data "
+        " SetData(self, glidertype) - set form data "
         self.glidertype = glidertype
         self.text_name.Value = glidertype.column_as_str('name')
         self.text_coefficient.Value = glidertype.column_as_str('coefficient')
