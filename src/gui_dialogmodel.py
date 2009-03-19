@@ -4,16 +4,16 @@ import wx
 from wx import GetTranslation as _
 
 import settings
-import forms
+import gui_forms
 
 from database import session
-from widgets import error_message_dialog
+from gui_widgets import error_message_dialog
 
-class DialogModel(forms.DialogModel):
+class DialogModel(gui_forms.DialogModel):
     " IGC handicap list dialog "
     def __init__(self, *args, **kwargs):
         " __init__(self, Window parent, int id=-1) "
-        forms.DialogModel.__init__(self, *args, **kwargs)
+        gui_forms.DialogModel.__init__(self, *args, **kwargs)
         
         self.__edit_dialog = None
         self.message_insert_error = _("Insert error")

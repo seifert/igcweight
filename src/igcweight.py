@@ -18,7 +18,7 @@ if __name__ == '__main__':
     
     wx.InitAllImageHandlers()
 
-    from form_main import Main
+    from gui_main import Main
     main = Main(None, -1, "")
     app.SetTopWindow(main)
     main.Show()

@@ -3,23 +3,23 @@
 import wx
 from wx import GetTranslation as _
 
-import forms
+import gui_forms
 import settings
 
 from sqlalchemy.orm import eagerload
 
 from database import session
 from models import GliderCard, Pilot, Organization, GliderType, Photo
-from widgets import error_message_dialog
-from form_igchandicap import IgcHandicapList
-from form_organizations import OrganizationList
-from form_pilots import PilotList
+from gui_widgets import error_message_dialog
+from gui_igchandicap import IgcHandicapList
+from gui_organizations import OrganizationList
+from gui_pilots import PilotList
 
-class Main(forms.Main):
+class Main(gui_forms.Main):
     " Main application window "
     def __init__(self, *args, **kwargs):
         " __init__(self, Window parent, int id=-1) "
-        forms.Main.__init__(self, *args, **kwargs)
+        gui_forms.Main.__init__(self, *args, **kwargs)
         
         self.__sort_glider_card = 0
 

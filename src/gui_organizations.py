@@ -3,16 +3,16 @@
 import wx
 from wx import GetTranslation as _
 
-import form_dialogmodel
+import gui_dialogmodel
 
 from database import session
 from models import Organization
 
-class OrganizationList(form_dialogmodel.DialogModel):
+class OrganizationList(gui_dialogmodel.DialogModel):
     " Organizations or countries list dialog "
     def __init__(self, *args, **kwargs):
         " __init__(self, Window parent, int id=-1) "
-        form_dialogmodel.DialogModel.__init__(self, *args, **kwargs)
+        gui_dialogmodel.DialogModel.__init__(self, *args, **kwargs)
 
         self.SetTitle( _("Organizations or countries") )
         

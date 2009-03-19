@@ -4,7 +4,7 @@ import wx
 
 # begin wxGlade: extracode
 from wx import GetTranslation as _
-from widgets import VirtualListCtrl
+from gui_widgets import VirtualListCtrl
 # end wxGlade
 
 
