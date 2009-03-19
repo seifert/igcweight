@@ -5,7 +5,7 @@ import decimal
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Table, MetaData, Column
-from sqlalchemy import Integer, SmallInteger, String, Text, Date, Numeric, CHAR, ForeignKey, Sequence
+from sqlalchemy import Integer, SmallInteger, String, Text, Date, Numeric, Boolean, CHAR, ForeignKey, Sequence
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy.orm import relation, backref
 
@@ -26,6 +26,8 @@ Base = declarative_base()
 
 
 class Organization(Base):
+    " Model Organization "
+    
     __table__ = Table('organization', Base.metadata,
         Column( 'organization_id', Integer, Sequence('organization_seq', optional=True), key='id', nullable=False ),
         Column( 'name', String(50), nullable=False ),
@@ -66,15 +68,18 @@ class Organization(Base):
         setattr( self, columnname, value )
 
     def GetDescription(self, length=50):
-        " GetDescription(self, int length=50) -: str - get short description "
+        " GetDescription(self, int length=50) -> str - get short description "
         return get_short_description(self.description, length)
     
     @property
     def short_description(self):
+        " Return short description, max. length is 50 chars "
         return self.GetDescription()
 
 
 class Pilot(Base):
+    " Model Pilot "
+
     __table__ = Table('pilot', Base.metadata,
         Column( 'pilot_id', Integer, Sequence('pilot_seq', optional=True), key='id', nullable=False ),
         Column( 'degree', String(15) ),
@@ -124,21 +129,32 @@ class Pilot(Base):
     @property
     def fullname(self):
         " fullname(self) -> str - get fullname Degree Firstname Surname "
+        fullanme = "%s %s" % (self.firstname, self.surname)
         if self.degree != None:
-            return "%s %s %s" % (self.degree, self.firstname, self.surname)
-        else:
-            return "%s %s" % (self.firstname, self.surname)
+            fullanme = "%s %s" % (self.degree, fullanme)
+        return fullanme
+    
+    @property
+    def fullname_rev(self):
+        " fullname_rev(self) -> str - get fullname Surname Firstname Degree "
+        fullanme = "%s %s" % (self.surname, self.firstname)
+        if self.degree != None:
+            fullanme = "%s %s" % (fullanme, self.degree)
+        return fullanme
 
     def GetDescription(self, length=50):
-        " GetDescription(self, int length=50) -: str - get short description "
+        " GetDescription(self, int length=50) -> str - get short description "
         return get_short_description(self.description, length)
     
     @property
     def short_description(self):
+        " Return short description, max. length is 50 chars "
         return self.GetDescription()
 
 
 class GliderType(Base):
+    " Model GliderType "
+
     __table__ = Table('glider_type', Base.metadata,
         Column( 'glider_type_id', Integer, Sequence('glider_type_seq', optional=True), key='id', nullable=False ),
         Column( 'name', String(50), nullable=False ),
@@ -175,7 +191,7 @@ class GliderType(Base):
             return ''
         elif columnname in ('weight_non_lifting', 'mtow_without_water', 'mtow', 'weight_referential'):
             return locale.format("%d", value)
-        if columnname == 'coefficient':
+        elif columnname == 'coefficient':
             return locale.format("%.2f", value)
         else:
             return value
@@ -192,48 +208,135 @@ class GliderType(Base):
         setattr( self, columnname, value )
     
     def GetDescription(self, length=50):
-        " GetDescription(self, int length=50) -: str - get short description "
+        " GetDescription(self, int length=50) -> str - get short description "
         return get_short_description(self.description, length)
     
     @property
     def short_description(self):
+        " Return short description, max. length is 50 chars "
         return self.GetDescription()
 
 
-#class Glider(Base):
-#    __table__ = Table('glider', Base.metadata,
-#        Column( 'glider_id', Integer, Sequence('glider_seq', optional=True), key='id', nullable=False ),
-#        Column( 'registration', String(10), nullable=False ),
-#        Column( 'competition_number', String(3), nullable=False ),
-#        Column( 'glider_type_id', Integer, nullable=False ),
-#        Column( 'description', Text ),
-#        PrimaryKeyConstraint( 'id', name='pk_glider' ),
-#        ForeignKeyConstraint( ('glider_type_id',), ('glider_type.id',), name='fk_glider_glider_type' ),
-#        UniqueConstraint( 'registration', name='uq_glider_registration' ),
-#        UniqueConstraint( 'competition_number', name='uq_glider_competition_number' )
-#    )
-#
-#    glider_type = relation( GliderType, order_by=GliderType.name, backref='glider_type' )
-#
-#    def __init__(self, **kwargs):
-#        """ Glider(self, str registration=None, str competition_number=None,
-#        GliderType glider_type=None, str description=None) """
-#        for key in kwargs.keys():
-#            if hasattr(self, key):
-#                setattr(self, key, kwargs[key])
-#            else:
-#                raise AttributeError( "'%s' object has no attribute '%s'" % (self.__class__.__name__, key) )
-#        
-#    def __repr__(self):
-#        return "<Glider: #%s, '%s'>" % ( str(self.id), self.registration )
-#    
-#    def GetDescription(self, length=50):
-#        " GetDescription(self, int length=50) -: str - get short description "
-#        return __get_short_destcription(self.description, length)
-#    
-#    @property
-#    def short_description(self):
-#        return self.GetDescription()
+class Photo(Base):
+    " Model Photo "
+
+    __table__ = Table('photo', Base.metadata,
+        Column( 'photo_id', Integer, Sequence('photo_seq', optional=True), key='id', nullable=False ),
+        Column( 'glider_card_id', Integer, nullable=False ),
+        Column( 'main', Boolean, nullable=False ),
+        Column( 'description', Text ),
+        PrimaryKeyConstraint( 'id', name='pk_photo' ),
+        ForeignKeyConstraint( ('glider_card_id',), ('glider_card.id',), name='fk_photo_glider_card' )
+    )
+
+    def __init__(self, **kwargs):
+        " Photo(self, GliderCard glider_card=None, bool main=None, str description=None) "
+        for key in kwargs.keys():
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
+            else:
+                raise AttributeError( "'%s' object has no attribute '%s'" % (self.__class__.__name__, key) )
+        
+    def __repr__(self):
+        return "<Photo: #%s, %s>" % ( str(self.id), self.glider_card )
+    
+    def __unicode__(self):
+        return "%d - %s" % ( str(self.id), self.glider_card )
+
+    def column_as_str(self, columnname):
+        " column_as_str(self, str columnname) -> str - return column value as string "
+        value = getattr( self, columnname )
+        
+        if value == None:
+            return ''
+        elif columnname == 'main':
+            return value == True and _("True") or _("False")
+        else:
+            return value
+    
+    def str_to_column(self, columnname, value):
+        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
+        if value == '':
+            value = None
+        setattr( self, columnname, value )
+    
+    def GetDescription(self, length=50):
+        " GetDescription(self, int length=50) -> str - get short description "
+        return __get_short_destcription(self.description, length)
+    
+    @property
+    def short_description(self):
+        " Return short description, max. length is 50 chars "
+        return self.GetDescription()
+
+
+class GliderCard(Base):
+    " Model GliderCard "
+
+    __table__ = Table('glider_card', Base.metadata,
+        Column( 'glider_card_id', Integer, Sequence('glider_card_seq', optional=True), key='id', nullable=False ),
+        Column( 'registration', String(10), nullable=False ),
+        Column( 'competition_number', String(5), nullable=False ),
+        Column( 'glider_type_id', Integer, nullable=False ),
+        Column( 'pilot_id', Integer, nullable=False ),
+        Column( 'organization_id', Integer, nullable=False ),
+        Column( 'landing_gear', Boolean, nullable=False ),
+        Column( 'winglets', Boolean, nullable=False ),
+        Column( 'description', Text ),
+        PrimaryKeyConstraint( 'id', name='pk_glider_card' ),
+        ForeignKeyConstraint( ('glider_type_id',), ('glider_type.id',), name='fk_glider_card_glider_type' ),
+        ForeignKeyConstraint( ('pilot_id',), ('pilot.id',), name='fk_glider_card_pilot' ),
+        ForeignKeyConstraint( ('organization_id',), ('organization.id',), name='fk_glider_card_organization' ),
+        UniqueConstraint( 'registration', name='uq_glider_card_registration' ),
+        UniqueConstraint( 'competition_number', name='uq_glider_card_competition_number' ),
+        UniqueConstraint( 'pilot_id', name='uq_glider_card_pilot' )
+    )
+
+    glider_type = relation( GliderType, order_by=GliderType.name, backref='glider_type' )
+    pilot = relation( Pilot, order_by=Pilot.surname, backref='pilot' )
+    organization = relation( Organization, order_by=Organization.name, backref='organization' )
+    photos = relation(Photo, backref=backref('photo', order_by='id'))
+
+    def __init__(self, **kwargs):
+        """ GliderCard(self, str registration=None, str competition_number=None, GliderType glider_type=None,
+        Pilot pilot=None, Organization organization=None, str description=None) """
+        for key in kwargs.keys():
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
+            else:
+                raise AttributeError( "'%s' object has no attribute '%s'" % (self.__class__.__name__, key) )
+        
+    def __repr__(self):
+        return "<GliderCard: #%s, '%s', '%s'>" % ( str(self.id), self.registration, self.competition_number )
+    
+    def __unicode__(self):
+        return "%s, %s" % ( self.registration, self.competition_number )
+
+    def column_as_str(self, columnname):
+        " column_as_str(self, str columnname) -> str - return column value as string "
+        value = getattr( self, columnname )
+        
+        if value == None:
+            return ''
+        elif columnname in ('landing_gear', 'winglets'):
+            return value == True and _("True") or _("False")
+        else:
+            return value
+    
+    def str_to_column(self, columnname, value):
+        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
+        if value == '':
+            value = None
+        setattr( self, columnname, value )
+    
+    def GetDescription(self, length=50):
+        " GetDescription(self, int length=50) -> str - get short description "
+        return __get_short_destcription(self.description, length)
+    
+    @property
+    def short_description(self):
+        " Return short description, max. length is 50 chars "
+        return self.GetDescription()
 
 
 from database import engine

@@ -25,7 +25,7 @@ class IgcHandicapList(form_dialogmodel.DialogModel):
         self.list_ctrl.InsertColumn(5, _("Referential w."), 'weight_referential', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         
         # Open data source
-        self.datasource = session.query( GliderType ).order_by( GliderType.name ).all()
+        self.datasource = session.query( GliderType ).all()
         # Assign edit dialog
         self.edit_dialog = IgcHandicapForm
         # Assign error messages

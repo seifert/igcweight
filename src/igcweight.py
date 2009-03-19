@@ -3,9 +3,9 @@
 
 " Main program module "
 
-from os.path import abspath, dirname, join
+from os.path import join
 
-BASE_DIR = abspath( join(dirname(__file__), '..') )
+from settings import BASE_DIR
 
 if __name__ == '__main__':
     

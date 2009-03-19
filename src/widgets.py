@@ -39,6 +39,10 @@ class VirtualListCtrl(wx.ListCtrl):
         # Re-count columns - call self.__OnResize
         self.GetEventHandler().ProcessEvent( wx.SizeEvent( self.GetSize() ) )
     
+    def GetColumnFieldName(self, col):
+        " InsertColumn(self, long col) -> str - get column db field name "
+        return self.__columns[col]['fieldname']
+    
     def __OnResize(self, evt):
         " __OnResize(self, Event evt) - re-count grid columns size "
         if self.__column_sum > 0:

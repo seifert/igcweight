@@ -17,9 +17,8 @@ class OrganizationList(form_dialogmodel.DialogModel):
         self.SetTitle( _("Organizations or countries") )
         
         # Set grid columns
-        self.list_ctrl.InsertColumn(0, _("Name"), 'name', proportion=3)
+        self.list_ctrl.InsertColumn(0, _("Name"), 'name', proportion=4)
         self.list_ctrl.InsertColumn(1, _("Code"), 'code', proportion=1)
-        self.list_ctrl.InsertColumn(2, _("Description"), 'short_description', proportion=3)
         
         # Open data source
         self.datasource = session.query( Organization ).order_by( Organization.name ).all()
@@ -56,7 +55,7 @@ class OrganizationForm(wx.Dialog):
         self.CenterOnParent()
 
     def __set_properties(self):
-        self.SetTitle(_("Organization/Country"))
+        self.SetTitle(_("Organization or country"))
         fontbold = self.label_name.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
         self.label_name.SetFont(fontbold)

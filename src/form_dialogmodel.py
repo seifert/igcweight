@@ -40,6 +40,7 @@ class DialogModel(forms.DialogModel):
         self.list_ctrl.Bind( wx.EVT_CONTEXT_MENU, self.__popup_menu )
         self.list_ctrl.Bind( wx.EVT_LEFT_UP, self.__list_ctrl_left_click )
         self.list_ctrl.Bind( wx.EVT_LEFT_DCLICK, self.__properties )
+        self.Bind( wx.EVT_LIST_COL_CLICK, self.__sort_datasource, self.list_ctrl )
         self.Bind( wx.EVT_BUTTON, self.__exit, self.button_close )
         self.Bind( wx.EVT_BUTTON, self.__new, self.button_new )
         self.Bind( wx.EVT_BUTTON, self.__properties, self.button_properties )
@@ -57,7 +58,8 @@ class DialogModel(forms.DialogModel):
         " datasource(self, list value) - set datasource, value is SQLAlchemy query "
         self.list_ctrl.datasource = value
         count = len(self.datasource)
-        if count > 0:            
+        if count > 0:
+            self.Sort(0)
             self.list_ctrl.SetItemCount(count)
             self.list_ctrl.Select(0)
             self.list_ctrl.Focus(0)
@@ -102,6 +104,27 @@ class DialogModel(forms.DialogModel):
         " __list_ctrl_left_click(self, Event evt) "
         self.__set_enabled_disabled()
         evt.Skip()
+    
+    def __sort_datasource(self, evt):
+        " __sort_datasource(self, evt) - sort datasource, left-click column tile event handler "
+        self.Sort( evt.m_col )
+    
+    def Sort(self, col):
+        " Sort(self, long col) - sort list ctrl "
+        if self.datasource != None:
+            count = len(self.datasource)
+            if count > 0:
+                colname = self.list_ctrl.GetColumnFieldName( col )
+                current_item = self.list_ctrl.current_item
+                self.list_ctrl.SetItemCount(0)
+                self.datasource.sort( lambda a, b: cmp( a.column_as_str(colname).upper(), b.column_as_str(colname).upper() ) )
+                if current_item == None:
+                    i = 0
+                else:
+                    i = self.datasource.index(current_item)
+                self.list_ctrl.SetItemCount(count)
+                self.list_ctrl.Select(i)
+                self.list_ctrl.Focus(i)
 
     def __exit(self, evt):
         " Exit(self, Event evt) - close button event handler "
