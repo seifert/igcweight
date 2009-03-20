@@ -10,7 +10,8 @@ import settings
 def error_message_dialog(parent, message, exception=None):
     " error_message_dialog(Window parent, str message, Exception exception=None) - show error message dialog "
     if settings.DEBUG and exception != None:
-        message += "\n\n%s" % exception
+        if len(exception.args) > 0:
+               message += "\n\n%s" % exception.args[0]
     wx.MessageBox( message, _("Error"), wx.OK | wx.ICON_ERROR, parent )
 
 class VirtualListCtrl(wx.ListCtrl):
