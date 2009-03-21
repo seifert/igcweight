@@ -49,12 +49,10 @@ class DialogModel(gui_forms.DialogModel):
         self.Bind( wx.EVT_MENU, self.__properties, self.menu_properties )
         self.Bind( wx.EVT_MENU, self.__delete, self.menu_delete )
     
-    @property
-    def datasource(self):
+    def get_datasource(self):
         " datasource(self) -> list of db items (SQLAlchemy query) "
         return getattr(self.list_ctrl, 'datasource', None)
-    @datasource.setter
-    def datasource(self, value):
+    def set_datasource(self, value):
         " datasource(self, list value) - set datasource, value is SQLAlchemy query "
         self.list_ctrl.datasource = value
         count = len(self.datasource)
@@ -64,16 +62,16 @@ class DialogModel(gui_forms.DialogModel):
             self.list_ctrl.Select(0)
             self.list_ctrl.Focus(0)
         self.__set_enabled_disabled()
+    datasource = property(get_datasource, set_datasource)
     
-    @property
-    def edit_dialog(self):
+    def get_edit_dialog(self):
         " edit_dialog(self) -> Window class - get edit dialog class "
         return self.__edit_dialog
-    @edit_dialog.setter
-    def edit_dialog(self, value):
+    def set_edit_dialog(self, value):
         " edit_dialog(self, Window class value) - set edit dialog class "
         self.__edit_dialog = value
         self.__set_enabled_disabled()
+    edit_dialog = property(get_edit_dialog, set_edit_dialog)
 
     def __set_enabled_disabled(self):
         " __set_enabled_disabled(self) - enable or disable controls "

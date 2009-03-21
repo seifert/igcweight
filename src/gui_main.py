@@ -51,12 +51,10 @@ class Main(gui_forms.Main):
         self.Bind(wx.EVT_MENU, self.Organizations, self.menu_organizations)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__sort_glider_card_list, self.list_glider_card)
     
-    @property
-    def datasource_glider_card(self):
+    def get_datasource_glider_card(self):
         " datasource_glider_card(self) -> list of db items (SQLAlchemy query) "
         return getattr(self.list_glider_card, 'datasource', None)
-    @datasource_glider_card.setter
-    def datasource_glider_card(self, value):
+    def set_datasource_glider_card(self, value):
         " datasource_glider_card(self, list value) - set datasource, value is SQLAlchemy query "
         self.list_glider_card.datasource = value
         count = len(self.datasource_glider_card)
@@ -66,6 +64,7 @@ class Main(gui_forms.Main):
             self.list_glider_card.Select(0)
             self.list_glider_card.Focus(0)
         self.__set_enabled_disabled()
+    datasource_glider_card = property(get_datasource_glider_card, set_datasource_glider_card)
     
     def __set_enabled_disabled(self):
         " __set_enabled_disabled(self) - enable or disable controls "
