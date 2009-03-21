@@ -7,21 +7,33 @@ from os.path import join
 
 from settings import BASE_DIR
 
-if __name__ == '__main__':
+def main():
+    " main() - start application "
     
     import wx
     app = wx.App()
 
-    mylocale = wx.Locale(wx.LANGUAGE_DEFAULT)
-    mylocale.AddCatalogLookupPathPrefix( join(BASE_DIR, 'locale') )
-    mylocale.AddCatalog('igcweight')
+    try:
+        
+        mylocale = wx.Locale(wx.LANGUAGE_DEFAULT)
+        mylocale.AddCatalogLookupPathPrefix( join(BASE_DIR, 'locale') )
+        mylocale.AddCatalog('igcweight')
+        
+        wx.InitAllImageHandlers()
     
-    wx.InitAllImageHandlers()
+        from gui_main import Main
+        main = Main(None, -1, "")
+        app.SetTopWindow(main)
+        main.Show()
+    
+        app.SetAppName( main.GetTitle() )
+        app.MainLoop()
+        
+    except Exception, e:
+        from gui_widgets import error_message_dialog
+        from wx import GetTranslation as _
+        
+        error_message_dialog(None, _("Some error during starting application"), e)
 
-    from gui_main import Main
-    main = Main(None, -1, "")
-    app.SetTopWindow(main)
-    main.Show()
-    
-    app.SetAppName( main.GetTitle() )
-    app.MainLoop()
+if __name__ == '__main__':
+    main()
