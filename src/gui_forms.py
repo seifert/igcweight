@@ -8,6 +8,95 @@ from gui_widgets import VirtualListCtrl
 # end wxGlade
 
 
+class GliderCardForm(wx.Dialog):
+    def __init__(self, *args, **kwds):
+        # begin wxGlade: GliderCardForm.__init__
+        kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
+        wx.Dialog.__init__(self, *args, **kwds)
+        self.sizer_picture_staticbox = wx.StaticBox(self, -1, _("Picture"))
+        self.label_registration = wx.StaticText(self, -1, _("Registration"))
+        self.label_competition_number = wx.StaticText(self, -1, _("Competition number"))
+        self.text_ctrl_registration = wx.TextCtrl(self, -1, "")
+        self.text_ctrl_competition_number = wx.TextCtrl(self, -1, "")
+        self.label_glider_type = wx.StaticText(self, -1, _("Glider type"))
+        self.combo_box_glider_type = wx.ComboBox(self, -1, choices=[], style=wx.CB_DROPDOWN|wx.CB_DROPDOWN|wx.CB_READONLY)
+        self.button_add_glide_type = wx.Button(self, -1, _("Add..."), style=wx.BU_EXACTFIT)
+        self.label_pilot = wx.StaticText(self, -1, _("Pilot"))
+        self.combo_box_pilot = wx.ComboBox(self, -1, choices=[], style=wx.CB_DROPDOWN|wx.CB_DROPDOWN|wx.CB_READONLY)
+        self.button_pilot = wx.Button(self, -1, _("Add..."), style=wx.BU_EXACTFIT)
+        self.label_organization = wx.StaticText(self, -1, _("Organization or country"))
+        self.combo_box_organization = wx.ComboBox(self, -1, choices=[], style=wx.CB_DROPDOWN|wx.CB_DROPDOWN|wx.CB_READONLY)
+        self.button_organization = wx.Button(self, -1, _("Add..."), style=wx.BU_EXACTFIT)
+        self.checkbox_winglets = wx.CheckBox(self, -1, _("Winglets"))
+        self.checkbox_gear = wx.CheckBox(self, -1, _("Landing gear"))
+        self.picture = wx.StaticBitmap(self, -1)
+        self.button_open_picture = wx.Button(self, wx.ID_OPEN, "")
+        self.button_clear_picture = wx.Button(self, wx.ID_CLEAR, "")
+        self.label_description = wx.StaticText(self, -1, _("Description"))
+        self.text_description = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE|wx.TE_WORDWRAP)
+        self.button_ok = wx.Button(self, wx.ID_OK, "")
+        self.button_cancel = wx.Button(self, wx.ID_CANCEL, "")
+
+        self.__set_properties()
+        self.__do_layout()
+        # end wxGlade
+
+    def __set_properties(self):
+        # begin wxGlade: GliderCardForm.__set_properties
+        self.SetTitle(_("Glider card"))
+        self.button_add_glide_type.SetToolTipString(_("Add glider type"))
+        self.button_pilot.SetToolTipString(_("Add pilot"))
+        self.button_organization.SetToolTipString(_("Add organization or country"))
+        self.button_open_picture.SetToolTipString(_("Open picture from file"))
+        self.button_clear_picture.SetToolTipString(_("Clear picture"))
+        self.button_ok.SetDefault()
+        # end wxGlade
+
+    def __do_layout(self):
+        # begin wxGlade: GliderCardForm.__do_layout
+        sizer_main = wx.BoxSizer(wx.VERTICAL)
+        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_description = wx.BoxSizer(wx.VERTICAL)
+        sizer_glider_card = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_picture = wx.StaticBoxSizer(self.sizer_picture_staticbox, wx.VERTICAL)
+        sizer_picture_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_data = wx.FlexGridSizer(9, 3, 2, 2)
+        sizer_data.Add(self.label_registration, 0, wx.RIGHT|wx.EXPAND, 2)
+        sizer_data.Add(self.label_competition_number, 0, wx.LEFT|wx.EXPAND, 2)
+        sizer_data.Add(self.text_ctrl_registration, 0, wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.text_ctrl_competition_number, 0, wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.label_glider_type, 0, wx.RIGHT|wx.EXPAND, 2)
+        sizer_data.Add(self.combo_box_glider_type, 0, wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.button_add_glide_type, 0, wx.LEFT|wx.BOTTOM, 2)
+        sizer_data.Add(self.label_pilot, 0, wx.RIGHT|wx.EXPAND, 2)
+        sizer_data.Add(self.combo_box_pilot, 0, wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.button_pilot, 0, wx.LEFT|wx.BOTTOM, 2)
+        sizer_data.Add(self.label_organization, 0, wx.RIGHT|wx.EXPAND, 2)
+        sizer_data.Add(self.combo_box_organization, 0, wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.button_organization, 0, wx.LEFT|wx.BOTTOM, 2)
+        sizer_data.Add(self.checkbox_winglets, 0, wx.RIGHT|wx.EXPAND, 2)
+        sizer_data.Add(self.checkbox_gear, 0, wx.LEFT|wx.EXPAND, 2)
+        sizer_glider_card.Add(sizer_data, 2, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
+        sizer_picture.Add(self.picture, 1, wx.EXPAND, 0)
+        sizer_picture_buttons.Add(self.button_open_picture, 1, wx.RIGHT|wx.EXPAND, 2)
+        sizer_picture_buttons.Add(self.button_clear_picture, 1, wx.LEFT|wx.EXPAND, 2)
+        sizer_picture.Add(sizer_picture_buttons, 0, wx.ALL|wx.EXPAND, 4)
+        sizer_glider_card.Add(sizer_picture, 1, wx.EXPAND, 0)
+        sizer_main.Add(sizer_glider_card, 0, wx.LEFT|wx.RIGHT|wx.EXPAND, 4)
+        sizer_description.Add(self.label_description, 0, wx.BOTTOM|wx.EXPAND, 2)
+        sizer_description.Add(self.text_description, 1, wx.BOTTOM|wx.EXPAND, 2)
+        sizer_main.Add(sizer_description, 1, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
+        sizer_buttons.Add(self.button_ok, 0, wx.RIGHT, 2)
+        sizer_buttons.Add(self.button_cancel, 0, wx.LEFT, 2)
+        sizer_main.Add(sizer_buttons, 0, wx.ALL|wx.ALIGN_RIGHT, 4)
+        self.SetSizer(sizer_main)
+        sizer_main.Fit(self)
+        self.Layout()
+        # end wxGlade
+
+# end of class GliderCardForm
+
+
 class PilotForm(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: PilotForm.__init__
