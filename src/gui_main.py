@@ -69,18 +69,25 @@ class Main(gui_forms.Main):
     def __set_enabled_disabled(self):
         " __set_enabled_disabled(self) - enable or disable controls "
         if self.datasource_glider_card != None:
-            self.button_glider_card_new.Enable(True)
+            glider_card_new = True
             count = len(self.datasource_glider_card)
             if count > 0 and self.list_glider_card.current_item:            
-                self.button_glider_card_properties.Enable(True)
-                self.button_glider_card_delete.Enable(True)
+                glider_card_properties = True
+                glider_card_delete = True
             else:
-                self.button_glider_card_properties.Enable(False)
-                self.button_glider_card_delete.Enable(False)
+                glider_card_properties = False
+                glider_card_delete =  False
         else:
-            self.button_glider_card_new.Enable(False)
-            self.button_glider_card_properties.Enable(False)
-            self.button_glider_card_delete.Enable(False)
+            glider_card_new = False
+            glider_card_properties = False
+            glider_card_delete = False
+            
+        self.button_glider_card_new.Enable(glider_card_new)
+        self.menu_glider_card_new.Enable(glider_card_new)
+        self.button_glider_card_properties.Enable(glider_card_properties)
+        self.menu_glider_card_properties.Enable(glider_card_properties)
+        self.button_glider_card_delete.Enable(glider_card_delete)
+        self.menu_glider_card_delete.Enable(glider_card_delete)
     
     def __list_glider_card_popup_menu(self, evt):
         " __list_glider_popup_menu(self, Event evt) - show pop-up menu "

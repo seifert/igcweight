@@ -75,19 +75,26 @@ class DialogModel(gui_forms.DialogModel):
 
     def __set_enabled_disabled(self):
         " __set_enabled_disabled(self) - enable or disable controls "
-        if self.datasource != None and self.edit_dialog != None:
-            self.button_new.Enable(True)
-            count = len(self.list_ctrl.datasource)
+        if self.datasource != None:
+            new = True
+            count = len(self.datasource)
             if count > 0 and self.list_ctrl.current_item:            
-                self.button_properties.Enable(True)
-                self.button_delete.Enable(True)
+                properties = True
+                delete = True
             else:
-                self.button_properties.Enable(False)
-                self.button_delete.Enable(False)
+                properties = False
+                delete =  False
         else:
-            self.button_new.Enable(False)
-            self.button_properties.Enable(False)
-            self.button_delete.Enable(False)
+            new = False
+            properties = False
+            delete = False
+            
+        self.button_new.Enable(new)
+        self.menu_new.Enable(new)
+        self.button_properties.Enable(properties)
+        self.menu_properties.Enable(properties)
+        self.button_delete.Enable(delete)
+        self.menu_delete.Enable(delete)
     
     def __popup_menu(self, evt):
         " __on_popup_menu(self, Event evt) - show pop-up menu "
@@ -134,12 +141,11 @@ class DialogModel(gui_forms.DialogModel):
 
     def __new(self, evt):
         " __new(self, Event evt) - new button event handler "
-        self.OnNew()
+        if self.button_new.IsEnabled():
+            self.OnNew()
 
     def OnNew(self):
         " OnNew(self) - add new record "
-        if not self.button_new.IsEnabled():
-            return
         dlg = self.edit_dialog(self)
         try:
             while True:
@@ -165,12 +171,11 @@ class DialogModel(gui_forms.DialogModel):
 
     def __properties(self, evt):
         " __properties(self, Event evt) - properties button event handler "
-        self.OnProperties()
+        if self.button_properties.IsEnabled():
+            self.OnProperties()
 
     def OnProperties(self):
         " OnProperties(self) - edit record "
-        if not self.button_properties.IsEnabled():
-            return
         dlg = self.edit_dialog(self)
         try:
             record = self.list_ctrl.current_item
@@ -190,12 +195,11 @@ class DialogModel(gui_forms.DialogModel):
 
     def __delete(self, evt):
         " __delete(self, Event evt) - delete button event handler "
-        self.OnDelete()
+        if self.button_delete.IsEnabled():
+            self.OnDelete()
 
     def OnDelete(self):
         " OnDelete(self) - delete record "
-        if not self.button_delete.IsEnabled():
-            return
         record = self.list_ctrl.current_item
         if wx.MessageDialog(self,
                             _("Are you sure to delete %s?") % record,
