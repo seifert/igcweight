@@ -33,8 +33,8 @@ class Main(gui_forms.Main):
         # Set grid columns
         self.list_glider_card.InsertColumn(0, _("Nr."), 'competition_number', proportion=1)
         self.list_glider_card.InsertColumn(1, _("Registration"), 'registration', proportion=3)
-        self.list_glider_card.InsertColumn(2, _("Glider type"), 'glider_type.name', proportion=3)
-        self.list_glider_card.InsertColumn(3, _("Pilot"), 'pilot.fullname_rev', proportion=4)
+        self.list_glider_card.InsertColumn(2, _("Glider type"), 'glider_type', proportion=3)
+        self.list_glider_card.InsertColumn(3, _("Pilot"), 'pilot', proportion=4)
 
         # Open data source
         self.BASE_QUERY = session.query( GliderCard ).options( eagerload('pilot') ).options( eagerload('glider_type') )
@@ -181,17 +181,70 @@ class Main(gui_forms.Main):
         " GliderCardNew(self, Event evt=None) - add new glider card event handler "
         dlg = GliderCardForm(self)
         try:
-            dlg.ShowModal()
+            while True:
+                try:
+                    if dlg.ShowModal() == wx.ID_OK:
+                        try:
+                            record = dlg.GetData()
+                            session.add(record)
+                            session.commit()
+                            self.datasource_glider_card.append(record)
+                            count = len(self.datasource_glider_card)
+                            self.list_glider_card.SetItemCount(count)
+                            self.list_glider_card.Select(count-1)
+                            self.list_glider_card.Focus(count-1)
+                        finally:
+                            self.__set_enabled_disabled()
+                    break
+                except Exception, e:
+                    session.rollback()
+                    error_message_dialog( self, _("Glider card insert error"), e )
         finally:
             dlg.Destroy()
 
     def GliderCardProperties(self, evt=None):
         " GliderCardProperties(self, Event evt=None) - edit glider card event handler "
-        print "delete"
+        dlg = GliderCardForm(self)
+        try:
+            record = self.list_glider_card.current_item
+            dlg.SetData(record)
+            while True:
+                try:
+                    if dlg.ShowModal() == wx.ID_OK:
+                        record = dlg.GetData()
+                        session.commit()
+                        self.list_glider_card.RefreshItem( self.list_glider_card.GetFocusedItem() )
+                    break
+                except Exception, e:
+                    session.rollback()
+                    error_message_dialog( self, _("Glider card edit error"), e )
+        finally:
+            dlg.Destroy()
 
     def GliderCardDelete(self, evt=None):
         " GliderCardDelete(self, Event evt=None) - delete glider card event handler "
-        print "delete"
+        record = self.list_glider_card.current_item
+        if wx.MessageDialog(self,
+                            _("Are you sure to delete %s?") % record,
+                            _("Delete %s?") % record,
+                            wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
+                           ).ShowModal() == wx.ID_YES:
+            try:
+                i = self.datasource_glider_card.index(record)
+                try:
+                    session.delete(record)
+                    session.commit()
+                    del( self.datasource_glider_card[i] )
+                    i = i - 1
+                    i = i >= 0 and i or 0
+                    self.list_glider_card.SetItemCount( len(self.datasource_glider_card) )
+                    self.list_glider_card.Select(i)
+                    self.list_glider_card.Focus(i)
+                finally:
+                    self.__set_enabled_disabled()
+            except Exception, e:
+                session.rollback()
+                error_message_dialog( self, _("Glider card delete error"), e )
 
 class GliderCardForm(wx.Dialog):
     def __init__(self, *args, **kwds):
@@ -348,4 +401,4 @@ class GliderCardForm(wx.Dialog):
         if glidercard.pilot != None:
             self.combo_pilot.SetSelection( self.pilot_items.index( glidercard.pilot ) )
         if glidercard.organization != None:
-            self.combo_organization.SetSelection( self.organization_type_items.index( glidercard.organization ) )
+            self.combo_organization.SetSelection( self.organization_items.index( glidercard.organization ) )
