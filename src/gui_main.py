@@ -290,8 +290,9 @@ class GliderCardForm(wx.Dialog):
         sizer_description.Add(self.label_description, 0, wx.BOTTOM|wx.EXPAND, 2)
         sizer_description.Add(self.text_description, 1, wx.BOTTOM|wx.EXPAND, 2)
         # Dialog buttons sizer
-        sizer_buttons.Add(self.button_ok, 0, wx.RIGHT, 2)
-        sizer_buttons.Add(self.button_cancel, 0, wx.LEFT, 2)
+        sizer_buttons.AddButton(self.button_ok)
+        sizer_buttons.AddButton(self.button_cancel)
+        sizer_buttons.Realize()
         
         sizer_glider_card.Add(sizer_data, 1, wx.RIGHT|wx.TOP|wx.EXPAND, 4)
         sizer_glider_card.Add(sizer_photo, 0, wx.LEFT|wx.TOP|wx.EXPAND, 4)
@@ -329,16 +330,22 @@ class GliderCardForm(wx.Dialog):
         glidercard.str_to_column( 'description', self.text_description.Value )
         glidercard.landing_gear = self.checkbox_gear.Value
         glidercard.winglets = self.checkbox_winglets.Value
-        glidercard.glider_type = self.combo_glider_type.CurrentSelection >= 0 and self.glider_type_items[self.combo_glider_type.CurrentSelection] or None
-        glidercard.pilot = self.combo_pilot.CurrentSelection >= 0 and self.pilot_items[self.combo_pilot.CurrentSelection] or None
-        glidercard.organization = self.combo_organization.CurrentSelection >= 0 and self.organization_items[self.combo_organization.CurrentSelection] or None
+        glidercard.glider_type = self.combo_glider_type.CurrentSelection >= 0 and self.glider_type_items[ self.combo_glider_type.CurrentSelection ] or None
+        glidercard.pilot = self.combo_pilot.CurrentSelection >= 0 and self.pilot_items[ self.combo_pilot.CurrentSelection ] or None
+        glidercard.organization = self.combo_organization.CurrentSelection >= 0 and self.organization_items[ self.combo_organization.CurrentSelection ] or None
         return glidercard
     
-    def SetData(self, glidertype):
+    def SetData(self, glidercard):
         " SetData(self, glidercard) - set form data "
         self.glidercard = glidercard
-        self.text_registration.Value = glidertype.column_as_str('registration')
-        self.text_competition_number.Value = glidertype.column_as_str('competition_number')
-        self.text_description.Value = glidertype.column_as_str('bescription')
+        self.text_registration.Value = glidercard.column_as_str('registration')
+        self.text_competition_number.Value = glidercard.column_as_str('competition_number')
+        self.text_description.Value = glidercard.column_as_str('description')
         self.checkbox_gear.Value = glidercard.landing_gear != None and glidercard.landing_gear or False 
         self.checkbox_winglets.Value = glidercard.winglets !=None and glidercard.winglets or False
+        if glidercard.glider_type != None:
+            self.combo_glider_type.SetSelection( self.glider_type_items.index( glidercard.glider_type ) )
+        if glidercard.pilot != None:
+            self.combo_pilot.SetSelection( self.pilot_items.index( glidercard.pilot ) )
+        if glidercard.organization != None:
+            self.combo_organization.SetSelection( self.organization_type_items.index( glidercard.organization ) )
