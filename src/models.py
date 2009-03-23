@@ -3,6 +3,8 @@
 import locale
 import decimal
 
+from datetime import date
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Table, MetaData, Column
 from sqlalchemy import Integer, SmallInteger, String, Text, Date, Numeric, Boolean, CHAR, ForeignKey, Sequence
@@ -122,7 +124,7 @@ class Pilot(Base):
         " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
         if value == '':
             value = None
-        elif columnname in ('age',):
+        elif columnname in ('year_of_birth',):
             value = locale.atoi(value)
         setattr( self, columnname, value )
     
