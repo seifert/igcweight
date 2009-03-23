@@ -277,6 +277,10 @@ class GliderCardForm(wx.Dialog):
 
         self.__set_properties()
         self.__do_layout()
+
+        # Bind events
+        self.Bind(wx.EVT_TEXT, self.__text_ctrl_change, self.text_registration)
+        self.Bind(wx.EVT_TEXT, self.__text_ctrl_change, self.text_competition_number)
         
         self.SetSize( (750, 450) )
         self.SetMinSize( self.GetSize() )
@@ -298,7 +302,10 @@ class GliderCardForm(wx.Dialog):
         self.label_organization.SetFont(fontbold)
         
         self.photo.SetMinSize( (250, -1) )
-        
+
+        self.text_registration.SetMaxLength(10)
+        self.text_competition_number.SetMaxLength(5)
+
         self.button_add_glider_type.SetToolTipString(_("Add glider type"))
         self.button_add_pilot.SetToolTipString(_("Add pilot"))
         self.button_add_organization.SetToolTipString(_("Add organization or country"))
@@ -374,7 +381,13 @@ class GliderCardForm(wx.Dialog):
         self.organization_items = session.query( Organization ).all()
         self.organization_items.sort( lambda a, b: cmp( a.name.upper(), b.name.upper() ) )
         self.combo_organization.SetItems( [ "%s, %s" % (i.name, i.code,) for i in self.organization_items ] )
-    
+        
+    def __text_ctrl_change(self, evt):
+        " __text_ctrl_change(self, evt) - text control  content change event handler "
+        ctrl = self.FindWindowById( evt.Id )
+        ctrl.ChangeValue( ctrl.GetValue().upper() )
+#        ctrl.SetInsertionPointEnd()
+        
     def GetData(self):
         " GetData(self) -> GliderCard - get cleaned form data "
         glidercard = getattr( self, 'glidercard', GliderCard() )

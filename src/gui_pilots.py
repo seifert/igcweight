@@ -59,19 +59,31 @@ class PilotForm(wx.Dialog):
 
         self.__set_properties()
         self.__do_layout()
+
+        # Bind events
+        self.Bind(wx.EVT_TEXT, self.__text_ctrl_change, self.text_sex)
         
         self.SetMinSize(self.GetSize())
         self.CenterOnParent()
 
     def __set_properties(self):
         self.SetTitle(_("Pilot"))
+        
         fontbold = self.label_firstname.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
         self.label_firstname.SetFont(fontbold)
         self.label_surname.SetFont(fontbold)
+        
         self.text_degree.SetMinSize((100,-1))
         self.text_name.SetMinSize((200,-1))
         self.text_surname.SetMinSize((200,-1))
+        
+        self.text_degree.SetMaxLength(15)
+        self.text_name.SetMaxLength(24)
+        self.text_surname.SetMaxLength(35)
+        self.text_year_of_birth.SetMaxLength(4)
+        self.text_sex.SetMaxLength(1)
+        
         self.text_degree.SetFocus()
         self.button_ok.SetDefault()
 
@@ -108,6 +120,12 @@ class PilotForm(wx.Dialog):
         self.SetSizer(sizer_main)
         sizer_main.Fit(self)
         self.Layout()
+        
+    def __text_ctrl_change(self, evt):
+        " __text_ctrl_change(self, evt) - text control  content change event handler "
+        ctrl = self.FindWindowById( evt.Id )
+        ctrl.ChangeValue( ctrl.GetValue().upper() )
+#        ctrl.SetInsertionPointEnd()
     
     def GetData(self):
         " GetData(self) -> Pilot - get cleaned form data "

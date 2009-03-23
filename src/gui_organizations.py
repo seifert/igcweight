@@ -50,18 +50,27 @@ class OrganizationForm(wx.Dialog):
 
         self.__set_properties()
         self.__do_layout()
+
+        # Bind events
+        self.Bind(wx.EVT_TEXT, self.__text_ctrl_change, self.text_code)
         
         self.SetMinSize(self.GetSize())
         self.CenterOnParent()
 
     def __set_properties(self):
         self.SetTitle(_("Organization or country"))
+        
         fontbold = self.label_name.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
         self.label_name.SetFont(fontbold)
         self.label_code.SetFont(fontbold)
+        
         self.text_name.SetMinSize((400,-1))
         self.text_code.SetMinSize((100,-1))
+        
+        self.text_name.SetMaxLength(50)
+        self.text_code.SetMaxLength(4)
+        
         self.text_name.SetFocus()
         self.button_ok.SetDefault()
 
@@ -86,6 +95,12 @@ class OrganizationForm(wx.Dialog):
         self.SetSizer(sizer_main)
         sizer_main.Fit(self)
         self.Layout()
+        
+    def __text_ctrl_change(self, evt):
+        " __text_ctrl_change(self, evt) - text control  content change event handler "
+        ctrl = self.FindWindowById( evt.Id )
+        ctrl.ChangeValue( ctrl.GetValue().upper() )
+#        ctrl.SetInsertionPointEnd()
     
     def GetData(self):
         " GetData(self) -> Organization - get cleaned form data "

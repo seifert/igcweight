@@ -68,14 +68,19 @@ class IgcHandicapForm(wx.Dialog):
 
     def __set_properties(self):
         self.SetTitle(_("Glider type"))
+        
         fontbold = self.label_name.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
         self.label_name.SetFont(fontbold)
         self.label_coefficient.SetFont(fontbold)
+        
         self.text_weight_non_lifting.SetMinSize((150,-1))
         self.text_mtow_without_water.SetMinSize((150,-1))
         self.text_mtow.SetMinSize((150,-1))
         self.text_weight_referential.SetMinSize((150,-1))
+
+        self.text_name.SetMaxLength(50)
+
         self.text_name.SetFocus()
         self.button_ok.SetDefault()
 
