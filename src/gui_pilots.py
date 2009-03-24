@@ -122,10 +122,14 @@ class PilotForm(wx.Dialog):
         self.Layout()
         
     def __text_ctrl_change(self, evt):
-        " __text_ctrl_change(self, evt) - text control  content change event handler "
-        ctrl = self.FindWindowById( evt.Id )
-        ctrl.ChangeValue( ctrl.GetValue().upper() )
-#        ctrl.SetInsertionPointEnd()
+        " __text_ctrl_change(self, evt) - upper case value in the text control "
+        ctrl = evt.GetEventObject()
+        old = ctrl.GetValue()
+        new = old.upper()
+        if old != new:
+            ctrl.ChangeValue(new)
+            ctrl.SetInsertionPointEnd()
+        evt.Skip()
     
     def GetData(self):
         " GetData(self) -> Pilot - get cleaned form data "
