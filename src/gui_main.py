@@ -11,9 +11,9 @@ from sqlalchemy.orm import eagerload
 from database import session
 from models import GliderCard, Pilot, Organization, GliderType, Photo
 from gui_widgets import error_message_dialog
-from gui_igchandicap import IgcHandicapList
-from gui_organizations import OrganizationList
-from gui_pilots import PilotList
+from gui_igchandicap import IgcHandicapList, IgcHandicapForm, GLIDER_TYPE_INSERT_ERROR
+from gui_organizations import OrganizationList, OrganizationForm, ORGANIZATION_INSERT_ERROR
+from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
 
 class Main(gui_forms.Main):
     " Main application window "
@@ -247,6 +247,7 @@ class Main(gui_forms.Main):
                 error_message_dialog( self, _("Glider card delete error"), e )
 
 class GliderCardForm(wx.Dialog):
+    " Glider card insert/edit dialog "
     def __init__(self, *args, **kwds):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
         wx.Dialog.__init__(self, *args, **kwds)
@@ -281,17 +282,23 @@ class GliderCardForm(wx.Dialog):
         # Bind events
         self.Bind(wx.EVT_TEXT, self.__text_ctrl_change, self.text_registration)
         self.Bind(wx.EVT_TEXT, self.__text_ctrl_change, self.text_competition_number)
+        self.Bind(wx.EVT_BUTTON, self.__add_glider_type, self.button_add_glider_type)
+        self.Bind(wx.EVT_BUTTON, self.__add_pilot, self.button_add_pilot)
+        self.Bind(wx.EVT_BUTTON, self.__add_organization, self.button_add_organization)
         
-        self.SetSize( (750, 450) )
-        self.SetMinSize( self.GetSize() )
-        self.CenterOnParent()
-        
+        # Init combo-box data sources
+        self.glider_type_items = session.query( GliderType ).all()
+        self.pilot_items = session.query( Pilot ).all()
+        self.organization_items = session.query( Organization ).all()
+        # Fill combo-boxes
         self.__init_combo_glider_type()
         self.__init_combo_pilot()
         self.__init_combo_organization()
 
     def __set_properties(self):
         self.SetTitle(_("Glider card"))
+        self.SetSize( (750, 450) )
+        self.SetMinSize( self.GetSize() )
         
         fontbold = self.label_registration.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
@@ -363,22 +370,21 @@ class GliderCardForm(wx.Dialog):
         self.SetSizer(sizer_main)
         sizer_main.Fit(self)
         self.Layout()
+        self.CenterOnParent()
 
     def __init_combo_glider_type(self):
         " __init_combo_glider_type(self) - load data into combo_box_glider_type "
-        self.glider_type_items = session.query( GliderType ).all()
         self.glider_type_items.sort( lambda a, b: cmp( a.name.upper(), b.name.upper() ) )
+        self.combo_glider_type.Clear()
         self.combo_glider_type.SetItems( [ i.name for i in self.glider_type_items ] )
 
     def __init_combo_pilot(self):
         " __init_combo_pilot(self) - load data into combo_box_pilot "
-        self.pilot_items = session.query( Pilot ).all()
         self.pilot_items.sort( lambda a, b: cmp( a.fullname_rev.upper(), b.fullname_rev.upper() ) )
         self.combo_pilot.SetItems( [ i.fullname for i in self.pilot_items ] )
 
     def __init_combo_organization(self):
         " __init_combo_organization(self) - load data into combo_box_organization "
-        self.organization_items = session.query( Organization ).all()
         self.organization_items.sort( lambda a, b: cmp( a.name.upper(), b.name.upper() ) )
         self.combo_organization.SetItems( [ "%s, %s" % (i.name, i.code,) for i in self.organization_items ] )
         
@@ -391,6 +397,66 @@ class GliderCardForm(wx.Dialog):
             ctrl.ChangeValue(new)
             ctrl.SetInsertionPointEnd()
         evt.Skip()
+        
+    def __add_glider_type(self, evt):
+        " __add_glider_type(self, evt) - add new glider type event handler "
+        dlg = IgcHandicapForm(self)
+        try:
+            while True:
+                try:
+                    if dlg.ShowModal() == wx.ID_OK:
+                        record = dlg.GetData()
+                        session.add(record)
+                        session.commit()
+                        self.glider_type_items.append(record)
+                        self.__init_combo_glider_type()
+                        self.combo_glider_type.SetSelection( self.glider_type_items.index(record) )
+                    break
+                except Exception, e:
+                    session.rollback()
+                    error_message_dialog( self, GLIDER_TYPE_INSERT_ERROR, e )
+        finally:
+            dlg.Destroy()
+        
+    def __add_pilot(self, evt):
+        " __add_pilot(self, evt) - add new pilot event handler "
+        dlg = PilotForm(self)
+        try:
+            while True:
+                try:
+                    if dlg.ShowModal() == wx.ID_OK:
+                        record = dlg.GetData()
+                        session.add(record)
+                        session.commit()
+                        self.pilot_items.append(record)
+                        self.__init_combo_pilot()
+                        self.combo_pilot.SetSelection( self.pilot_items.index(record) )
+                    break
+                except Exception, e:
+                    session.rollback()
+                    error_message_dialog( self, PILOT_INSERT_ERROR, e )
+        finally:
+            dlg.Destroy()
+        
+    def __add_organization(self, evt):
+        " __add_organization(self, evt) - add new organization event handler "
+        dlg = OrganizationForm(self)
+        try:
+            while True:
+                try:
+                    if dlg.ShowModal() == wx.ID_OK:
+                        record = dlg.GetData()
+                        session.add(record)
+                        session.commit()
+                        self.organization_items.append(record)
+                        self.__init_combo_organization()
+                        self.combo_organization.SetSelection( self.organization_items.index(record) )
+                    break
+                except Exception, e:
+                    session.rollback()
+                    error_message_dialog( self, ORGANIZATION_INSERT_ERROR, e )
+        finally:
+            dlg.Destroy()
         
     def GetData(self):
         " GetData(self) -> GliderCard - get cleaned form data "

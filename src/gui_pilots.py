@@ -8,6 +8,10 @@ import gui_dialogmodel
 from database import session
 from models import Pilot
 
+PILOT_INSERT_ERROR = _("Pilot insert error")
+PILOT_EDIT_ERROR   = _("Pilot edit error")
+PILOT_DELETE_ERROR = _("Pilot delete error")
+
 class PilotList(gui_dialogmodel.DialogModel):
     " Pilots list dialog "
     def __init__(self, *args, **kwargs):
@@ -28,9 +32,9 @@ class PilotList(gui_dialogmodel.DialogModel):
         # Assign edit dialog
         self.edit_dialog = PilotForm
         # Assign error messages
-        self.message_insert_error = _("Pilot insert error")
-        self.message_edit_error   = _("Pilot edit error")
-        self.message_delete_error = _("Pilot delete error")
+        self.message_insert_error = PILOT_INSERT_ERROR
+        self.message_edit_error   = PILOT_EDIT_ERROR
+        self.message_delete_error = PILOT_DELETE_ERROR
 
         self.SetSize( (750, 450) )
         self.SetMinSize( self.GetSize() )
@@ -62,9 +66,6 @@ class PilotForm(wx.Dialog):
 
         # Bind events
         self.Bind(wx.EVT_TEXT, self.__text_ctrl_change, self.text_sex)
-        
-        self.SetMinSize(self.GetSize())
-        self.CenterOnParent()
 
     def __set_properties(self):
         self.SetTitle(_("Pilot"))
@@ -120,6 +121,8 @@ class PilotForm(wx.Dialog):
         self.SetSizer(sizer_main)
         sizer_main.Fit(self)
         self.Layout()
+        self.SetMinSize(self.GetSize())
+        self.CenterOnParent()
         
     def __text_ctrl_change(self, evt):
         " __text_ctrl_change(self, evt) - upper case value in the text control "

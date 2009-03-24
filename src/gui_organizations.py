@@ -8,6 +8,10 @@ import gui_dialogmodel
 from database import session
 from models import Organization
 
+ORGANIZATION_INSERT_ERROR = _("Organization insert error")
+ORGANIZATION_EDIT_ERROR   = _("Organization edit error")
+ORGANIZATION_DELETE_ERROR = _("Organization delete error")
+
 class OrganizationList(gui_dialogmodel.DialogModel):
     " Organizations or countries list dialog "
     def __init__(self, *args, **kwargs):
@@ -25,9 +29,9 @@ class OrganizationList(gui_dialogmodel.DialogModel):
         # Assign edit dialog
         self.edit_dialog = OrganizationForm
         # Assign error messages
-        self.message_insert_error = _("Organization insert error")
-        self.message_edit_error   = _("Organization edit error")
-        self.message_delete_error = _("Organization delete error")
+        self.message_insert_error = ORGANIZATION_INSERT_ERROR
+        self.message_edit_error   = ORGANIZATION_EDIT_ERROR
+        self.message_delete_error = ORGANIZATION_DELETE_ERROR
 
         self.SetSize( (750, 450) )
         self.SetMinSize( self.GetSize() )
@@ -53,9 +57,6 @@ class OrganizationForm(wx.Dialog):
 
         # Bind events
         self.Bind(wx.EVT_TEXT, self.__text_ctrl_change, self.text_code)
-        
-        self.SetMinSize(self.GetSize())
-        self.CenterOnParent()
 
     def __set_properties(self):
         self.SetTitle(_("Organization or country"))
@@ -95,6 +96,8 @@ class OrganizationForm(wx.Dialog):
         self.SetSizer(sizer_main)
         sizer_main.Fit(self)
         self.Layout()
+        self.SetMinSize(self.GetSize())
+        self.CenterOnParent()
         
     def __text_ctrl_change(self, evt):
         " __text_ctrl_change(self, evt) - upper case value in the text control "

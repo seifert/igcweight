@@ -8,6 +8,10 @@ import gui_dialogmodel
 from database import session
 from models import GliderType
 
+GLIDER_TYPE_INSERT_ERROR = _("Glider type insert error")
+GLIDER_TYPE_EDIT_ERROR   = _("Glider type edit error")
+GLIDER_TYPE_DELETE_ERROR = _("Glider type delete error")
+
 class IgcHandicapList(gui_dialogmodel.DialogModel):
     " IGC handicap list dialog "
     def __init__(self, *args, **kwargs):
@@ -29,9 +33,9 @@ class IgcHandicapList(gui_dialogmodel.DialogModel):
         # Assign edit dialog
         self.edit_dialog = IgcHandicapForm
         # Assign error messages
-        self.message_insert_error = _("Glider type insert error")
-        self.message_edit_error   = _("Glider type edit error")
-        self.message_delete_error = _("Glider type delete error")
+        self.message_insert_error = GLIDER_TYPE_INSERT_ERROR
+        self.message_edit_error   = GLIDER_TYPE_EDIT_ERROR
+        self.message_delete_error = GLIDER_TYPE_DELETE_ERROR
 
         self.SetSize( (750, 450) )
         self.SetMinSize( self.GetSize() )
@@ -63,9 +67,6 @@ class IgcHandicapForm(wx.Dialog):
         self.__set_properties()
         self.__do_layout()
         
-        self.SetMinSize(self.GetSize())
-        self.CenterOnParent()
-
     def __set_properties(self):
         self.SetTitle(_("Glider type"))
         
@@ -115,6 +116,8 @@ class IgcHandicapForm(wx.Dialog):
         self.SetSizer(sizer_main)
         sizer_main.Fit(self)
         self.Layout()
+        self.SetMinSize(self.GetSize())
+        self.CenterOnParent()
     
     def GetData(self):
         " GetData(self) -> GliderType - get cleaned form data "
