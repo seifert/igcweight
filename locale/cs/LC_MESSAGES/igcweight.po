@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGC Weight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-23 09:15+0100\n"
-"PO-Revision-Date: 2009-03-23 09:15+0100\n"
+"POT-Creation-Date: 2009-03-24 09:56+0100\n"
+"PO-Revision-Date: 2009-03-24 09:57+0100\n"
 "Last-Translator: Jan Seifert <jan.seifert@centrumholdings.com>\n"
 "Language-Team: JS <jan.seifert@fotkyzcest.net>\n"
 "MIME-Version: 1.0\n"
@@ -65,17 +65,17 @@ msgid "Competition number"
 msgstr "Startovní číslo"
 
 #: gui_forms.py:21
-#: gui_main.py:206
+#: gui_main.py:259
 msgid "Glider type"
 msgstr "Typ kluzáku"
 
 #: gui_forms.py:23
-#: gui_main.py:211
+#: gui_main.py:264
 msgid "Add..."
 msgstr "Přidat..."
 
 #: gui_forms.py:24
-#: gui_pilots.py:67
+#: gui_pilots.py:70
 msgid "Pilot"
 msgstr "Pilot"
 
@@ -92,7 +92,7 @@ msgid "Landing gear"
 msgstr "Zatahovací podvozek"
 
 #: gui_forms.py:35
-#: gui_main.py:220
+#: gui_main.py:273
 msgid "Description"
 msgstr "Popis"
 
@@ -306,6 +306,18 @@ msgstr "Ukončit?"
 msgid "This program is licensed under GNU General Public License version 2"
 msgstr "Tento program je šířen za podmínek GNU General Public License verze 2"
 
+#: gui_main.py:201
+msgid "Glider card insert error"
+msgstr "Došlo k chybě při vkládání nové karty kluzáku"
+
+#: gui_main.py:220
+msgid "Glider card edit error"
+msgstr "Došlo k chybě při editaci karty kluzáku"
+
+#: gui_main.py:247
+msgid "Glider card delete error"
+msgstr "Došlo k chybě při mazání karty kluzáku"
+
 #: gui_organizations.py:17
 msgid "Organizations or countries"
 msgstr "Organizace nebo země"
@@ -350,11 +362,11 @@ msgstr "Chyba"
 msgid "Some error during starting application"
 msgstr "Došlo k chybě během spouštění aplikace"
 
-#: models.py:253
+#: models.py:255
 msgid "True"
 msgstr "Ano"
 
-#: models.py:253
+#: models.py:255
 msgid "False"
 msgstr "Ne"
 
