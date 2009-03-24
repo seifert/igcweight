@@ -3,6 +3,7 @@
 import locale
 import decimal
 
+from os.path import join
 from datetime import date
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -11,6 +12,7 @@ from sqlalchemy import Integer, SmallInteger, String, Text, Date, Numeric, Boole
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy.orm import relation, backref
 
+from settings import PHOTOS_DIR
 
 def get_short_description(description, length):
     " get_short_description(str description, int length) -> str - get short description "
@@ -268,8 +270,13 @@ class Photo(Base):
     
     @property
     def short_description(self):
-        " Return short description, max. length is 50 chars "
+        " Return shorts description, max. length is 50 chars "
         return self.GetDescription()
+    
+    @property
+    def full_path(self):
+        " Returns photo full path "
+        return join( PHOTOS_DIR, "%08d.jpg" % self.id )
 
 
 class GliderCard(Base):
