@@ -304,7 +304,7 @@ class GliderCard(Base):
     glider_type = relation( GliderType, order_by=GliderType.name, backref='glider_type' )
     pilot = relation( Pilot, order_by=Pilot.surname, backref='pilot' )
     organization = relation( Organization, order_by=Organization.name, backref='organization' )
-    photos = relation(Photo, backref=backref('photo', order_by='id'))
+    photos = relation(Photo, backref=backref('photo', order_by='id'), cascade="all, delete, delete-orphan")
 
     def __init__(self, **kwargs):
         """ GliderCard(self, str registration=None, str competition_number=None, GliderType glider_type=None,

@@ -118,7 +118,6 @@ class Main(gui_forms.Main):
     
     def SortGliderCardList(self, col):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
-        # TODO: blbne razeni pilota a typu kluzaku
         if self.datasource_glider_card != None:
             count = len(self.datasource_glider_card)
             if count > 0:
@@ -188,16 +187,19 @@ class Main(gui_forms.Main):
         try:
             while True:
                 try:
+                    dlg.SetData( GliderCard() )
                     if dlg.ShowModal() == wx.ID_OK:
                         try:
                             record = dlg.GetData()
+                            session.add(record)
+                            
                             # TODO: improve adding new photo
                             if dlg.is_photo_changed:
                                 main_photo = Photo(main=True)
                                 record.photos.append(main_photo)
                                 session.flush()
                                 copy( dlg.photo_fullpath, main_photo.full_path )
-                            session.add(record)
+                            
                             session.commit()
                             self.datasource_glider_card.append(record)
                             count = len(self.datasource_glider_card)
@@ -225,7 +227,8 @@ class Main(gui_forms.Main):
                 try:
                     if dlg.ShowModal() == wx.ID_OK:
                         record = dlg.GetData()
-                        # TODO: improve
+                        
+                        # TODO: improve change or delete photo
                         if dlg.is_photo_changed:
                             # Delete old photo
                             if main_photo != None:
@@ -240,6 +243,7 @@ class Main(gui_forms.Main):
                                 record.photos.append(main_photo)
                                 session.flush()
                                 copy( dlg.photo_fullpath, main_photo.full_path )
+                        
                         session.commit()
                         self.list_glider_card.RefreshItem( self.list_glider_card.GetFocusedItem() )
                     break
@@ -260,15 +264,13 @@ class Main(gui_forms.Main):
             try:
                 i = self.datasource_glider_card.index(record)
                 try:
-                    # TODO: delete photos
+                    # TODO: improve delete photos
                     photos_path = [ photo.full_path for photo in record.photos ]
-                    photos = [ photo for photo in record.photos ]
-                    for photo in photos:
-                        session.delete(photo)
                     session.delete(record)
                     session.flush()
                     for path in photos_path:
                         remove(path)
+                    
                     session.commit()
                     del( self.datasource_glider_card[i] )
                     i = i - 1
