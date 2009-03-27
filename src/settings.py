@@ -32,4 +32,4 @@ DB_USERNAME = ''
 DB_PASSWORD = ''
 DB_ARGS     = {}
 
-VERSION = '0.3'
+VERSION = '0.4'
