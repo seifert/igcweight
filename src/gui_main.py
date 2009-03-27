@@ -1,5 +1,9 @@
 " GUI - Main window "
 
+from os import remove
+from os.path import join, isfile
+from shutil import copy
+
 import wx
 from wx import GetTranslation as _
 
@@ -114,6 +118,7 @@ class Main(gui_forms.Main):
     
     def SortGliderCardList(self, col):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
+        # TODO: blbne razeni pilota a typu kluzaku
         if self.datasource_glider_card != None:
             count = len(self.datasource_glider_card)
             if count > 0:
@@ -186,6 +191,12 @@ class Main(gui_forms.Main):
                     if dlg.ShowModal() == wx.ID_OK:
                         try:
                             record = dlg.GetData()
+                            # TODO: improve adding new photo
+                            if dlg.is_photo_changed:
+                                main_photo = Photo(main=True)
+                                record.photos.append(main_photo)
+                                session.flush()
+                                copy( dlg.photo_fullpath, main_photo.full_path )
                             session.add(record)
                             session.commit()
                             self.datasource_glider_card.append(record)
@@ -207,11 +218,28 @@ class Main(gui_forms.Main):
         dlg = GliderCardForm(self)
         try:
             record = self.list_glider_card.current_item
+            main_photo = record.main_photo
+            # Put data into dialog
             dlg.SetData(record)
             while True:
                 try:
                     if dlg.ShowModal() == wx.ID_OK:
                         record = dlg.GetData()
+                        # TODO: improve
+                        if dlg.is_photo_changed:
+                            # Delete old photo
+                            if main_photo != None:
+                                full_path = main_photo.full_path
+                                session.delete(main_photo)
+                                session.flush()
+                                if isfile(full_path):
+                                    remove(full_path)
+                            # Add new photo
+                            if dlg.photo_fullpath != None:
+                                main_photo = Photo(main=True)
+                                record.photos.append(main_photo)
+                                session.flush()
+                                copy( dlg.photo_fullpath, main_photo.full_path )
                         session.commit()
                         self.list_glider_card.RefreshItem( self.list_glider_card.GetFocusedItem() )
                     break
@@ -232,7 +260,15 @@ class Main(gui_forms.Main):
             try:
                 i = self.datasource_glider_card.index(record)
                 try:
+                    # TODO: delete photos
+                    photos_path = [ photo.full_path for photo in record.photos ]
+                    photos = [ photo for photo in record.photos ]
+                    for photo in photos:
+                        session.delete(photo)
                     session.delete(record)
+                    session.flush()
+                    for path in photos_path:
+                        remove(path)
                     session.commit()
                     del( self.datasource_glider_card[i] )
                     i = i - 1
@@ -251,7 +287,7 @@ class GliderCardForm(wx.Dialog):
     def __init__(self, *args, **kwds):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
         wx.Dialog.__init__(self, *args, **kwds)
-
+        
         self.sizer_picture_staticbox = wx.StaticBox(self, -1, _("Photo"))
         self.label_registration = wx.StaticText(self, -1, _("Registration"))
         self.label_competition_number = wx.StaticText(self, -1, _("Competition number"))
@@ -285,7 +321,9 @@ class GliderCardForm(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.__add_glider_type, self.button_add_glider_type)
         self.Bind(wx.EVT_BUTTON, self.__add_pilot, self.button_add_pilot)
         self.Bind(wx.EVT_BUTTON, self.__add_organization, self.button_add_organization)
-        
+        self.Bind(wx.EVT_BUTTON, self.__open_photo, self.button_open_photo)
+        self.Bind(wx.EVT_BUTTON, self.__clear_photo, self.button_clear_photo)
+
         # Init combo-box data sources
         self.glider_type_items = session.query( GliderType ).all()
         self.pilot_items = session.query( Pilot ).all()
@@ -297,8 +335,9 @@ class GliderCardForm(wx.Dialog):
 
     def __set_properties(self):
         self.SetTitle(_("Glider card"))
-        self.SetSize( (750, 450) )
-        self.SetMinSize( self.GetSize() )
+        
+        char_w = self.combo_glider_type.CharWidth
+        self.combo_glider_type.SetMinSize( (char_w * 50, -1) )
         
         fontbold = self.label_registration.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
@@ -308,8 +347,6 @@ class GliderCardForm(wx.Dialog):
         self.label_pilot.SetFont(fontbold)
         self.label_organization.SetFont(fontbold)
         
-        self.photo.SetMinSize( (250, -1) )
-
         self.text_registration.SetMaxLength(10)
         self.text_competition_number.SetMaxLength(5)
 
@@ -332,7 +369,7 @@ class GliderCardForm(wx.Dialog):
         sizer_buttons = wx.StdDialogButtonSizer()
         # Glider data sizer
         sizer_data.Add(self.label_registration, (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
-        sizer_data.Add(self.label_competition_number, (0, 1), (1, 2), wx.LEFT|wx.EXPAND, 2)
+        sizer_data.Add(self.label_competition_number, (0, 1), (1, 1), wx.LEFT|wx.EXPAND, 2)
         sizer_data.Add(self.text_registration, (1, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_data.Add(self.text_competition_number, (1, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_data.Add(self.label_glider_type, (2, 0), (1, 3), wx.RIGHT|wx.EXPAND, 2)
@@ -370,6 +407,7 @@ class GliderCardForm(wx.Dialog):
         self.SetSizer(sizer_main)
         sizer_main.Fit(self)
         self.Layout()
+        self.SetMinSize( self.GetSize() )
         self.CenterOnParent()
 
     def __init_combo_glider_type(self):
@@ -387,7 +425,7 @@ class GliderCardForm(wx.Dialog):
         " __init_combo_organization(self) - load data into combo_box_organization "
         self.organization_items.sort( lambda a, b: cmp( a.name.upper(), b.name.upper() ) )
         self.combo_organization.SetItems( [ "%s, %s" % (i.name, i.code,) for i in self.organization_items ] )
-        
+
     def __text_ctrl_change(self, evt):
         " __text_ctrl_change(self, evt) - upper case value in the text control "
         ctrl = evt.GetEventObject()
@@ -458,6 +496,69 @@ class GliderCardForm(wx.Dialog):
         finally:
             dlg.Destroy()
         
+    def __open_photo(self, evt):
+        " __open_photo(self, evt) - open photo event handler "
+        dlg = wx.FileDialog( self, defaultDir=settings.LAST_OPEN_FILE_PATH, message=_("Open file"),
+                             wildcard=_("JPEG files")+" (*.jpg;*.jpeg)|*.jpg;*.jpeg",
+                             style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST|wx.FD_PREVIEW )
+        try:
+            if dlg.ShowModal() == wx.ID_OK:
+                self.__photo_changed = True
+                self.photo_fullpath = join( dlg.Directory, dlg.Filename )
+                settings.LAST_OPEN_FILE_PATH = dlg.Directory
+                self.__show_photo( self.photo_fullpath )
+        finally:
+            dlg.Destroy()
+
+    def __clear_photo(self, evt):
+        " __clear_photo(self, evt) - clear photo event handler "
+        if getattr(self, 'photo_fullpath', None) != None:
+            self.__photo_changed = True
+            self.photo_fullpath = None
+            self.__show_empty_photo()
+    
+    def __show_photo(self, full_path):
+        " __show_photo(self, full_path) - load photo file and show it "
+        # Create bitmap from file
+        image = wx.Image( full_path, type=wx.BITMAP_TYPE_JPEG )
+        # Count thumbnail size
+        image_w, image_h =  image.GetSize()
+        ctrl_w, ctrl_h = self.photo.GetClientSize()
+        image_proportion = float(image_w) / image_h
+        image_w = ctrl_w
+        image_h = int( image_w / image_proportion )
+        if image_h > ctrl_h:
+            image_h = ctrl_h
+            image_w = int( image_h * image_proportion )
+        # Scale and resize photo thumbnail
+        image.Rescale( image_w, image_h, quality=wx.IMAGE_QUALITY_HIGH )
+        image.Resize( (ctrl_w, ctrl_h), ( (ctrl_w-image_w)/2, (ctrl_h-image_h)/2 ) )
+        # Set bitmap into photo ctrl
+        self.photo.SetBitmap( image.ConvertToBitmap() )
+        
+    def __init_photo(self, photo=None):
+        " __init_photo(self, Photo photo=None) - show photo thumbnail or empty photo "
+        self.__photo_changed = False
+        if photo == None:
+            # Show empty photo
+            self.photo_fullpath = None
+            self.__show_empty_photo()
+        else:
+            self.photo_fullpath = photo.full_path
+            self.__show_photo(self.photo_fullpath)
+        
+    def __show_empty_photo(self):
+        " __show_empty_photo(self) - if no photo, show show empty photo icon "
+        ctrl_w, ctrl_h = self.photo.GetClientSize()
+        image = wx.Image( join(settings.IMAGES_DIR, 'lphoto.png'), type=wx.BITMAP_TYPE_PNG )
+        image_w, image_h =  image.GetSize()
+        image.Resize( (ctrl_w, ctrl_h), ( (ctrl_w-image_w)/2, (ctrl_h-image_h)/2 ) )
+        self.photo.SetBitmap( image.ConvertToBitmap() )
+    
+    @property
+    def is_photo_changed(self):
+        return self.__photo_changed
+        
     def GetData(self):
         " GetData(self) -> GliderCard - get cleaned form data "
         glidercard = getattr( self, 'glidercard', GliderCard() )
@@ -485,3 +586,4 @@ class GliderCardForm(wx.Dialog):
             self.combo_pilot.SetSelection( self.pilot_items.index( glidercard.pilot ) )
         if glidercard.organization != None:
             self.combo_organization.SetSelection( self.organization_items.index( glidercard.organization ) )
+        self.__init_photo(glidercard.main_photo)

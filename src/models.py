@@ -63,7 +63,7 @@ class Organization(Base):
         if value == None:
             return ''
         else:
-            return value
+            return unicode(value)
     
     def str_to_column(self, columnname, value):
         " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
@@ -113,7 +113,7 @@ class Pilot(Base):
 
     def column_as_str(self, columnname):
         " column_as_str(self, str columnname) -> str - return column value as string "
-        value = getattr( self, columnname )
+        value = unicode( getattr( self, columnname ) )
         
         if value == None:
             return ''
@@ -198,7 +198,7 @@ class GliderType(Base):
         elif columnname == 'coefficient':
             return locale.format("%.2f", value)
         else:
-            return value
+            return unicode(value)
     
     def str_to_column(self, columnname, value):
         " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
@@ -242,7 +242,7 @@ class Photo(Base):
                 raise AttributeError( "'%s' object has no attribute '%s'" % (self.__class__.__name__, key) )
         
     def __repr__(self):
-        return "<Photo: #%s, %s>" % ( str(self.id), self.glider_card )
+        return "<Photo: #%s %s>" % ( str(self.id), self.full_path )
     
     def __unicode__(self):
         return "%d - %s" % ( str(self.id), self.glider_card )
@@ -256,7 +256,7 @@ class Photo(Base):
         elif columnname == 'main':
             return value == True and _("True") or _("False")
         else:
-            return value
+            return unicode(value)
     
     def str_to_column(self, columnname, value):
         " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
@@ -330,7 +330,7 @@ class GliderCard(Base):
         elif columnname in ('landing_gear', 'winglets'):
             return value == True and _("True") or _("False")
         else:
-            return value
+            return unicode(value)
     
     def str_to_column(self, columnname, value):
         " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
@@ -344,8 +344,16 @@ class GliderCard(Base):
     
     @property
     def short_description(self):
-        " Return short description, max. length is 50 chars "
+        " short_description -> str - return short description, max. length is 50 chars "
         return self.GetDescription()
+
+    @property
+    def main_photo(self):
+        " main_photo -> Photo - return main photo "
+        for photo in self.photos:
+            if photo.main == True:
+                return photo
+        return None
 
 
 from database import engine

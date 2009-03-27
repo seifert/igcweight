@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGC Weight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-24 09:56+0100\n"
-"PO-Revision-Date: 2009-03-24 09:57+0100\n"
+"POT-Creation-Date: 2009-03-26 15:12+0100\n"
+"PO-Revision-Date: 2009-03-26 15:13+0100\n"
 "Last-Translator: Jan Seifert <jan.seifert@centrumholdings.com>\n"
 "Language-Team: JS <jan.seifert@fotkyzcest.net>\n"
 "MIME-Version: 1.0\n"
@@ -65,17 +65,17 @@ msgid "Competition number"
 msgstr "Startovní číslo"
 
 #: gui_forms.py:21
-#: gui_main.py:259
+#: gui_main.py:266
 msgid "Glider type"
 msgstr "Typ kluzáku"
 
 #: gui_forms.py:23
-#: gui_main.py:264
+#: gui_main.py:271
 msgid "Add..."
 msgstr "Přidat..."
 
 #: gui_forms.py:24
-#: gui_pilots.py:70
+#: gui_pilots.py:71
 msgid "Pilot"
 msgstr "Pilot"
 
@@ -92,7 +92,7 @@ msgid "Landing gear"
 msgstr "Zatahovací podvozek"
 
 #: gui_forms.py:35
-#: gui_main.py:273
+#: gui_main.py:280
 msgid "Description"
 msgstr "Popis"
 
@@ -125,8 +125,8 @@ msgid "Degree"
 msgstr "Titul"
 
 #: gui_forms.py:107
-#: gui_igchandicap.py:46
-#: gui_pilots.py:21
+#: gui_igchandicap.py:50
+#: gui_pilots.py:25
 msgid "Name"
 msgstr "Jméno"
 
@@ -262,97 +262,105 @@ msgstr "MTOW"
 msgid "Weight referential"
 msgstr "Referenční hmotnost"
 
-#: gui_igchandicap.py:17
-msgid "IGC handicap list"
-msgstr "IGC seznam koeficientů"
-
-#: gui_igchandicap.py:22
-msgid "Non lifting w."
-msgstr "Nevztlakové části"
-
-#: gui_igchandicap.py:23
-msgid "Without water"
-msgstr "Bez vody"
-
-#: gui_igchandicap.py:25
-msgid "Referential w."
-msgstr "Ref. hmotnost"
-
-#: gui_igchandicap.py:32
+#: gui_igchandicap.py:11
 msgid "Glider type insert error"
 msgstr "Došlo k chybě při vkládání nového typu kluzáku"
 
-#: gui_igchandicap.py:33
+#: gui_igchandicap.py:12
 msgid "Glider type edit error"
 msgstr "Došlo k chybě při editaci typu kluzáku"
 
-#: gui_igchandicap.py:34
+#: gui_igchandicap.py:13
 msgid "Glider type delete error"
 msgstr "Došlo k chybě při mazání typu kluzáku"
 
-#: gui_main.py:34
+#: gui_igchandicap.py:21
+msgid "IGC handicap list"
+msgstr "IGC seznam koeficientů"
+
+#: gui_igchandicap.py:26
+msgid "Non lifting w."
+msgstr "Nevztlakové části"
+
+#: gui_igchandicap.py:27
+msgid "Without water"
+msgstr "Bez vody"
+
+#: gui_igchandicap.py:29
+msgid "Referential w."
+msgstr "Ref. hmotnost"
+
+#: gui_main.py:38
 msgid "Nr."
 msgstr "Č."
 
-#: gui_main.py:140
+#: gui_main.py:144
 msgid "Exit application?"
 msgstr "Chcete opravdu ukončit aplikaci?"
 
-#: gui_main.py:140
+#: gui_main.py:144
 msgid "Exit?"
 msgstr "Ukončit?"
 
-#: gui_main.py:152
+#: gui_main.py:156
 msgid "This program is licensed under GNU General Public License version 2"
 msgstr "Tento program je šířen za podmínek GNU General Public License verze 2"
 
-#: gui_main.py:201
+#: gui_main.py:205
 msgid "Glider card insert error"
 msgstr "Došlo k chybě při vkládání nové karty kluzáku"
 
-#: gui_main.py:220
+#: gui_main.py:224
 msgid "Glider card edit error"
 msgstr "Došlo k chybě při editaci karty kluzáku"
 
-#: gui_main.py:247
+#: gui_main.py:251
 msgid "Glider card delete error"
 msgstr "Došlo k chybě při mazání karty kluzáku"
 
-#: gui_organizations.py:17
-msgid "Organizations or countries"
-msgstr "Organizace nebo země"
+#: gui_main.py:474
+msgid "Open file"
+msgstr "Otevřít soubor"
 
-#: gui_organizations.py:21
-msgid "Code"
-msgstr "Kód"
+#: gui_main.py:475
+msgid "JPEG files"
+msgstr "obrázky JPEG"
 
-#: gui_organizations.py:28
+#: gui_organizations.py:11
 msgid "Organization insert error"
 msgstr "Došlo k chybě při vkládání nové organizace/země"
 
-#: gui_organizations.py:29
+#: gui_organizations.py:12
 msgid "Organization edit error"
 msgstr "Došlo k chybě při změně organizace/země"
 
-#: gui_organizations.py:30
+#: gui_organizations.py:13
 msgid "Organization delete error"
 msgstr "Došlo k chybě při mazání organizace/země"
 
-#: gui_pilots.py:17
-msgid "Pilots"
-msgstr "Piloti"
+#: gui_organizations.py:21
+msgid "Organizations or countries"
+msgstr "Organizace nebo země"
 
-#: gui_pilots.py:31
+#: gui_organizations.py:25
+msgid "Code"
+msgstr "Kód"
+
+#: gui_pilots.py:11
 msgid "Pilot insert error"
 msgstr "Došlo k chybě při vkládání nového pilota"
 
-#: gui_pilots.py:32
+#: gui_pilots.py:12
 msgid "Pilot edit error"
 msgstr "Došlo k chybě při změně pilota"
 
-#: gui_pilots.py:33
+#: gui_pilots.py:13
 msgid "Pilot delete error"
 msgstr "Došlo k chybě při mazání pilota"
+
+#: gui_pilots.py:21
+msgid "Pilots"
+msgstr "Piloti"
 
 #: gui_widgets.py:15
 msgid "Error"
@@ -362,11 +370,11 @@ msgstr "Chyba"
 msgid "Some error during starting application"
 msgstr "Došlo k chybě během spouštění aplikace"
 
-#: models.py:255
+#: models.py:257
 msgid "True"
 msgstr "Ano"
 
-#: models.py:255
+#: models.py:257
 msgid "False"
 msgstr "Ne"
 

@@ -9,9 +9,12 @@ try:
 except ImportError:
     __homedir = expanduser("~")
 
-HOME_DIR   = join(__homedir, '.igcweight')
-PHOTOS_DIR = join(HOME_DIR, 'photos')
+LAST_OPEN_FILE_PATH = __homedir
+
+HOME_DIR   = join( __homedir, '.igcweight' )
+PHOTOS_DIR = join( HOME_DIR, 'photos' )
 BASE_DIR   = abspath( join(dirname(__file__), '..') )
+IMAGES_DIR = join( BASE_DIR, 'images' )
 
 if not isdir(HOME_DIR):
     makedirs(HOME_DIR, mode=0755)
