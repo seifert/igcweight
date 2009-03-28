@@ -224,6 +224,7 @@ class Main(wx.Frame):
         statusbar_fields = [""]
         for i in range(len(statusbar_fields)):
             self.statusbar.SetStatusText(statusbar_fields[i], i)
+        self.list_glider_card.SetFocus()
         self.button_glider_card_new.SetToolTipString(_("Add new glider"))
         self.button_glider_card_new.Enable(False)
         self.button_glider_card_properties.SetToolTipString(_("Edit glider properties"))

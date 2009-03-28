@@ -45,7 +45,6 @@ class Main(gui_forms.Main):
         self.datasource_glider_card = self.BASE_QUERY.all()
 
         # Bind events
-        self.menu_glider_card.Bind(wx.EVT_MENU_OPEN, self.__menu_glider_card_open)
         self.list_glider_card.Bind(wx.EVT_CONTEXT_MENU, self.__list_glider_card_popup_menu)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__sort_glider_card_list, self.list_glider_card)
         self.Bind(wx.EVT_CLOSE, self.Exit, self)
@@ -104,13 +103,7 @@ class Main(gui_forms.Main):
         pos = evt.GetPosition()
         pos = self.ScreenToClient(pos)
         self.PopupMenu( self.menu_glider_card, pos )
-    
-    def __menu_glider_card_open(self, evt):
-        " __menu_glider_card_open(self, Event evt) - menu glider type has been opened "
-        self.menu_glider_card_new.Enable( self.button_glider_card_new.IsEnabled() )
-        self.menu_glider_card_properties.Enable( self.button_glider_card_properties.IsEnabled() )
-        self.menu_glider_card_delete.Enable( self.button_glider_card_delete.IsEnabled() )
-    
+
     def __sort_glider_card_list(self, evt):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
         self.__sort_glider_card = evt.m_col
@@ -187,7 +180,7 @@ class Main(gui_forms.Main):
         try:
             while True:
                 try:
-                    dlg.SetData( GliderCard() )
+                    dlg.SetData()
                     if dlg.ShowModal() == wx.ID_OK:
                         try:
                             record = dlg.GetData()
@@ -501,7 +494,7 @@ class GliderCardForm(wx.Dialog):
     def __open_photo(self, evt):
         " __open_photo(self, evt) - open photo event handler "
         dlg = wx.FileDialog( self, defaultDir=settings.LAST_OPEN_FILE_PATH, message=_("Open file"),
-                             wildcard=_("JPEG files")+" (*.jpg;*.jpeg)|*.jpg;*.jpeg",
+                             wildcard=_("JPEG files")+" (*.jpg;*.jpeg)|*.jpg;*.jpeg;*.JPG;*.JPEG",
                              style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST|wx.FD_PREVIEW )
         try:
             if dlg.ShowModal() == wx.ID_OK:
@@ -523,19 +516,22 @@ class GliderCardForm(wx.Dialog):
         " __show_photo(self, full_path) - load photo file and show it "
         # Create bitmap from file
         image = wx.Image( full_path, type=wx.BITMAP_TYPE_JPEG )
-        # Count thumbnail size
+        
         image_w, image_h =  image.GetSize()
         ctrl_w, ctrl_h = self.photo.GetClientSize()
-        image_proportion = float(image_w) / image_h
-        image_w = ctrl_w
-        image_h = int( image_w / image_proportion )
-        if image_h > ctrl_h:
-            image_h = ctrl_h
-            image_w = int( image_h * image_proportion )
-        # Scale and resize photo thumbnail
-        image.Rescale( image_w, image_h, quality=wx.IMAGE_QUALITY_HIGH )
+        if image_w > ctrl_w or image_h > ctrl_h:
+            # Count thumbnail size
+            image_proportion = float(image_w) / image_h
+            image_w = ctrl_w
+            image_h = int( image_w / image_proportion )
+            if image_h > ctrl_h:
+                image_h = ctrl_h
+                image_w = int( image_h * image_proportion )
+            # Scale photo thumbnail
+            image.Rescale( image_w, image_h, quality=wx.IMAGE_QUALITY_HIGH )
+        # Resize photo thumbnail
         image.Resize( (ctrl_w, ctrl_h), ( (ctrl_w-image_w)/2, (ctrl_h-image_h)/2 ) )
-        # Set bitmap into photo ctrl
+
         self.photo.SetBitmap( image.ConvertToBitmap() )
         
     def __init_photo(self, photo=None):
@@ -551,10 +547,24 @@ class GliderCardForm(wx.Dialog):
         
     def __show_empty_photo(self):
         " __show_empty_photo(self) - if no photo, show show empty photo icon "
-        ctrl_w, ctrl_h = self.photo.GetClientSize()
+        # Create bitmap from file
         image = wx.Image( join(settings.IMAGES_DIR, 'lphoto.png'), type=wx.BITMAP_TYPE_PNG )
+
         image_w, image_h =  image.GetSize()
+        ctrl_w, ctrl_h = self.photo.GetClientSize()
+        if image_w > ctrl_w or image_h > ctrl_h:
+            # Count thumbnail size
+            image_proportion = float(image_w) / image_h
+            image_w = ctrl_w
+            image_h = int( image_w / image_proportion )
+            if image_h > ctrl_h:
+                image_h = ctrl_h
+                image_w = int( image_h * image_proportion )
+            # Scale photo thumbnail
+            image.Rescale( image_w, image_h, quality=wx.IMAGE_QUALITY_HIGH )
+        # Resize photo thumbnail
         image.Resize( (ctrl_w, ctrl_h), ( (ctrl_w-image_w)/2, (ctrl_h-image_h)/2 ) )
+
         self.photo.SetBitmap( image.ConvertToBitmap() )
     
     @property
@@ -574,18 +584,21 @@ class GliderCardForm(wx.Dialog):
         glidercard.organization = self.combo_organization.CurrentSelection >= 0 and self.organization_items[ self.combo_organization.CurrentSelection ] or None
         return glidercard
     
-    def SetData(self, glidercard):
-        " SetData(self, glidercard) - set form data "
-        self.glidercard = glidercard
-        self.text_registration.Value = glidercard.column_as_str('registration')
-        self.text_competition_number.Value = glidercard.column_as_str('competition_number')
-        self.text_description.Value = glidercard.column_as_str('description')
-        self.checkbox_gear.Value = glidercard.landing_gear != None and glidercard.landing_gear or False 
-        self.checkbox_winglets.Value = glidercard.winglets !=None and glidercard.winglets or False
-        if glidercard.glider_type != None:
-            self.combo_glider_type.SetSelection( self.glider_type_items.index( glidercard.glider_type ) )
-        if glidercard.pilot != None:
-            self.combo_pilot.SetSelection( self.pilot_items.index( glidercard.pilot ) )
-        if glidercard.organization != None:
-            self.combo_organization.SetSelection( self.organization_items.index( glidercard.organization ) )
-        self.__init_photo(glidercard.main_photo)
+    def SetData(self, glidercard=None):
+        " SetData(self, glidercard=None) - set form data "
+        if glidercard != None:
+            self.glidercard = glidercard
+            self.text_registration.Value = glidercard.column_as_str('registration')
+            self.text_competition_number.Value = glidercard.column_as_str('competition_number')
+            self.text_description.Value = glidercard.column_as_str('description')
+            self.checkbox_gear.Value = glidercard.landing_gear != None and glidercard.landing_gear or False 
+            self.checkbox_winglets.Value = glidercard.winglets !=None and glidercard.winglets or False
+            if glidercard.glider_type != None:
+                self.combo_glider_type.SetSelection( self.glider_type_items.index( glidercard.glider_type ) )
+            if glidercard.pilot != None:
+                self.combo_pilot.SetSelection( self.pilot_items.index( glidercard.pilot ) )
+            if glidercard.organization != None:
+                self.combo_organization.SetSelection( self.organization_items.index( glidercard.organization ) )
+            self.__init_photo(glidercard.main_photo)
+        else:
+            self.__init_photo()
