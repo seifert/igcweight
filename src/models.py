@@ -113,14 +113,14 @@ class Pilot(Base):
 
     def column_as_str(self, columnname):
         " column_as_str(self, str columnname) -> str - return column value as string "
-        value = unicode( getattr( self, columnname ) )
+        value = getattr( self, columnname )
         
         if value == None:
             return ''
         elif columnname in ('year_of_birth',):
             return locale.format("%d", value)
         else:
-            return value
+            return unicode(value)
     
     def str_to_column(self, columnname, value):
         " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
