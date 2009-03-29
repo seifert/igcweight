@@ -1,7 +1,9 @@
 " GUI - Main window "
 
+import os
+
 from os import remove
-from os.path import join, isfile
+from os.path import isfile
 from shutil import copy
 
 import wx
@@ -10,7 +12,8 @@ from wx import GetTranslation as _
 import gui_forms
 import settings
 
-from sqlalchemy.orm import eagerload
+from sqlalchemy import or_
+from sqlalchemy.orm import eagerload, join
 
 from database import session
 from models import GliderCard, Pilot, Organization, GliderType, Photo
@@ -26,6 +29,7 @@ class Main(gui_forms.Main):
         gui_forms.Main.__init__(self, *args, **kwargs)
         
         self.__sort_glider_card = 0
+        self.__filtered = False
 
         self.split_main.SetSashGravity(0.33)
         self.split_main.SetMinimumPaneSize(375)
@@ -41,11 +45,12 @@ class Main(gui_forms.Main):
         self.list_glider_card.InsertColumn(3, _("Pilot"), 'pilot', proportion=4)
 
         # Open data source
-        self.BASE_QUERY = session.query( GliderCard ).options( eagerload('pilot') ).options( eagerload('glider_type') )
+        self.BASE_QUERY = session.query(GliderCard).join( (Pilot, GliderCard.pilot_id==Pilot.id), (GliderType, GliderCard.glider_type_id==GliderType.id) )
         self.datasource_glider_card = self.BASE_QUERY.all()
 
         # Bind events
         self.list_glider_card.Bind(wx.EVT_CONTEXT_MENU, self.__list_glider_card_popup_menu)
+        self.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.ChangeGliderCard, self.list_glider_card)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__sort_glider_card_list, self.list_glider_card)
         self.Bind(wx.EVT_CLOSE, self.Exit, self)
         self.Bind(wx.EVT_MENU, self.Exit, self.menu_exit)
@@ -59,6 +64,9 @@ class Main(gui_forms.Main):
         self.Bind(wx.EVT_BUTTON, self.GliderCardNew, self.button_glider_card_new)
         self.Bind(wx.EVT_BUTTON, self.GliderCardProperties, self.button_glider_card_properties)
         self.Bind(wx.EVT_BUTTON, self.GliderCardDelete, self.button_glider_card_delete)
+        self.Bind(wx.EVT_TEXT_ENTER, self.SearchGliderCard, self.text_find)
+        self.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.SearchGliderCard, self.text_find)
+        self.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.AllGliderCard, self.text_find)
     
     def get_datasource_glider_card(self):
         " datasource_glider_card(self) -> list of db items (SQLAlchemy query) "
@@ -68,10 +76,11 @@ class Main(gui_forms.Main):
         self.list_glider_card.datasource = value
         count = len(self.datasource_glider_card)
         self.list_glider_card.SetItemCount(count)
-        if count > 0:            
+        if count > 0:
             self.SortGliderCardList(self.__sort_glider_card)
             self.list_glider_card.Select(0)
             self.list_glider_card.Focus(0)
+            self.ChangeGliderCard()
         self.__set_enabled_disabled()
     datasource_glider_card = property(get_datasource_glider_card, set_datasource_glider_card)
     
@@ -276,6 +285,33 @@ class Main(gui_forms.Main):
             except Exception, e:
                 session.rollback()
                 error_message_dialog( self, _("Glider card delete error"), e )
+
+    def SearchGliderCard(self, evt=None):
+        " SearchGliderCard(self, Event evt=None) - filter glider card according to competition number or registration "
+        value = self.text_find.Value
+        if value != '':
+            value = '%%%s%%' % value
+            self.datasource_glider_card = self.BASE_QUERY.filter(or_(
+                    GliderCard.competition_number.ilike(value),
+                    GliderCard.registration.ilike(value),
+                    GliderType.name.ilike(value),
+                    Pilot.firstname.ilike(value),
+                    Pilot.surname.ilike(value)
+                )).all()
+            self.__filtered = True
+        else:
+            self.AllGliderCard()
+
+    def AllGliderCard(self, evt=None):
+        " AllGliderCard(self, Event evt=None) - cancel filter glider card and show all data "
+        if self.__filtered:
+            self.text_find.SetValue('')
+            self.datasource_glider_card = self.BASE_QUERY.all()
+            self.__filtered = False
+
+    def ChangeGliderCard(self, evt=None):
+        " ChangeGliderCard(self, Event evt=None) - this method is called when glider card is changed "
+        pass
 
 class GliderCardForm(wx.Dialog):
     " Glider card insert/edit dialog "
@@ -499,7 +535,7 @@ class GliderCardForm(wx.Dialog):
         try:
             if dlg.ShowModal() == wx.ID_OK:
                 self.__photo_changed = True
-                self.photo_fullpath = join( dlg.Directory, dlg.Filename )
+                self.photo_fullpath = os.path.join( dlg.Directory, dlg.Filename )
                 settings.LAST_OPEN_FILE_PATH = dlg.Directory
                 self.__show_photo( self.photo_fullpath )
         finally:
@@ -548,7 +584,7 @@ class GliderCardForm(wx.Dialog):
     def __show_empty_photo(self):
         " __show_empty_photo(self) - if no photo, show show empty photo icon "
         # Create bitmap from file
-        image = wx.Image( join(settings.IMAGES_DIR, 'lphoto.png'), type=wx.BITMAP_TYPE_PNG )
+        image = wx.Image( os.path.join(settings.IMAGES_DIR, 'lphoto.png'), type=wx.BITMAP_TYPE_PNG )
 
         image_w, image_h =  image.GetSize()
         ctrl_w, ctrl_h = self.photo.GetClientSize()

@@ -205,7 +205,7 @@ class Main(wx.Frame):
         self.SetMenuBar(self.main_menu)
         # Menu Bar end
         self.statusbar = self.CreateStatusBar(1, wx.ST_SIZEGRIP)
-        self.text_find = wx.SearchCtrl(self.panel_gliders, -1)
+        self.text_find = wx.SearchCtrl(self.panel_gliders, -1, style=wx.TE_PROCESS_ENTER)
         self.list_glider_card = VirtualListCtrl(self.panel_gliders, -1)
         self.button_glider_card_new = wx.Button(self.panel_gliders, wx.ID_NEW, "")
         self.button_glider_card_properties = wx.Button(self.panel_gliders, wx.ID_PROPERTIES, "")
