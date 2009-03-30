@@ -268,7 +268,7 @@ class Photo(Base):
     
     def GetDescription(self, length=50):
         " GetDescription(self, int length=50) -> str - get short description "
-        return __get_short_destcription(self.description, length)
+        return get_short_description(self.description, length)
     
     @property
     def short_description(self):
@@ -342,7 +342,7 @@ class GliderCard(Base):
     
     def GetDescription(self, length=50):
         " GetDescription(self, int length=50) -> str - get short description "
-        return __get_short_destcription(self.description, length)
+        return get_short_description(self.description, length)
     
     @property
     def short_description(self):
