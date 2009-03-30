@@ -9,31 +9,88 @@ from shutil import copy
 import wx
 from wx import GetTranslation as _
 
-import gui_forms
-import settings
-
 from sqlalchemy import or_
 from sqlalchemy.orm import eagerload, join
 
+import settings
+
 from database import session
 from models import GliderCard, Pilot, Organization, GliderType, Photo
-from gui_widgets import error_message_dialog
+from gui_widgets import error_message_dialog, VirtualListCtrl, GetPhotoBitmap
 from gui_igchandicap import IgcHandicapList, IgcHandicapForm, GLIDER_TYPE_INSERT_ERROR
 from gui_organizations import OrganizationList, OrganizationForm, ORGANIZATION_INSERT_ERROR
 from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
 
-class Main(gui_forms.Main):
+class Main(wx.Frame):
     " Main application window "
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwds):
         " __init__(self, Window parent, int id=-1) "
-        gui_forms.Main.__init__(self, *args, **kwargs)
         
+        kwds["style"] = wx.DEFAULT_FRAME_STYLE
+        wx.Frame.__init__(self, *args, **kwds)
+        
+        self.split_main = wx.SplitterWindow(self, -1, style=wx.SP_3D|wx.SP_BORDER)
+        self.panel_card = wx.Panel(self.split_main, -1)
+        self.sizer_photo_staticbox = wx.StaticBox(self.panel_card, -1, _("Photo"))
+        self.panel_gliders = wx.Panel(self.split_main, -1)
+        
+        # Menu Bar
+        self.main_menu = wx.MenuBar()
+        self.menu_file = wx.Menu()
+        self.menu_exit = wx.MenuItem(self.menu_file, wx.NewId(), _("E&xit\tAlt-F4"), _("Exit application"), wx.ITEM_NORMAL)
+        self.menu_file.AppendItem(self.menu_exit)
+        self.main_menu.Append(self.menu_file, _("&File"))
+        self.menu_edit = wx.Menu()
+        self.menu_coefficients = wx.MenuItem(self.menu_edit, wx.NewId(), _("&IGC handicap list..."), _("Edit gliders and IGC handicap list"), wx.ITEM_NORMAL)
+        self.menu_edit.AppendItem(self.menu_coefficients)
+        self.menu_pilots = wx.MenuItem(self.menu_edit, wx.NewId(), _("&Pilots..."), _("Edit pilots list"), wx.ITEM_NORMAL)
+        self.menu_edit.AppendItem(self.menu_pilots)
+        self.menu_organizations = wx.MenuItem(self.menu_edit, wx.NewId(), _("&Organizations or countries..."), _("Edit organizations or coutries list"), wx.ITEM_NORMAL)
+        self.menu_edit.AppendItem(self.menu_organizations)
+        self.main_menu.Append(self.menu_edit, _("&Edit"))
+        self.menu_glider_card = wx.Menu()
+        self.menu_glider_card_new = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&New...\tInsert"), _("Add new glider"), wx.ITEM_NORMAL)
+        self.menu_glider_card.AppendItem(self.menu_glider_card_new)
+        self.menu_glider_card_properties = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Properties..."), _("Edit glider properties"), wx.ITEM_NORMAL)
+        self.menu_glider_card.AppendItem(self.menu_glider_card_properties)
+        self.menu_glider_card_delete = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Delete"), _("Delete glider"), wx.ITEM_NORMAL)
+        self.menu_glider_card.AppendItem(self.menu_glider_card_delete)
+        self.main_menu.Append(self.menu_glider_card, _("&Glider card"))
+        self.menu_help = wx.Menu()
+        self.menu_about = wx.MenuItem(self.menu_help, wx.NewId(), _("&About\tF1"), _("About this application"), wx.ITEM_NORMAL)
+        self.menu_help.AppendItem(self.menu_about)
+        self.main_menu.Append(self.menu_help, _("&Help"))
+        self.SetMenuBar(self.main_menu)
+        # Menu Bar end
+        self.statusbar = self.CreateStatusBar(1, wx.ST_SIZEGRIP)
+        self.text_find = wx.SearchCtrl(self.panel_gliders, -1, style=wx.TE_PROCESS_ENTER)
+        self.list_glider_card = VirtualListCtrl(self.panel_gliders, -1)
+        self.button_glider_card_new = wx.Button(self.panel_gliders, wx.ID_NEW, "")
+        self.button_glider_card_properties = wx.Button(self.panel_gliders, wx.ID_PROPERTIES, "")
+        self.button_glider_card_delete = wx.Button(self.panel_gliders, wx.ID_DELETE, "")
+        self.label_registration = wx.StaticText(self.panel_card, -1, _("Registration"))
+        self.label_competition_number = wx.StaticText(self.panel_card, -1, _("Competition number"))
+        self.text_registration = wx.StaticText(self.panel_card, -1, "")
+        self.text_competition_number = wx.StaticText(self.panel_card, -1, "")
+        self.label_glider_type = wx.StaticText(self.panel_card, -1, _("Glider type"))
+        self.text_glider_type = wx.StaticText(self.panel_card, -1, "")
+        self.label_pilot = wx.StaticText(self.panel_card, -1, _("Pilot"))
+        self.text_pilot = wx.StaticText(self.panel_card, -1, "")
+        self.label_organization = wx.StaticText(self.panel_card, -1, _("Organization or country"))
+        self.text_organization = wx.StaticText(self.panel_card, -1, "")
+        self.label_winglets = wx.StaticText(self.panel_card, -1, _("Winglets"))
+        self.label_landing_gear = wx.StaticText(self.panel_card, -1, _("Landing gear"))
+        self.text_winglets = wx.StaticText(self.panel_card, -1, "")
+        self.text_landing_gear = wx.StaticText(self.panel_card, -1, "")
+#        self.text_description = wx.StaticText(self.panel_card, -1, "")
+        self.photo = wx.StaticBitmap(self.panel_card, -1)
+        self.button_show_photo = wx.Button(self.panel_card, wx.ID_ZOOM_IN, "")
+
+        self.__set_properties()
+        self.__do_layout()
+
         self.__sort_glider_card = 0
         self.__filtered = False
-
-        self.split_main.SetSashGravity(0.33)
-        self.split_main.SetMinimumPaneSize(375)
-        self.SetSize( (900, 700) )
 
         self.text_find.ShowSearchButton(True)
         self.text_find.ShowCancelButton(True)
@@ -50,7 +107,7 @@ class Main(gui_forms.Main):
 
         # Bind events
         self.list_glider_card.Bind(wx.EVT_CONTEXT_MENU, self.__list_glider_card_popup_menu)
-        self.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.ChangeGliderCard, self.list_glider_card)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ChangeGliderCard, self.list_glider_card)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__sort_glider_card_list, self.list_glider_card)
         self.Bind(wx.EVT_CLOSE, self.Exit, self)
         self.Bind(wx.EVT_MENU, self.Exit, self.menu_exit)
@@ -67,6 +124,99 @@ class Main(gui_forms.Main):
         self.Bind(wx.EVT_TEXT_ENTER, self.SearchGliderCard, self.text_find)
         self.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.SearchGliderCard, self.text_find)
         self.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.AllGliderCard, self.text_find)
+
+    def __set_properties(self):
+        self.SetTitle(_("IGC Weight"))
+
+        self.statusbar.SetStatusWidths([-1])
+        statusbar_fields = [""]
+        for i in range(len(statusbar_fields)):
+            self.statusbar.SetStatusText(statusbar_fields[i], i)
+            
+        self.list_glider_card.SetFocus()
+        
+        self.button_glider_card_new.SetToolTipString(_("Add new glider"))
+        self.button_glider_card_new.Enable(False)
+        self.button_glider_card_properties.SetToolTipString(_("Edit glider properties"))
+        self.button_glider_card_properties.Enable(False)
+        self.button_glider_card_delete.SetToolTipString(_("Delete glider"))
+        self.button_glider_card_delete.Enable(False)
+        self.button_show_photo.SetToolTipString(_("Show photo"))
+        
+        self.text_registration.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+        self.text_registration.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
+        self.text_competition_number.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+        self.text_competition_number.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
+        self.text_glider_type.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+        self.text_glider_type.SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
+        self.text_pilot.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+        self.text_pilot.SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
+        self.text_organization.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+        self.text_organization.SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
+        self.text_winglets.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
+        self.text_landing_gear.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
+#        self.text_description.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+        
+        self.photo.SetMinSize((180, -1))
+        self.split_main.SetSashGravity(0.33)
+        self.split_main.SetMinimumPaneSize(375)
+
+    def __do_layout(self):
+        sizer_main = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_card = wx.BoxSizer(wx.VERTICAL)
+        sizer_card_head = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_photo = wx.StaticBoxSizer(self.sizer_photo_staticbox, wx.VERTICAL)
+
+        sizer_card_base = wx.GridBagSizer(0, 0)
+        sizer_gliders = wx.BoxSizer(wx.VERTICAL)
+        sizer_gliders_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_gliders.Add(self.text_find, 0, wx.LEFT|wx.TOP|wx.EXPAND, 4)
+        sizer_gliders.Add(self.list_glider_card, 1, wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
+        sizer_gliders_buttons.Add(self.button_glider_card_new, 1, wx.RIGHT, 2)
+        sizer_gliders_buttons.Add(self.button_glider_card_properties, 1, wx.LEFT|wx.RIGHT, 2)
+        sizer_gliders_buttons.Add(self.button_glider_card_delete, 1, wx.LEFT, 2)
+        sizer_gliders.Add(sizer_gliders_buttons, 0, wx.LEFT|wx.BOTTOM|wx.EXPAND, 4)
+        self.panel_gliders.SetSizer(sizer_gliders)
+        
+        sizer_card_base.Add(self.label_competition_number, (0, 0), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.label_registration, (0, 1), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.text_competition_number, (1, 0), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.text_registration, (1, 1), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.label_glider_type, (2, 0), (1, 2), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.text_glider_type, (3, 0), (1, 2), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.label_pilot, (4, 0), (1, 2), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.text_pilot, (5, 0), (1, 2), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.label_organization, (6, 0), (1, 2), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.text_organization, (7, 0), (1, 2), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.label_landing_gear, (8, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.label_winglets, (8, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.text_landing_gear, (9, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.text_winglets, (9, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(wx.StaticLine(self.panel_card), (10, 0), (1, 2), wx.TOP|wx.EXPAND, 2)
+#        sizer_card_base.Add(self.text_description, (11, 0), (1, 2), wx.TOP|wx.BOTTOM|wx.EXPAND, 0)
+#        sizer_card_base.AddGrowableRow(11)
+        sizer_card_base.AddGrowableCol(0)
+        sizer_card_base.AddGrowableCol(1)
+        
+        sizer_photo.Add(self.photo, 1, wx.ALL|wx.EXPAND, 4)
+        sizer_photo.Add(self.button_show_photo, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.EXPAND, 4)
+
+        sizer_card_head.Add(sizer_card_base, 1, wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
+        sizer_card_head.Add(sizer_photo, 0, wx.ALL|wx.EXPAND, 4)
+        
+        sizer_card.Add(sizer_card_head, 0, wx.EXPAND, 0)
+        sizer_card.Add(wx.Panel(self.panel_card, -1), 1, wx.ALL|wx.EXPAND, 4)
+
+        self.panel_card.SetSizer(sizer_card)
+        self.split_main.SplitVertically(self.panel_gliders, self.panel_card)
+        sizer_main.Add(self.split_main, 1, wx.EXPAND, 0)
+        
+        self.SetSizer(sizer_main)
+        sizer_main.Fit(self)
+        self.Layout()
+        
+        self.SetSize( (950, 700) )
+        self.split_main.SetSashPosition(375)
     
     def get_datasource_glider_card(self):
         " datasource_glider_card(self) -> list of db items (SQLAlchemy query) "
@@ -208,6 +358,7 @@ class Main(gui_forms.Main):
                             self.list_glider_card.SetItemCount(count)
                             self.list_glider_card.Select(count-1)
                             self.list_glider_card.Focus(count-1)
+                            self.ChangeGliderCard()
                         finally:
                             self.__set_enabled_disabled()
                     break
@@ -248,6 +399,7 @@ class Main(gui_forms.Main):
                         
                         session.commit()
                         self.list_glider_card.RefreshItem( self.list_glider_card.GetFocusedItem() )
+                        self.ChangeGliderCard()
                     break
                 except Exception, e:
                     session.rollback()
@@ -280,6 +432,7 @@ class Main(gui_forms.Main):
                     self.list_glider_card.SetItemCount( len(self.datasource_glider_card) )
                     self.list_glider_card.Select(i)
                     self.list_glider_card.Focus(i)
+                    self.ChangeGliderCard()
                 finally:
                     self.__set_enabled_disabled()
             except Exception, e:
@@ -299,6 +452,7 @@ class Main(gui_forms.Main):
                     Pilot.surname.ilike(value)
                 )).all()
             self.__filtered = True
+            self.ChangeGliderCard()
         else:
             self.AllGliderCard()
 
@@ -308,10 +462,35 @@ class Main(gui_forms.Main):
             self.text_find.SetValue('')
             self.datasource_glider_card = self.BASE_QUERY.all()
             self.__filtered = False
+            self.ChangeGliderCard()
 
     def ChangeGliderCard(self, evt=None):
         " ChangeGliderCard(self, Event evt=None) - this method is called when glider card is changed "
-        pass
+        record = self.list_glider_card.current_item
+        if record != None:
+            self.text_registration.Label = record.column_as_str('registration')
+            self.text_competition_number.Label = record.column_as_str('competition_number')
+            self.text_glider_type.Label = record.column_as_str('glider_type')
+            self.text_pilot.Label = record.column_as_str('pilot')
+            self.text_organization.Label = record.column_as_str('organization')
+            self.text_winglets.Label = record.column_as_str('winglets')
+            self.text_landing_gear.Label = record.column_as_str('landing_gear')
+            if record.main_photo != None:
+                self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, record.main_photo.full_path ) )
+                self.button_show_photo.Enable(True)
+            else:
+                self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
+                self.button_show_photo.Enable(False)
+        else:
+            self.text_registration.Label = ''
+            self.text_competition_number.Label = ''
+            self.text_glider_type.Label = ''
+            self.text_pilot.Label = ''
+            self.text_organization.Label = ''
+            self.text_winglets.Label = ''
+            self.text_landing_gear.Label = ''
+            self.button_show_photo.Enable(False)
+            self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
 
 class GliderCardForm(wx.Dialog):
     " Glider card insert/edit dialog "
@@ -320,7 +499,7 @@ class GliderCardForm(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         
         self.sizer_picture_staticbox = wx.StaticBox(self, -1, _("Photo"))
-        self.label_registration = wx.StaticText(self, -1, _("Registration"))
+        self.label_registration = wx.StaticText(self, -1, _("Registration"), style=wx.BORDER_SUNKEN)
         self.label_competition_number = wx.StaticText(self, -1, _("Competition number"))
         self.text_registration = wx.TextCtrl(self, -1, "")
         self.text_competition_number = wx.TextCtrl(self, -1, "")
@@ -537,7 +716,7 @@ class GliderCardForm(wx.Dialog):
                 self.__photo_changed = True
                 self.photo_fullpath = os.path.join( dlg.Directory, dlg.Filename )
                 settings.LAST_OPEN_FILE_PATH = dlg.Directory
-                self.__show_photo( self.photo_fullpath )
+                self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, self.photo_fullpath ) )
         finally:
             dlg.Destroy()
 
@@ -546,62 +725,18 @@ class GliderCardForm(wx.Dialog):
         if getattr(self, 'photo_fullpath', None) != None:
             self.__photo_changed = True
             self.photo_fullpath = None
-            self.__show_empty_photo()
+            self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
     
-    def __show_photo(self, full_path):
-        " __show_photo(self, full_path) - load photo file and show it "
-        # Create bitmap from file
-        image = wx.Image( full_path, type=wx.BITMAP_TYPE_JPEG )
-        
-        image_w, image_h =  image.GetSize()
-        ctrl_w, ctrl_h = self.photo.GetClientSize()
-        if image_w > ctrl_w or image_h > ctrl_h:
-            # Count thumbnail size
-            image_proportion = float(image_w) / image_h
-            image_w = ctrl_w
-            image_h = int( image_w / image_proportion )
-            if image_h > ctrl_h:
-                image_h = ctrl_h
-                image_w = int( image_h * image_proportion )
-            # Scale photo thumbnail
-            image.Rescale( image_w, image_h, quality=wx.IMAGE_QUALITY_HIGH )
-        # Resize photo thumbnail
-        image.Resize( (ctrl_w, ctrl_h), ( (ctrl_w-image_w)/2, (ctrl_h-image_h)/2 ) )
-
-        self.photo.SetBitmap( image.ConvertToBitmap() )
-        
     def __init_photo(self, photo=None):
         " __init_photo(self, Photo photo=None) - show photo thumbnail or empty photo "
         self.__photo_changed = False
         if photo == None:
             # Show empty photo
             self.photo_fullpath = None
-            self.__show_empty_photo()
+            self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
         else:
             self.photo_fullpath = photo.full_path
-            self.__show_photo(self.photo_fullpath)
-        
-    def __show_empty_photo(self):
-        " __show_empty_photo(self) - if no photo, show show empty photo icon "
-        # Create bitmap from file
-        image = wx.Image( os.path.join(settings.IMAGES_DIR, 'lphoto.png'), type=wx.BITMAP_TYPE_PNG )
-
-        image_w, image_h =  image.GetSize()
-        ctrl_w, ctrl_h = self.photo.GetClientSize()
-        if image_w > ctrl_w or image_h > ctrl_h:
-            # Count thumbnail size
-            image_proportion = float(image_w) / image_h
-            image_w = ctrl_w
-            image_h = int( image_w / image_proportion )
-            if image_h > ctrl_h:
-                image_h = ctrl_h
-                image_w = int( image_h * image_proportion )
-            # Scale photo thumbnail
-            image.Rescale( image_w, image_h, quality=wx.IMAGE_QUALITY_HIGH )
-        # Resize photo thumbnail
-        image.Resize( (ctrl_w, ctrl_h), ( (ctrl_w-image_w)/2, (ctrl_h-image_h)/2 ) )
-
-        self.photo.SetBitmap( image.ConvertToBitmap() )
+            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, self.photo_fullpath ) )
     
     @property
     def is_photo_changed(self):

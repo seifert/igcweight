@@ -6,6 +6,8 @@ import decimal
 from os.path import join
 from datetime import date
 
+from wx import GetTranslation as _
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Table, MetaData, Column
 from sqlalchemy import Integer, SmallInteger, String, Text, Date, Numeric, Boolean, CHAR, ForeignKey, Sequence

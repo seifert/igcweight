@@ -14,6 +14,31 @@ def error_message_dialog(parent, message, exception=None):
                message += "\n\n%s" % exception.args[0]
     wx.MessageBox( message, _("Error"), wx.OK | wx.ICON_ERROR, parent )
 
+def GetPhotoBitmap(max_size, full_path=None):
+    " __get_photo(self, Size max_size, str full_path='') -> Bitmap - load photo file and return bitmap "
+    # Create bitmap from file
+    if full_path != '' and full_path !=None:
+        image = wx.Image( full_path, type=wx.BITMAP_TYPE_JPEG )
+    else:
+        image = wx.Image( os.path.join(settings.IMAGES_DIR, 'lphoto.png'), type=wx.BITMAP_TYPE_PNG )
+    
+    image_w, image_h =  image.GetSize()
+    ctrl_w, ctrl_h = max_size
+    if image_w > ctrl_w or image_h > ctrl_h:
+        # Count thumbnail size
+        image_proportion = float(image_w) / image_h
+        image_w = ctrl_w
+        image_h = int( image_w / image_proportion )
+        if image_h > ctrl_h:
+            image_h = ctrl_h
+            image_w = int( image_h * image_proportion )
+        # Scale photo thumbnail
+        image.Rescale( image_w, image_h, quality=wx.IMAGE_QUALITY_HIGH )
+    # Resize photo thumbnail
+    image.Resize( (ctrl_w, ctrl_h), ( (ctrl_w-image_w)/2, (ctrl_h-image_h)/2 ) )
+
+    return image.ConvertToBitmap()
+
 class VirtualListCtrl(wx.ListCtrl):
     " VirtualListCtrl(self, Window parent, int id=-1) "
     def __init__(self, parent, id):
@@ -71,4 +96,7 @@ class VirtualListCtrl(wx.ListCtrl):
     @property
     def current_item(self):
         " current_item(self) -> db item - return currently selected item "
-        return self.GetSelectedItemCount()==1 and self.datasource[ self.GetFocusedItem() ] or None
+        if self.GetItemCount() > 0 and self.GetSelectedItemCount() == 1:
+            return self.datasource[ self.GetFocusedItem() ]
+        else:
+            None
