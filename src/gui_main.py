@@ -82,7 +82,8 @@ class Main(wx.Frame):
         self.label_landing_gear = wx.StaticText(self.panel_card, -1, _("Landing gear"))
         self.text_winglets = wx.StaticText(self.panel_card, -1, "")
         self.text_landing_gear = wx.StaticText(self.panel_card, -1, "")
-        self.text_description = wx.StaticText(self.panel_card, -1, "")
+#        self.text_description = wx.TextCtrl(self.panel_card, -1, style=wx.NO_BORDER|wx.TE_MULTILINE|wx.TE_WORDWRAP)
+#        self.text_description = wx.StaticText(self.panel_card, -1, "")
         self.photo = wx.StaticBitmap(self.panel_card, -1)
         self.button_show_photo = wx.Button(self.panel_card, wx.ID_ZOOM_IN, "")
 
@@ -144,19 +145,22 @@ class Main(wx.Frame):
         self.button_show_photo.SetToolTipString(_("Show photo"))
         
         self.text_registration.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_registration.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
         self.text_competition_number.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_competition_number.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
         self.text_glider_type.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_glider_type.SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
         self.text_pilot.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_pilot.SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
         self.text_organization.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+        self.text_winglets.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+        self.text_landing_gear.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+#        self.text_description.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+
+        self.text_registration.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
+        self.text_competition_number.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
+        self.text_glider_type.SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
+        self.text_pilot.SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
         self.text_organization.SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
         self.text_winglets.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
         self.text_landing_gear.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
-        self.text_description.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_description.SetFont(wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
+#        self.text_description.SetFont(wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
         
         self.photo.SetMinSize((180, -1))
         self.split_main.SetSashGravity(0.33)
@@ -181,8 +185,8 @@ class Main(wx.Frame):
         
         sizer_card_base.Add(self.label_competition_number, (0, 0), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.label_registration, (0, 1), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_card_base.Add(self.text_competition_number, (1, 0), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_card_base.Add(self.text_registration, (1, 1), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.text_competition_number, (1, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(self.text_registration, (1, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.label_glider_type, (2, 0), (1, 2), wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.text_glider_type, (3, 0), (1, 2), wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.label_pilot, (4, 0), (1, 2), wx.BOTTOM|wx.EXPAND, 2)
@@ -193,9 +197,9 @@ class Main(wx.Frame):
         sizer_card_base.Add(self.label_winglets, (8, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.text_landing_gear, (9, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.text_winglets, (9, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_card_base.Add(self.text_description, (10, 0), (1, 2), wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_card_base.Add(wx.StaticLine(self.panel_card), (11, 0), (1, 2), wx.EXPAND, 2)
-        sizer_card_base.AddGrowableRow(10)
+#        sizer_card_base.Add(self.text_description, (10, 0), (1, 2), wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(wx.StaticLine(self.panel_card), (10, 0), (1, 2), wx.TOP|wx.EXPAND, 4)
+        sizer_card_base.AddGrowableRow(9)
         sizer_card_base.AddGrowableCol(0)
         sizer_card_base.AddGrowableCol(1)
         
@@ -469,24 +473,26 @@ class Main(wx.Frame):
         " ChangeGliderCard(self, Event evt=None) - this method is called when glider card is changed "
         record = self.list_glider_card.current_item
         if record != None:
-            self.text_registration.Label = record.column_as_str('registration')
-            self.text_competition_number.Label = record.column_as_str('competition_number')
-            self.text_glider_type.Label = record.column_as_str('glider_type')
-            self.text_pilot.Label = record.column_as_str('pilot')
-            self.text_organization.Label = record.column_as_str('organization')
-            self.text_winglets.Label = record.column_as_str('winglets')
-            self.text_landing_gear.Label = record.column_as_str('landing_gear')
-            self.text_description.Label = record.short_description and record.short_description or ''
-            if record.description:
-                self.text_description.SetToolTipString( record.column_as_str('description') )
-            else:
-                self.text_description.SetToolTipString('')
+            self.text_registration.SetLabel( record.column_as_str('registration') )
+            self.text_competition_number.SetLabel( record.column_as_str('competition_number') )
+            self.text_glider_type.SetLabel( record.column_as_str('glider_type') )
+            self.text_pilot.SetLabel( record.column_as_str('pilot') )
+            self.text_organization.SetLabel( record.column_as_str('organization') )
+            self.text_winglets.SetLabel( record.column_as_str('winglets') )
+            self.text_landing_gear.SetLabel( record.column_as_str('landing_gear') )
+#            self.text_description.SetValue( record.column_as_str('description') )
+#            self.text_description.SetLabel( record.short_description and record.short_description or '' )
+#            if record.description:
+#                self.text_description.SetToolTipString( record.column_as_str('description') )
+#            else:
+#                self.text_description.SetToolTipString('')
             if record.main_photo != None:
                 self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, record.main_photo.full_path ) )
                 self.button_show_photo.Enable(True)
             else:
                 self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
                 self.button_show_photo.Enable(False)
+#            self.AddPendingEvent( wx.SizeEvent( self.GetClientSize() ) )
         else:
             self.text_registration.Label = ''
             self.text_competition_number.Label = ''
