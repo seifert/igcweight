@@ -82,7 +82,7 @@ class Main(wx.Frame):
         self.label_landing_gear = wx.StaticText(self.panel_card, -1, _("Landing gear"))
         self.text_winglets = wx.StaticText(self.panel_card, -1, "")
         self.text_landing_gear = wx.StaticText(self.panel_card, -1, "")
-#        self.text_description = wx.StaticText(self.panel_card, -1, "")
+        self.text_description = wx.StaticText(self.panel_card, -1, "")
         self.photo = wx.StaticBitmap(self.panel_card, -1)
         self.button_show_photo = wx.Button(self.panel_card, wx.ID_ZOOM_IN, "")
 
@@ -155,7 +155,8 @@ class Main(wx.Frame):
         self.text_organization.SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
         self.text_winglets.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
         self.text_landing_gear.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
-#        self.text_description.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+        self.text_description.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+        self.text_description.SetFont(wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
         
         self.photo.SetMinSize((180, -1))
         self.split_main.SetSashGravity(0.33)
@@ -192,9 +193,9 @@ class Main(wx.Frame):
         sizer_card_base.Add(self.label_winglets, (8, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.text_landing_gear, (9, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.text_winglets, (9, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_card_base.Add(wx.StaticLine(self.panel_card), (10, 0), (1, 2), wx.TOP|wx.EXPAND, 2)
-#        sizer_card_base.Add(self.text_description, (11, 0), (1, 2), wx.TOP|wx.BOTTOM|wx.EXPAND, 0)
-#        sizer_card_base.AddGrowableRow(11)
+        sizer_card_base.Add(self.text_description, (10, 0), (1, 2), wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_card_base.Add(wx.StaticLine(self.panel_card), (11, 0), (1, 2), wx.EXPAND, 2)
+        sizer_card_base.AddGrowableRow(10)
         sizer_card_base.AddGrowableCol(0)
         sizer_card_base.AddGrowableCol(1)
         
@@ -475,6 +476,11 @@ class Main(wx.Frame):
             self.text_organization.Label = record.column_as_str('organization')
             self.text_winglets.Label = record.column_as_str('winglets')
             self.text_landing_gear.Label = record.column_as_str('landing_gear')
+            self.text_description.Label = record.short_description and record.short_description or ''
+            if record.description:
+                self.text_description.SetToolTipString( record.column_as_str('description') )
+            else:
+                self.text_description.SetToolTipString('')
             if record.main_photo != None:
                 self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, record.main_photo.full_path ) )
                 self.button_show_photo.Enable(True)
@@ -489,6 +495,8 @@ class Main(wx.Frame):
             self.text_organization.Label = ''
             self.text_winglets.Label = ''
             self.text_landing_gear.Label = ''
+            self.text_description.Label = ''
+            self.text_description.SetToolTipString('')
             self.button_show_photo.Enable(False)
             self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
 
