@@ -144,13 +144,13 @@ class Main(wx.Frame):
         self.button_glider_card_delete.Enable(False)
         self.button_show_photo.SetToolTipString(_("Show photo"))
         
-        self.text_registration.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_competition_number.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_glider_type.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_pilot.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_organization.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_winglets.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
-        self.text_landing_gear.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+#        self.text_registration.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+#        self.text_competition_number.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+#        self.text_glider_type.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+#        self.text_pilot.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+#        self.text_organization.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+#        self.text_winglets.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+#        self.text_landing_gear.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
 #        self.text_description.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
 
         self.text_registration.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
@@ -206,7 +206,7 @@ class Main(wx.Frame):
         sizer_photo.Add(self.photo, 1, wx.ALL|wx.EXPAND, 4)
         sizer_photo.Add(self.button_show_photo, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.EXPAND, 4)
 
-        sizer_card_head.Add(sizer_card_base, 1, wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
+        sizer_card_head.Add(sizer_card_base, 1, wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
         sizer_card_head.Add(sizer_photo, 0, wx.ALL|wx.EXPAND, 4)
         
         sizer_card.Add(sizer_card_head, 0, wx.EXPAND, 0)
@@ -513,7 +513,7 @@ class GliderCardForm(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         
         self.sizer_picture_staticbox = wx.StaticBox(self, -1, _("Photo"))
-        self.label_registration = wx.StaticText(self, -1, _("Registration"), style=wx.BORDER_SUNKEN)
+        self.label_registration = wx.StaticText(self, -1, _("Registration"))
         self.label_competition_number = wx.StaticText(self, -1, _("Competition number"))
         self.text_registration = wx.TextCtrl(self, -1, "")
         self.text_competition_number = wx.TextCtrl(self, -1, "")
