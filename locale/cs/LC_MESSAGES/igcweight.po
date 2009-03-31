@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGC Weight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-30 09:02+0200\n"
-"PO-Revision-Date: 2009-03-30 09:03+0100\n"
+"POT-Creation-Date: 2009-03-31 08:36+0200\n"
+"PO-Revision-Date: 2009-03-31 08:37+0100\n"
 "Last-Translator: Jan Seifert <jan.seifert@centrumholdings.com>\n"
 "Language-Team: JS <jan.seifert@fotkyzcest.net>\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +57,7 @@ msgid "Photo"
 msgstr "Obrázek"
 
 #: gui_forms.py:17
-#: gui_main.py:494
+#: gui_main.py:516
 msgid "Registration"
 msgstr "Imatrikulace"
 
@@ -71,12 +71,12 @@ msgid "Glider type"
 msgstr "Typ kluzáku"
 
 #: gui_forms.py:23
-#: gui_main.py:503
+#: gui_main.py:525
 msgid "Add..."
 msgstr "Přidat..."
 
 #: gui_forms.py:24
-#: gui_main.py:102
+#: gui_main.py:103
 msgid "Pilot"
 msgstr "Pilot"
 
@@ -297,39 +297,39 @@ msgstr "Bez vody"
 msgid "Referential w."
 msgstr "Ref. hmotnost"
 
-#: gui_main.py:99
+#: gui_main.py:100
 msgid "Nr."
 msgstr "Č."
 
-#: gui_main.py:296
+#: gui_main.py:301
 msgid "Exit application?"
 msgstr "Chcete opravdu ukončit aplikaci?"
 
-#: gui_main.py:296
+#: gui_main.py:301
 msgid "Exit?"
 msgstr "Ukončit?"
 
-#: gui_main.py:308
-msgid "This program is licensed under GNU General Public License version 2"
-msgstr "Tento program je šířen za podmínek GNU General Public License verze 2"
+#: gui_main.py:313
+msgid "Final version will be released under open source license"
+msgstr "Finální verze bude uvolněna pod open source licencí"
 
-#: gui_main.py:367
+#: gui_main.py:372
 msgid "Glider card insert error"
 msgstr "Došlo k chybě při vkládání nové karty kluzáku"
 
-#: gui_main.py:406
+#: gui_main.py:411
 msgid "Glider card edit error"
 msgstr "Došlo k chybě při editaci karty kluzáku"
 
-#: gui_main.py:440
+#: gui_main.py:445
 msgid "Glider card delete error"
 msgstr "Došlo k chybě při mazání karty kluzáku"
 
-#: gui_main.py:703
+#: gui_main.py:725
 msgid "Open file"
 msgstr "Otevřít soubor"
 
-#: gui_main.py:704
+#: gui_main.py:726
 msgid "JPEG files"
 msgstr "obrázky JPEG"
 
@@ -385,6 +385,9 @@ msgstr "Ano"
 msgid "False"
 msgstr "Ne"
 
+#~ msgid "This program is licensed under GNU General Public License version 2"
+#~ msgstr ""
+#~ "Tento program je šířen za podmínek GNU General Public License verze 2"
 #~ msgid "Picture"
 #~ msgstr "Obrázek"
 #~ msgid "Organization/Country"

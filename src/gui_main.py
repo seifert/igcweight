@@ -235,8 +235,8 @@ class Main(wx.Frame):
             self.SortGliderCardList(self.__sort_glider_card)
             self.list_glider_card.Select(0)
             self.list_glider_card.Focus(0)
-            self.ChangeGliderCard()
         self.__set_enabled_disabled()
+        self.ChangeGliderCard()
     datasource_glider_card = property(get_datasource_glider_card, set_datasource_glider_card)
     
     def __set_enabled_disabled(self):
@@ -310,7 +310,7 @@ class Main(wx.Frame):
         about = wx.AboutDialogInfo()
         about.SetName( "IGC Weight" )
         about.SetVersion( settings.VERSION )
-        about.SetCopyright( _("This program is licensed under GNU General Public License version 2") )
+        about.SetCopyright( _("Final version will be released under open source license") )
         about.SetDevelopers( ("Jan Seifert, jan.seifert@fotkyzcest.net",) )
         wx.AboutBox(about)
 
@@ -501,8 +501,8 @@ class Main(wx.Frame):
             self.text_organization.Label = ''
             self.text_winglets.Label = ''
             self.text_landing_gear.Label = ''
-            self.text_description.Label = ''
-            self.text_description.SetToolTipString('')
+#            self.text_description.Label = ''
+#            self.text_description.SetToolTipString('')
             self.button_show_photo.Enable(False)
             self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
 

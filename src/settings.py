@@ -11,7 +11,7 @@ except ImportError:
 
 LAST_OPEN_FILE_PATH = __homedir
 
-HOME_DIR   = join( __homedir, '.igcweight' )
+HOME_DIR   = join( __homedir, '.igcweight-05' )
 PHOTOS_DIR = join( HOME_DIR, 'photos' )
 BASE_DIR   = abspath( join(dirname(__file__), '..') )
 IMAGES_DIR = join( BASE_DIR, 'images' )
