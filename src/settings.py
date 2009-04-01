@@ -3,15 +3,17 @@
 from os import makedirs
 from os.path import abspath, dirname, join, expanduser, isdir
 
+DEBUG = True
+
 try:
     from win32com.shell import shellcon, shell
-    __homedir = shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0)
+    USER_DIR = shell.SHGetFolderPath(0, shellcon.CSIDL_APPDATA, 0, 0)
 except ImportError:
-    __homedir = expanduser("~")
+    USER_DIR = expanduser("~")
 
-LAST_OPEN_FILE_PATH = __homedir
+LAST_OPEN_FILE_PATH = USER_DIR
 
-HOME_DIR   = join( __homedir, '.igcweight-05' )
+HOME_DIR   = join( USER_DIR, '.igcweight-05' )
 PHOTOS_DIR = join( HOME_DIR, 'photos' )
 BASE_DIR   = abspath( join(dirname(__file__), '..') )
 IMAGES_DIR = join( BASE_DIR, 'images' )
@@ -21,8 +23,7 @@ if not isdir(HOME_DIR):
 if not isdir(PHOTOS_DIR):
     makedirs(PHOTOS_DIR, mode=0755)
 
-
-DEBUG = True
+SHOW_PHOTO_APP = None
 
 DB_ENGINE   = 'sqlite'
 DB_HOST     = ''

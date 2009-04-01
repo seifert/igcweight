@@ -2,8 +2,8 @@
 
 import os
 
-from os import remove
-from os.path import isfile
+from os import remove, system
+from os.path import isfile, splitext, abspath, dirname
 from shutil import copy
 
 import wx
@@ -122,6 +122,7 @@ class Main(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.GliderCardNew, self.button_glider_card_new)
         self.Bind(wx.EVT_BUTTON, self.GliderCardProperties, self.button_glider_card_properties)
         self.Bind(wx.EVT_BUTTON, self.GliderCardDelete, self.button_glider_card_delete)
+        self.Bind(wx.EVT_BUTTON, self.ShowPhoto, self.button_show_photo)
         self.Bind(wx.EVT_TEXT_ENTER, self.SearchGliderCard, self.text_find)
         self.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.SearchGliderCard, self.text_find)
         self.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.AllGliderCard, self.text_find)
@@ -506,6 +507,35 @@ class Main(wx.Frame):
             self.button_show_photo.Enable(False)
             self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
 
+    def ShowPhoto(self, evt=None):
+        " ShowPhoto(self, Event evt=None) - show photo in associated application "
+        mime_man = wx.MimeTypesManager()
+        full_path = self.list_glider_card.current_item.main_photo.full_path
+        mime_type = mime_man.GetFileTypeFromExtension( splitext(full_path)[1].replace('.', '') )
+        command = mime_type.GetOpenCommand(full_path) 
+        if command == None:
+            if settings.SHOW_PHOTO_APP == None:
+                dlg = wx.MessageBox(
+                                    _("No application is associated to open %s mime type. Please, choose the program.") % mime_type.MimeType,
+                                    _("Show photo"), wx.OK | wx.CANCEL | wx.ICON_QUESTION, self
+                                   )
+                if dlg == wx.OK:
+                    dlg_open = wx.FileDialog(
+                                             self, defaultDir=settings.USER_DIR, message=_("Open file"),
+                                             style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST
+                                            )
+                    try:
+                        if dlg_open.ShowModal() == wx.ID_OK:
+                            settings.SHOW_PHOTO_APP = dlg_open.GetPath()
+                        else:
+                            return
+                    finally:
+                        dlg_open.Destroy()
+                else:
+                    return
+            command = settings.SHOW_PHOTO_APP
+        system( "%s %s" % (command, full_path) ) 
+
 class GliderCardForm(wx.Dialog):
     " Glider card insert/edit dialog "
     def __init__(self, *args, **kwds):
@@ -729,8 +759,8 @@ class GliderCardForm(wx.Dialog):
         try:
             if dlg.ShowModal() == wx.ID_OK:
                 self.__photo_changed = True
-                self.photo_fullpath = os.path.join( dlg.Directory, dlg.Filename )
-                settings.LAST_OPEN_FILE_PATH = dlg.Directory
+                self.photo_fullpath = abspath( dlg.GetPath() )
+                settings.LAST_OPEN_FILE_PATH = dirname(self.photo_fullpath)
                 self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, self.photo_fullpath ) )
         finally:
             dlg.Destroy()
