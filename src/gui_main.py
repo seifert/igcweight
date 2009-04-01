@@ -516,7 +516,7 @@ class Main(wx.Frame):
         if command == None:
             if settings.SHOW_PHOTO_APP == None:
                 dlg = wx.MessageBox(
-                                    _("No application is associated to open %s mime type. Please, choose the program.") % mime_type.MimeType,
+                                    _("No application is associated to open %s MIME type. Please, choose the program.") % mime_type.MimeType,
                                     _("Show photo"), wx.OK | wx.CANCEL | wx.ICON_QUESTION, self
                                    )
                 if dlg == wx.OK:

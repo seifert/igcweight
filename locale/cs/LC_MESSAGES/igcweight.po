@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGC Weight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-31 08:36+0200\n"
-"PO-Revision-Date: 2009-03-31 08:37+0100\n"
+"POT-Creation-Date: 2009-04-01 11:45+0200\n"
+"PO-Revision-Date: 2009-04-01 11:46+0100\n"
 "Last-Translator: Jan Seifert <jan.seifert@centrumholdings.com>\n"
 "Language-Team: JS <jan.seifert@fotkyzcest.net>\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +57,7 @@ msgid "Photo"
 msgstr "Obrázek"
 
 #: gui_forms.py:17
-#: gui_main.py:516
+#: gui_main.py:546
 msgid "Registration"
 msgstr "Imatrikulace"
 
@@ -71,7 +71,7 @@ msgid "Glider type"
 msgstr "Typ kluzáku"
 
 #: gui_forms.py:23
-#: gui_main.py:525
+#: gui_main.py:555
 msgid "Add..."
 msgstr "Přidat..."
 
@@ -301,35 +301,40 @@ msgstr "Ref. hmotnost"
 msgid "Nr."
 msgstr "Č."
 
-#: gui_main.py:301
+#: gui_main.py:302
 msgid "Exit application?"
 msgstr "Chcete opravdu ukončit aplikaci?"
 
-#: gui_main.py:301
+#: gui_main.py:302
 msgid "Exit?"
 msgstr "Ukončit?"
 
-#: gui_main.py:313
+#: gui_main.py:314
 msgid "Final version will be released under open source license"
 msgstr "Finální verze bude uvolněna pod open source licencí"
 
-#: gui_main.py:372
+#: gui_main.py:373
 msgid "Glider card insert error"
 msgstr "Došlo k chybě při vkládání nové karty kluzáku"
 
-#: gui_main.py:411
+#: gui_main.py:412
 msgid "Glider card edit error"
 msgstr "Došlo k chybě při editaci karty kluzáku"
 
-#: gui_main.py:445
+#: gui_main.py:446
 msgid "Glider card delete error"
 msgstr "Došlo k chybě při mazání karty kluzáku"
 
-#: gui_main.py:725
+#: gui_main.py:519
+#, python-format
+msgid "No application is associated to open %s MIME type. Please, choose the program."
+msgstr "Pro zobrazení %s MIME typu není asociován žádný program, vyberte jej ručně."
+
+#: gui_main.py:524
 msgid "Open file"
 msgstr "Otevřít soubor"
 
-#: gui_main.py:726
+#: gui_main.py:757
 msgid "JPEG files"
 msgstr "obrázky JPEG"
 
