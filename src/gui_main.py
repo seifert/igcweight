@@ -1,6 +1,7 @@
 " GUI - Main window "
 
 import os
+import sys
 
 from os import remove, system
 from os.path import isfile, splitext, abspath, dirname
@@ -509,8 +510,15 @@ class Main(wx.Frame):
 
     def ShowPhoto(self, evt=None):
         " ShowPhoto(self, Event evt=None) - show photo in associated application "
-        mime_man = wx.MimeTypesManager()
         full_path = self.list_glider_card.current_item.main_photo.full_path
+        
+        try:
+            os.startfile(full_path)
+            return
+        except:
+            pass
+
+        mime_man = wx.MimeTypesManager()
         mime_type = mime_man.GetFileTypeFromExtension( splitext(full_path)[1].replace('.', '') )
         command = mime_type.GetOpenCommand(full_path) 
         if command == None:
@@ -543,10 +551,10 @@ class GliderCardForm(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         
         self.sizer_picture_staticbox = wx.StaticBox(self, -1, _("Photo"))
-        self.label_registration = wx.StaticText(self, -1, _("Registration"))
         self.label_competition_number = wx.StaticText(self, -1, _("Competition number"))
-        self.text_registration = wx.TextCtrl(self, -1, "")
+        self.label_registration = wx.StaticText(self, -1, _("Registration"))
         self.text_competition_number = wx.TextCtrl(self, -1, "")
+        self.text_registration = wx.TextCtrl(self, -1, "")
         self.label_glider_type = wx.StaticText(self, -1, _("Glider type"))
         self.combo_glider_type = wx.ComboBox(self, -1, choices=[], style=wx.CB_DROPDOWN|wx.CB_READONLY)
         self.button_add_glider_type = wx.Button(self, -1, _("Add..."), style=wx.BU_EXACTFIT)
@@ -556,8 +564,8 @@ class GliderCardForm(wx.Dialog):
         self.label_organization = wx.StaticText(self, -1, _("Organization or country"))
         self.combo_organization = wx.ComboBox(self, -1, choices=[], style=wx.CB_DROPDOWN|wx.CB_READONLY)
         self.button_add_organization = wx.Button(self, -1, _("Add..."), style=wx.BU_EXACTFIT)
-        self.checkbox_winglets = wx.CheckBox(self, -1, _("Winglets"))
         self.checkbox_gear = wx.CheckBox(self, -1, _("Landing gear"))
+        self.checkbox_winglets = wx.CheckBox(self, -1, _("Winglets"))
         self.photo = wx.StaticBitmap(self, -1)
         self.button_open_photo = wx.Button(self, wx.ID_OPEN, "")
         self.button_clear_photo = wx.Button(self, wx.ID_CLEAR, "")
@@ -590,7 +598,7 @@ class GliderCardForm(wx.Dialog):
     def __set_properties(self):
         self.SetTitle(_("Glider card"))
         
-        char_w = self.combo_glider_type.CharWidth
+#        char_w = self.combo_glider_type.CharWidth
 #        self.combo_glider_type.SetMinSize( (char_w * 50, -1) )
         
         fontbold = self.label_registration.GetFont()
@@ -610,7 +618,7 @@ class GliderCardForm(wx.Dialog):
         self.button_open_photo.SetToolTipString(_("Open picture from file"))
         self.button_clear_photo.SetToolTipString(_("Clear picture"))
         
-        self.text_registration.SetFocus()
+        self.text_competition_number.SetFocus()
         self.button_ok.SetDefault()
 
     def __do_layout(self):
@@ -622,24 +630,27 @@ class GliderCardForm(wx.Dialog):
         sizer_photo_buttons = wx.BoxSizer(wx.HORIZONTAL)
         sizer_buttons = wx.StdDialogButtonSizer()
         # Glider data sizer
-        sizer_data.Add(self.label_registration, (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
-        sizer_data.Add(self.label_competition_number, (0, 1), (1, 2), wx.LEFT|wx.EXPAND, 2)
-        sizer_data.Add(self.text_registration, (1, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_data.Add(self.text_competition_number, (1, 1), (1, 2), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_data.Add(self.label_glider_type, (2, 0), (1, 3), wx.RIGHT|wx.EXPAND, 2)
-        sizer_data.Add(self.combo_glider_type, (3, 0), (1, 3), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_data.Add(self.button_add_glider_type, (3, 3), (1, 1), wx.LEFT|wx.BOTTOM, 2)
-        sizer_data.Add(self.label_pilot, (4, 0), (1, 3), wx.RIGHT|wx.EXPAND, 2)
-        sizer_data.Add(self.combo_pilot, (5, 0), (1, 3), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_data.Add(self.button_add_pilot, (5, 3), (1, 1), wx.LEFT|wx.BOTTOM, 2)
-        sizer_data.Add(self.label_organization, (6, 0), (1, 3), wx.RIGHT|wx.EXPAND, 2)
-        sizer_data.Add(self.combo_organization, (7, 0), (1, 3), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_data.Add(self.button_add_organization, (7, 3), (1, 1), wx.LEFT|wx.BOTTOM, 2)
-        sizer_data.Add(self.checkbox_winglets, (8, 0), (1, 1), wx.RIGHT|wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_data.Add(self.checkbox_gear, (8, 1), (1, 1), wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.label_competition_number, (0, 0), (1, 3), wx.LEFT|wx.EXPAND, 2)
+        sizer_data.Add(self.label_registration, (0, 3), (1, 3), wx.RIGHT|wx.EXPAND, 2)
+        sizer_data.Add(self.text_competition_number, (1, 0), (1, 3), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.text_registration, (1, 3), (1, 3), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.label_glider_type, (2, 0), (1, 6), wx.RIGHT|wx.EXPAND, 2)
+        sizer_data.Add(self.combo_glider_type, (3, 0), (1, 6), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.button_add_glider_type, (3, 6), (1, 1), wx.LEFT|wx.BOTTOM, 2)
+        sizer_data.Add(self.label_pilot, (4, 0), (1, 6), wx.RIGHT|wx.EXPAND, 2)
+        sizer_data.Add(self.combo_pilot, (5, 0), (1, 6), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.button_add_pilot, (5, 6), (1, 1), wx.LEFT|wx.BOTTOM, 2)
+        sizer_data.Add(self.label_organization, (6, 0), (1, 6), wx.RIGHT|wx.EXPAND, 2)
+        sizer_data.Add(self.combo_organization, (7, 0), (1, 6), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.button_add_organization, (7, 6), (1, 1), wx.LEFT|wx.BOTTOM, 2)
+        sizer_data.Add(self.checkbox_gear, (8, 0), (1, 3), wx.RIGHT|wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.checkbox_winglets, (8, 3), (1, 3), wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
         sizer_data.AddGrowableCol(0, 1)
         sizer_data.AddGrowableCol(1, 1)
         sizer_data.AddGrowableCol(2, 1)
+        sizer_data.AddGrowableCol(3, 1)
+        sizer_data.AddGrowableCol(4, 1)
+        sizer_data.AddGrowableCol(5, 1)
         # Photo sizer
         sizer_photo.Add(self.photo, 1, wx.ALL|wx.EXPAND, 4)
         sizer_photo_buttons.Add(self.button_open_photo, 1, wx.RIGHT|wx.EXPAND, 2)

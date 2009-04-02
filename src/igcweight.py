@@ -18,6 +18,7 @@ def main():
         mylocale = wx.Locale(wx.LANGUAGE_DEFAULT)
         mylocale.AddCatalogLookupPathPrefix( join(BASE_DIR, 'locale') )
         mylocale.AddCatalog('igcweight')
+        mylocale.AddCatalog('wxstd')
         
         wx.InitAllImageHandlers()
     

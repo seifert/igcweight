@@ -19,9 +19,9 @@ BASE_DIR   = abspath( join(dirname(__file__), '..') )
 IMAGES_DIR = join( BASE_DIR, 'images' )
 
 if not isdir(HOME_DIR):
-    makedirs(HOME_DIR, mode=0755)
+    makedirs(HOME_DIR)
 if not isdir(PHOTOS_DIR):
-    makedirs(PHOTOS_DIR, mode=0755)
+    makedirs(PHOTOS_DIR)
 
 SHOW_PHOTO_APP = None
 
