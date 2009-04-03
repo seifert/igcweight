@@ -14,7 +14,7 @@ from sqlalchemy import Integer, SmallInteger, String, Text, Date, Numeric, Boole
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy.orm import relation, backref
 
-from settings import PHOTOS_DIR
+import settings
 
 def get_short_description(description, length):
     " get_short_description(str description, int length) -> str - get short description "
@@ -278,7 +278,7 @@ class Photo(Base):
     @property
     def full_path(self):
         " Returns photo full path "
-        return join( PHOTOS_DIR, "%08d.jpg" % self.id )
+        return join( settings.PHOTOS_DIR, "%08d.jpg" % self.id )
 
 
 class GliderCard(Base):
@@ -293,6 +293,13 @@ class GliderCard(Base):
         Column( 'organization_id', Integer, nullable=False ),
         Column( 'landing_gear', Boolean, nullable=False ),
         Column( 'winglets', Boolean, nullable=False ),
+        Column( 'certified_weight_non_lifting', SmallInteger ),
+        Column( 'certified_empty_weight', SmallInteger ),
+        Column( 'certified_min_seat_weight', SmallInteger ),
+        Column( 'certified_max_seat_weight', SmallInteger ),
+        Column( 'glider_weight', SmallInteger ),
+        Column( 'pilot_weight', SmallInteger ),
+        Column( 'tow_bar_weight', SmallInteger ),
         Column( 'description', Text ),
         PrimaryKeyConstraint( 'id', name='pk_glider_card' ),
         ForeignKeyConstraint( ('glider_type_id',), ('glider_type.id',), name='fk_glider_card_glider_type' ),
@@ -331,6 +338,16 @@ class GliderCard(Base):
             return ''
         elif columnname in ('landing_gear', 'winglets'):
             return value == True and _("True") or _("False")
+        elif columnname in (
+                            'certified_weight_non_lifting',
+                            'certified_empty_weight',
+                            'certified_min_seat_weight',
+                            'certified_max_seat_weight',
+                            'glider_weight',
+                            'pilot_weight',
+                            'tow_bar_weight'
+                           ):
+            return locale.format("%d", value)
         else:
             return unicode(value)
     
@@ -338,6 +355,16 @@ class GliderCard(Base):
         " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
         if value == '':
             value = None
+        elif columnname in (
+                            'certified_weight_non_lifting',
+                            'certified_empty_weight',
+                            'certified_min_seat_weight',
+                            'certified_max_seat_weight',
+                            'glider_weight',
+                            'pilot_weight',
+                            'tow_bar_weight'
+                           ):
+            value = locale.atoi(value)
         setattr( self, columnname, value )
     
     def GetDescription(self, length=50):
@@ -356,6 +383,73 @@ class GliderCard(Base):
             if photo.main == True:
                 return photo
         return None
+    
+    @property
+    def referential_weight(self):
+        " referential_weight -> int or None - return competition referential weight "
+        if self.glider_weight != None and self.pilot_weight != None:
+            return self.glider_weight + self.pilot_weight
+        else:
+            return None
+    
+    @property
+    def referential_difference(self):
+        " referential_difference -> int or None - return difference between measured and igc weight "
+        if self.referential_weight != None and self.glider_type.weight_referential != None:
+            return self.referential_weight - self.glider_type.weight_referential
+        else:
+            return None
+    
+    @property
+    def coefficient(self):
+        " coefficient -> int or None - return competition coefficient "
+        referential_difference = self.referential_difference
+        if referential_difference != None:
+            gear_handicap = self.landing_gear and settings.GEAR_HANDICAP or 0
+            winglets_handicap = self.winglets and settings.WINGLETS_HANDICAP or 0
+            coefficient = self.glider_type.coefficient + gear_handicap + winglets_handicap
+            if referential_difference > 0:
+                coefficient = coefficient + ( ((referential_difference / settings.OWERWEIGHT_STEP) + 1) * settings.OWERWEIGHT_HANDICAP )
+            return coefficient
+        else:
+            return None
+    
+    @property
+    def non_lifting_difference(self):
+        " non_lifting_difference -> int or None - return difference between certified and igc non-lifting parts weight "
+        if self.certified_weight_non_lifting != None and self.glider_type.weight_non_lifting != None:
+            return self.certified_weight_non_lifting - self.glider_type.weight_non_lifting
+        else:
+            return None
+    
+    @property
+    def mtow_difference(self):
+        " mtow_difference -> int or None - return difference between measured and igc mtow "
+        if self.glider_type.mtow_without_water != None:
+            mtow = self.glider_type.mtow_without_water
+        else:
+            if self.glider_type.mtow_without_water != None:
+                mtow = self.glider_type.mtow_without_water
+            else:
+                mtow = None
+        referential_weight = self.referential_weight
+        if referential_weight != None and mtow != None:
+            return referential_weight - self.glider_type.mtow
+        else:
+            return None
+    
+    @property
+    def seat_weight_difference(self):
+        " seat_weight_difference -> int or None - return difference between certified and igc non-lifting parts weight  "
+        if self.certified_min_seat_weight != None and self.certified_max_seat_weight != None and self.pilot_weight != None:
+            if self.pilot_weight < self.certified_min_seat_weight:
+                return self.pilot_weight - self.certified_min_seat_weight
+            elif self.pilot_weight > self.certified_max_seat_weight:
+                return self.pilot_weight - self.certified_max_seat_weight
+            else:
+                return 0
+        else:
+            return None
 
 
 from database import engine

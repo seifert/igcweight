@@ -550,6 +550,7 @@ class GliderCardForm(wx.Dialog):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
         wx.Dialog.__init__(self, *args, **kwds)
         
+        # Base data
         self.sizer_picture_staticbox = wx.StaticBox(self, -1, _("Photo"))
         self.label_competition_number = wx.StaticText(self, -1, _("Competition number"))
         self.label_registration = wx.StaticText(self, -1, _("Registration"))
@@ -566,11 +567,29 @@ class GliderCardForm(wx.Dialog):
         self.button_add_organization = wx.Button(self, -1, _("Add..."), style=wx.BU_EXACTFIT)
         self.checkbox_gear = wx.CheckBox(self, -1, _("Landing gear"))
         self.checkbox_winglets = wx.CheckBox(self, -1, _("Winglets"))
+        # Main photo
         self.photo = wx.StaticBitmap(self, -1)
         self.button_open_photo = wx.Button(self, wx.ID_OPEN, "")
         self.button_clear_photo = wx.Button(self, wx.ID_CLEAR, "")
+        # Weights
+        self.label_non_lifting_weight = wx.StaticText(self, -1, _("Non-lifting parts weight"))
+        self.text_non_lifting_weight = wx.TextCtrl(self, -1, "")
+        self.label_empty_weight = wx.StaticText(self, -1, _("Empty glider weight"))
+        self.text_empty_weight = wx.TextCtrl(self, -1, "")
+        self.label_seat_min_weight = wx.StaticText(self, -1, _("Seat minimum weight"))
+        self.text_seat_min_weight = wx.TextCtrl(self, -1, "")
+        self.label_seat_max_weight = wx.StaticText(self, -1, _("Seat maximum weight"))
+        self.text_seat_max_weight = wx.TextCtrl(self, -1, "")
+        self.label_glider_weight = wx.StaticText(self, -1, _("Glider weight"))
+        self.text_glider_weight = wx.TextCtrl(self, -1, "")
+        self.label_pilot_weight = wx.StaticText(self, -1, _("Pilot weight"))
+        self.text_pilot_weight = wx.TextCtrl(self, -1, "")
+        self.label_tow_bar_weight = wx.StaticText(self, -1, _("Tow bar weight"))
+        self.text_tow_bar_weight = wx.TextCtrl(self, -1, "")
+        # Description
         self.label_description = wx.StaticText(self, -1, _("Description"))
         self.text_description = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE|wx.TE_WORDWRAP)
+        # Buttons
         self.button_ok = wx.Button(self, wx.ID_OK, "")
         self.button_cancel = wx.Button(self, wx.ID_CANCEL, "")
 
@@ -626,14 +645,15 @@ class GliderCardForm(wx.Dialog):
         sizer_glider_card = wx.BoxSizer(wx.HORIZONTAL)
         sizer_description = wx.BoxSizer(wx.VERTICAL)
         sizer_data = wx.GridBagSizer(2, 2)
+        sizer_weights = wx.GridBagSizer(2, 2)
         sizer_photo = wx.StaticBoxSizer(self.sizer_picture_staticbox, wx.VERTICAL)
         sizer_photo_buttons = wx.BoxSizer(wx.HORIZONTAL)
         sizer_buttons = wx.StdDialogButtonSizer()
-        # Glider data sizer
-        sizer_data.Add(self.label_competition_number, (0, 0), (1, 3), wx.LEFT|wx.EXPAND, 2)
-        sizer_data.Add(self.label_registration, (0, 3), (1, 3), wx.RIGHT|wx.EXPAND, 2)
-        sizer_data.Add(self.text_competition_number, (1, 0), (1, 3), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_data.Add(self.text_registration, (1, 3), (1, 3), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        # Glider base data sizer
+        sizer_data.Add(self.label_competition_number, (0, 0), (1, 3), wx.RIGHT|wx.EXPAND, 2)
+        sizer_data.Add(self.label_registration, (0, 3), (1, 3), wx.LEFT|wx.EXPAND, 2)
+        sizer_data.Add(self.text_competition_number, (1, 0), (1, 3), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(self.text_registration, (1, 3), (1, 3), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_data.Add(self.label_glider_type, (2, 0), (1, 6), wx.RIGHT|wx.EXPAND, 2)
         sizer_data.Add(self.combo_glider_type, (3, 0), (1, 6), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_data.Add(self.button_add_glider_type, (3, 6), (1, 1), wx.LEFT|wx.BOTTOM, 2)
@@ -645,12 +665,32 @@ class GliderCardForm(wx.Dialog):
         sizer_data.Add(self.button_add_organization, (7, 6), (1, 1), wx.LEFT|wx.BOTTOM, 2)
         sizer_data.Add(self.checkbox_gear, (8, 0), (1, 3), wx.RIGHT|wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
         sizer_data.Add(self.checkbox_winglets, (8, 3), (1, 3), wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_data.Add(wx.StaticLine(self, -1), (9, 0), (1, 7), wx.TOP|wx.EXPAND, 2)
         sizer_data.AddGrowableCol(0, 1)
         sizer_data.AddGrowableCol(1, 1)
         sizer_data.AddGrowableCol(2, 1)
         sizer_data.AddGrowableCol(3, 1)
         sizer_data.AddGrowableCol(4, 1)
         sizer_data.AddGrowableCol(5, 1)
+        # Certified and measured weights sizer
+        sizer_weights.Add(self.label_non_lifting_weight, (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
+        sizer_weights.Add(self.label_empty_weight, (0, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_weights.Add(self.label_seat_min_weight, (0, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_weights.Add(self.label_seat_max_weight, (0, 3), (1, 1), wx.LEFT|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_non_lifting_weight, (1, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_empty_weight, (1, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_seat_min_weight, (1, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_seat_max_weight, (1, 3), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_weights.Add(self.label_glider_weight, (2, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
+        sizer_weights.Add(self.label_pilot_weight, (2, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_weights.Add(self.label_tow_bar_weight, (2, 2), (1, 1), wx.LEFT|wx.LEFT|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_glider_weight, (3, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_pilot_weight, (3, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_tow_bar_weight, (3, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_weights.AddGrowableCol(0, 1)
+        sizer_weights.AddGrowableCol(1, 1)
+        sizer_weights.AddGrowableCol(2, 1)
+        sizer_weights.AddGrowableCol(3, 1)
         # Photo sizer
         sizer_photo.Add(self.photo, 1, wx.ALL|wx.EXPAND, 4)
         sizer_photo_buttons.Add(self.button_open_photo, 1, wx.RIGHT|wx.EXPAND, 2)
@@ -665,8 +705,11 @@ class GliderCardForm(wx.Dialog):
         sizer_buttons.Realize()
         
         sizer_glider_card.Add(sizer_data, 1, wx.RIGHT|wx.TOP|wx.EXPAND, 4)
-        sizer_glider_card.Add(sizer_photo, 0, wx.LEFT|wx.TOP|wx.EXPAND, 4)
+        sizer_glider_card.Add(sizer_photo, 0, wx.TOP|wx.EXPAND, 4)
+        
         sizer_main.Add(sizer_glider_card, 0, wx.LEFT|wx.RIGHT|wx.EXPAND, 4)
+        sizer_main.Add(sizer_weights, 0, wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
+        sizer_main.Add(wx.StaticLine(self, -1), 0, wx.TOP|wx.LEFT|wx.RIGHT|wx.EXPAND, 4)
         sizer_main.Add(sizer_description, 1, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
         sizer_main.Add(sizer_buttons, 0, wx.ALL|wx.ALIGN_RIGHT, 4)
         
@@ -674,6 +717,7 @@ class GliderCardForm(wx.Dialog):
         self.SetMinSize( (750, self.GetBestSize().height) )
         sizer_main.Fit(self)
         self.Layout()
+        self.SetMinSize(self.Size)
         self.CenterOnParent()
 
     def __init_combo_glider_type(self):

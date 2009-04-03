@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGC Weight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-01 11:45+0200\n"
-"PO-Revision-Date: 2009-04-01 11:46+0100\n"
+"POT-Creation-Date: 2009-04-03 14:56+0200\n"
+"PO-Revision-Date: 2009-04-03 14:58+0100\n"
 "Last-Translator: Jan Seifert <jan.seifert@centrumholdings.com>\n"
 "Language-Team: JS <jan.seifert@fotkyzcest.net>\n"
 "MIME-Version: 1.0\n"
@@ -36,7 +36,7 @@ msgstr "&Nový...\tInsert"
 
 #: gui_dialogmodel.py:27
 msgid "&Properties...\tEnter"
-msgstr "&Vlastnosti...\tEnter"
+msgstr "&Upravit...\tEnter"
 
 #: gui_dialogmodel.py:29
 msgid "&Delete\tCtrl+Delete"
@@ -57,7 +57,7 @@ msgid "Photo"
 msgstr "Obrázek"
 
 #: gui_forms.py:17
-#: gui_main.py:546
+#: gui_main.py:556
 msgid "Registration"
 msgstr "Imatrikulace"
 
@@ -66,17 +66,17 @@ msgid "Competition number"
 msgstr "Startovní číslo"
 
 #: gui_forms.py:21
-#: gui_main.py:75
+#: gui_main.py:76
 msgid "Glider type"
 msgstr "Typ kluzáku"
 
 #: gui_forms.py:23
-#: gui_main.py:555
+#: gui_main.py:564
 msgid "Add..."
 msgstr "Přidat..."
 
 #: gui_forms.py:24
-#: gui_main.py:103
+#: gui_main.py:104
 msgid "Pilot"
 msgstr "Pilot"
 
@@ -191,7 +191,7 @@ msgstr "Přidat nový kluzák"
 
 #: gui_forms.py:198
 msgid "&Properties..."
-msgstr "&Vlastnosti..."
+msgstr "&Upravit..."
 
 #: gui_forms.py:198
 msgid "Edit glider properties"
@@ -297,44 +297,72 @@ msgstr "Bez vody"
 msgid "Referential w."
 msgstr "Ref. hmotnost"
 
-#: gui_main.py:100
+#: gui_main.py:101
 msgid "Nr."
 msgstr "Č."
 
-#: gui_main.py:302
+#: gui_main.py:303
 msgid "Exit application?"
 msgstr "Chcete opravdu ukončit aplikaci?"
 
-#: gui_main.py:302
+#: gui_main.py:303
 msgid "Exit?"
 msgstr "Ukončit?"
 
-#: gui_main.py:314
+#: gui_main.py:315
 msgid "Final version will be released under open source license"
 msgstr "Finální verze bude uvolněna pod open source licencí"
 
-#: gui_main.py:373
+#: gui_main.py:374
 msgid "Glider card insert error"
 msgstr "Došlo k chybě při vkládání nové karty kluzáku"
 
-#: gui_main.py:412
+#: gui_main.py:413
 msgid "Glider card edit error"
 msgstr "Došlo k chybě při editaci karty kluzáku"
 
-#: gui_main.py:446
+#: gui_main.py:447
 msgid "Glider card delete error"
 msgstr "Došlo k chybě při mazání karty kluzáku"
 
-#: gui_main.py:519
+#: gui_main.py:527
 #, python-format
 msgid "No application is associated to open %s MIME type. Please, choose the program."
 msgstr "Pro zobrazení %s MIME typu není asociován žádný program, vyberte jej ručně."
 
-#: gui_main.py:524
+#: gui_main.py:532
 msgid "Open file"
 msgstr "Otevřít soubor"
 
-#: gui_main.py:757
+#: gui_main.py:575
+msgid "Non-lifting parts weight"
+msgstr "Hmotnost nevztlakových částí"
+
+#: gui_main.py:577
+msgid "Empty glider weight"
+msgstr "Hmotnost prázdného kluzáku"
+
+#: gui_main.py:579
+msgid "Seat minimum weight"
+msgstr "Mimimální zatížení sedačky"
+
+#: gui_main.py:581
+msgid "Seat maximum weight"
+msgstr "Maximální zatížení sedačky"
+
+#: gui_main.py:583
+msgid "Glider weight"
+msgstr "Hmotnost kluzáku"
+
+#: gui_main.py:585
+msgid "Pilot weight"
+msgstr "Hmotnost pilota"
+
+#: gui_main.py:587
+msgid "Tow bar weight"
+msgstr "Hmotnost na vlečné tyči"
+
+#: gui_main.py:811
 msgid "JPEG files"
 msgstr "obrázky JPEG"
 
@@ -378,7 +406,7 @@ msgstr "Piloti"
 msgid "Error"
 msgstr "Chyba"
 
-#: igcweight.py:36
+#: igcweight.py:37
 msgid "Some error during starting application"
 msgstr "Došlo k chybě během spouštění aplikace"
 
@@ -390,6 +418,16 @@ msgstr "Ano"
 msgid "False"
 msgstr "Ne"
 
+#~ msgid "&Properties"
+#~ msgstr "&Upravit"
+#~ msgid "&New"
+#~ msgstr "&Nový"
+#~ msgid "&Close"
+#~ msgstr "&Zavřít"
+#~ msgid "Zoom &In"
+#~ msgstr "&Zvětšit"
+#~ msgid "C&redits"
+#~ msgstr "Zá&sluhy"
 #~ msgid "This program is licensed under GNU General Public License version 2"
 #~ msgstr ""
 #~ "Tento program je šířen za podmínek GNU General Public License verze 2"
