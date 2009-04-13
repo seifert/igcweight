@@ -8,6 +8,7 @@ from os.path import isfile, splitext, abspath, dirname
 from shutil import copy
 
 import wx
+from wx.lib.multisash import EmptyChild
 from wx import GetTranslation as _
 
 from sqlalchemy import or_
@@ -33,6 +34,7 @@ class Main(wx.Frame):
         self.split_main = wx.SplitterWindow(self, -1, style=wx.SP_3D|wx.SP_BORDER)
         self.panel_card = wx.Panel(self.split_main, -1)
         self.sizer_photo_staticbox = wx.StaticBox(self.panel_card, -1, _("Photo"))
+        self.staticbox_certified_weights = wx.StaticBox(self.panel_card, -1, _("Certified weights"))
         self.panel_gliders = wx.Panel(self.split_main, -1)
         
         # Menu Bar
@@ -83,8 +85,19 @@ class Main(wx.Frame):
         self.label_landing_gear = wx.StaticText(self.panel_card, -1, _("Landing gear"))
         self.text_winglets = wx.StaticText(self.panel_card, -1, "")
         self.text_landing_gear = wx.StaticText(self.panel_card, -1, "")
+
+        self.label_non_lifting_weight = wx.StaticText(self.panel_card, -1, _("Non-lifting parts"))
+        self.text_non_lifting_weight = wx.StaticText(self.panel_card, -1, _(""))
+        self.label_empty_weight = wx.StaticText(self.panel_card, -1, _("Empty glider"))
+        self.text_empty_weight = wx.StaticText(self.panel_card, -1, _(""))
+        self.label_seat_min_weight = wx.StaticText(self.panel_card, -1, _("Seat min."))
+        self.text_seat_min_weight = wx.StaticText(self.panel_card, -1, _(""))
+        self.label_seat_max_weight = wx.StaticText(self.panel_card, -1, _("Seat max."))
+        self.text_seat_max_weight = wx.StaticText(self.panel_card, -1, _(""))
+
 #        self.text_description = wx.TextCtrl(self.panel_card, -1, style=wx.NO_BORDER|wx.TE_MULTILINE|wx.TE_WORDWRAP)
 #        self.text_description = wx.StaticText(self.panel_card, -1, "")
+
         self.photo = wx.StaticBitmap(self.panel_card, -1)
         self.button_show_photo = wx.Button(self.panel_card, wx.ID_ZOOM_IN, "")
 
@@ -169,22 +182,22 @@ class Main(wx.Frame):
         self.split_main.SetMinimumPaneSize(375)
 
     def __do_layout(self):
-        sizer_main = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_card = wx.BoxSizer(wx.VERTICAL)
-        sizer_card_head = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_photo = wx.StaticBoxSizer(self.sizer_photo_staticbox, wx.VERTICAL)
+        self.split_main.SplitVertically(self.panel_gliders, self.panel_card)
 
-        sizer_card_base = wx.GridBagSizer(0, 0)
-        sizer_gliders = wx.BoxSizer(wx.VERTICAL)
+        # Glider buttons sizer
         sizer_gliders_buttons = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_gliders.Add(self.text_find, 0, wx.LEFT|wx.TOP|wx.EXPAND, 4)
-        sizer_gliders.Add(self.list_glider_card, 1, wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
         sizer_gliders_buttons.Add(self.button_glider_card_new, 1, wx.RIGHT, 2)
         sizer_gliders_buttons.Add(self.button_glider_card_properties, 1, wx.LEFT|wx.RIGHT, 2)
         sizer_gliders_buttons.Add(self.button_glider_card_delete, 1, wx.LEFT, 2)
+        # Glider (left panel) sizer
+        sizer_gliders = wx.BoxSizer(wx.VERTICAL)
+        sizer_gliders.Add(self.text_find, 0, wx.LEFT|wx.TOP|wx.EXPAND, 4)
+        sizer_gliders.Add(self.list_glider_card, 1, wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
         sizer_gliders.Add(sizer_gliders_buttons, 0, wx.LEFT|wx.BOTTOM|wx.EXPAND, 4)
         self.panel_gliders.SetSizer(sizer_gliders)
         
+        # Glider card base sizer
+        sizer_card_base = wx.GridBagSizer(0, 0)
         sizer_card_base.Add(self.label_competition_number, (0, 0), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.label_registration, (0, 1), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.text_competition_number, (1, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
@@ -199,29 +212,47 @@ class Main(wx.Frame):
         sizer_card_base.Add(self.label_winglets, (8, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.text_landing_gear, (9, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(self.text_winglets, (9, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
-#        sizer_card_base.Add(self.text_description, (10, 0), (1, 2), wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
         sizer_card_base.Add(wx.StaticLine(self.panel_card), (10, 0), (1, 2), wx.TOP|wx.EXPAND, 4)
         sizer_card_base.AddGrowableRow(9)
         sizer_card_base.AddGrowableCol(0, 1)
         sizer_card_base.AddGrowableCol(1, 1)
-        
+        # Photo sizer
+        sizer_photo = wx.StaticBoxSizer(self.sizer_photo_staticbox, wx.VERTICAL)
         sizer_photo.Add(self.photo, 1, wx.ALL|wx.EXPAND, 4)
         sizer_photo.Add(self.button_show_photo, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.EXPAND, 4)
-
+        # Card head (top) sizer
+        sizer_card_head = wx.BoxSizer(wx.HORIZONTAL)
         sizer_card_head.Add(sizer_card_base, 1, wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
         sizer_card_head.Add(sizer_photo, 0, wx.ALL|wx.EXPAND, 4)
-        
+        # Certified weights sizer
+        sizer_certified_weights = wx.GridBagSizer(2, 2)
+        sizer_certified_weights.Add(self.label_non_lifting_weight, (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.label_empty_weight, (0, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.label_seat_min_weight, (0, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.label_seat_max_weight, (0, 3), (1, 1), wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.text_non_lifting_weight, (1, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.text_empty_weight, (1, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.text_seat_min_weight, (1, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.text_seat_max_weight, (1, 3), (1, 1), wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.AddGrowableCol(0, 1)
+        sizer_certified_weights.AddGrowableCol(1, 1)
+        sizer_certified_weights.AddGrowableCol(2, 1)
+        sizer_certified_weights.AddGrowableCol(3, 1)
+        sizer_certified_weights_staticbox = wx.StaticBoxSizer(self.staticbox_certified_weights, wx.VERTICAL)
+        sizer_certified_weights_staticbox.Add(sizer_certified_weights, 0, wx.ALL|wx.EXPAND, 4)
+        # Card sizer
+        sizer_card = wx.BoxSizer(wx.VERTICAL)
         sizer_card.Add(sizer_card_head, 0, wx.EXPAND, 0)
-        sizer_card.Add(wx.Panel(self.panel_card, -1), 1, wx.ALL|wx.EXPAND, 4)
-
+        sizer_card.Add(sizer_certified_weights_staticbox, 0, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
+        sizer_card.Add(EmptyChild(self.panel_card), 1, wx.ALL|wx.EXPAND, 4)
         self.panel_card.SetSizer(sizer_card)
-        self.split_main.SplitVertically(self.panel_gliders, self.panel_card)
+        # Main sizer
+        sizer_main = wx.BoxSizer(wx.HORIZONTAL)
         sizer_main.Add(self.split_main, 1, wx.EXPAND, 0)
-        
         self.SetSizer(sizer_main)
+
         sizer_main.Fit(self)
         self.Layout()
-        
         self.SetSize( (950, 700) )
         self.split_main.SetSashPosition(375)
     
@@ -482,6 +513,10 @@ class Main(wx.Frame):
             self.text_organization.SetLabel( record.column_as_str('organization') )
             self.text_winglets.SetLabel( record.column_as_str('winglets') )
             self.text_landing_gear.SetLabel( record.column_as_str('landing_gear') )
+            self.text_non_lifting_weight.SetLabel( record.column_as_str('certified_weight_non_lifting') )
+            self.text_empty_weight.SetLabel( record.column_as_str('certified_empty_weight') )
+            self.text_seat_min_weight.SetLabel( record.column_as_str('certified_min_seat_weight') )
+            self.text_seat_max_weight.SetLabel( record.column_as_str('certified_max_seat_weight') )
 #            self.text_description.SetValue( record.column_as_str('description') )
 #            self.text_description.SetLabel( record.short_description and record.short_description or '' )
 #            if record.description:
@@ -551,7 +586,9 @@ class GliderCardForm(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         
         # Base data
-        self.sizer_picture_staticbox = wx.StaticBox(self, -1, _("Photo"))
+        self.staticbox_picture = wx.StaticBox(self, -1, _("Photo"))
+        self.staticbox_certified_weights = wx.StaticBox(self, -1, _("Certified weights"))
+        self.staticbox_measured_weights = wx.StaticBox(self, -1, _("Measured weights"))
         self.label_competition_number = wx.StaticText(self, -1, _("Competition number"))
         self.label_registration = wx.StaticText(self, -1, _("Registration"))
         self.text_competition_number = wx.TextCtrl(self, -1, "")
@@ -617,9 +654,6 @@ class GliderCardForm(wx.Dialog):
     def __set_properties(self):
         self.SetTitle(_("Glider card"))
         
-#        char_w = self.combo_glider_type.CharWidth
-#        self.combo_glider_type.SetMinSize( (char_w * 50, -1) )
-        
         fontbold = self.label_registration.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
         self.label_registration.SetFont(fontbold)
@@ -645,8 +679,11 @@ class GliderCardForm(wx.Dialog):
         sizer_glider_card = wx.BoxSizer(wx.HORIZONTAL)
         sizer_description = wx.BoxSizer(wx.VERTICAL)
         sizer_data = wx.GridBagSizer(2, 2)
-        sizer_weights = wx.GridBagSizer(2, 2)
-        sizer_photo = wx.StaticBoxSizer(self.sizer_picture_staticbox, wx.VERTICAL)
+        sizer_certified_weights = wx.GridBagSizer(2, 2)
+        sizer_measured_weights = wx.GridBagSizer(2, 2)
+        sizer_photo = wx.StaticBoxSizer(self.staticbox_picture, wx.VERTICAL)
+        sizer_certified_weights_staticbox = wx.StaticBoxSizer(self.staticbox_certified_weights, wx.VERTICAL)
+        sizer_measured_weights_staticbox = wx.StaticBoxSizer(self.staticbox_measured_weights, wx.VERTICAL)
         sizer_photo_buttons = wx.BoxSizer(wx.HORIZONTAL)
         sizer_buttons = wx.StdDialogButtonSizer()
         # Glider base data sizer
@@ -665,32 +702,37 @@ class GliderCardForm(wx.Dialog):
         sizer_data.Add(self.button_add_organization, (7, 6), (1, 1), wx.LEFT|wx.BOTTOM, 2)
         sizer_data.Add(self.checkbox_gear, (8, 0), (1, 3), wx.RIGHT|wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
         sizer_data.Add(self.checkbox_winglets, (8, 3), (1, 3), wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_data.Add(wx.StaticLine(self, -1), (9, 0), (1, 7), wx.TOP|wx.EXPAND, 2)
         sizer_data.AddGrowableCol(0, 1)
         sizer_data.AddGrowableCol(1, 1)
         sizer_data.AddGrowableCol(2, 1)
         sizer_data.AddGrowableCol(3, 1)
         sizer_data.AddGrowableCol(4, 1)
         sizer_data.AddGrowableCol(5, 1)
-        # Certified and measured weights sizer
-        sizer_weights.Add(self.label_non_lifting_weight, (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
-        sizer_weights.Add(self.label_empty_weight, (0, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
-        sizer_weights.Add(self.label_seat_min_weight, (0, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
-        sizer_weights.Add(self.label_seat_max_weight, (0, 3), (1, 1), wx.LEFT|wx.EXPAND, 2)
-        sizer_weights.Add(self.text_non_lifting_weight, (1, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_weights.Add(self.text_empty_weight, (1, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_weights.Add(self.text_seat_min_weight, (1, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_weights.Add(self.text_seat_max_weight, (1, 3), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
-        sizer_weights.Add(self.label_glider_weight, (2, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
-        sizer_weights.Add(self.label_pilot_weight, (2, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
-        sizer_weights.Add(self.label_tow_bar_weight, (2, 2), (1, 1), wx.LEFT|wx.LEFT|wx.EXPAND, 2)
-        sizer_weights.Add(self.text_glider_weight, (3, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
-        sizer_weights.Add(self.text_pilot_weight, (3, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
-        sizer_weights.Add(self.text_tow_bar_weight, (3, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
-        sizer_weights.AddGrowableCol(0, 1)
-        sizer_weights.AddGrowableCol(1, 1)
-        sizer_weights.AddGrowableCol(2, 1)
-        sizer_weights.AddGrowableCol(3, 1)
+        # Certified weights sizer
+        sizer_certified_weights.Add(self.label_non_lifting_weight, (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.label_empty_weight, (0, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.label_seat_min_weight, (0, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.label_seat_max_weight, (0, 3), (1, 1), wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.text_non_lifting_weight, (1, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.text_empty_weight, (1, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.text_seat_min_weight, (1, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.Add(self.text_seat_max_weight, (1, 3), (1, 1), wx.LEFT|wx.EXPAND, 2)
+        sizer_certified_weights.AddGrowableCol(0, 1)
+        sizer_certified_weights.AddGrowableCol(1, 1)
+        sizer_certified_weights.AddGrowableCol(2, 1)
+        sizer_certified_weights.AddGrowableCol(3, 1)
+        # Measured weights sizer
+        sizer_measured_weights.Add(self.label_glider_weight, (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
+        sizer_measured_weights.Add(self.label_pilot_weight, (0, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_measured_weights.Add(self.label_tow_bar_weight, (0, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_measured_weights.Add(self.text_glider_weight, (1, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
+        sizer_measured_weights.Add(self.text_pilot_weight, (1, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_measured_weights.Add(self.text_tow_bar_weight, (1, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_measured_weights.Add(EmptyChild(self), (1, 3), (1, 1), wx.LEFT|wx.EXPAND, 2)
+        sizer_measured_weights.AddGrowableCol(0, 1)
+        sizer_measured_weights.AddGrowableCol(1, 1)
+        sizer_measured_weights.AddGrowableCol(2, 1)
+        sizer_measured_weights.AddGrowableCol(3, 1)
         # Photo sizer
         sizer_photo.Add(self.photo, 1, wx.ALL|wx.EXPAND, 4)
         sizer_photo_buttons.Add(self.button_open_photo, 1, wx.RIGHT|wx.EXPAND, 2)
@@ -707,9 +749,12 @@ class GliderCardForm(wx.Dialog):
         sizer_glider_card.Add(sizer_data, 1, wx.RIGHT|wx.TOP|wx.EXPAND, 4)
         sizer_glider_card.Add(sizer_photo, 0, wx.TOP|wx.EXPAND, 4)
         
+        sizer_certified_weights_staticbox.Add(sizer_certified_weights, 0, wx.ALL|wx.EXPAND, 4)
+        sizer_measured_weights_staticbox.Add(sizer_measured_weights, 0, wx.ALL|wx.EXPAND, 4)
+        
         sizer_main.Add(sizer_glider_card, 0, wx.LEFT|wx.RIGHT|wx.EXPAND, 4)
-        sizer_main.Add(sizer_weights, 0, wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
-        sizer_main.Add(wx.StaticLine(self, -1), 0, wx.TOP|wx.LEFT|wx.RIGHT|wx.EXPAND, 4)
+        sizer_main.Add(sizer_certified_weights_staticbox, 0, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
+        sizer_main.Add(sizer_measured_weights_staticbox, 0, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
         sizer_main.Add(sizer_description, 1, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
         sizer_main.Add(sizer_buttons, 0, wx.ALL|wx.ALIGN_RIGHT, 4)
         
@@ -847,6 +892,13 @@ class GliderCardForm(wx.Dialog):
         glidercard = getattr( self, 'glidercard', GliderCard() )
         glidercard.str_to_column( 'registration', self.text_registration.Value )
         glidercard.str_to_column( 'competition_number', self.text_competition_number.Value )
+        glidercard.str_to_column( 'certified_weight_non_lifting', self.text_non_lifting_weight.Value )
+        glidercard.str_to_column( 'certified_empty_weight', self.text_empty_weight.Value )
+        glidercard.str_to_column( 'certified_min_seat_weight', self.text_seat_min_weight.Value )
+        glidercard.str_to_column( 'certified_max_seat_weight', self.text_seat_max_weight.Value )
+        glidercard.str_to_column( 'glider_weight', self.text_glider_weight.Value )
+        glidercard.str_to_column( 'pilot_weight', self.text_pilot_weight.Value )
+        glidercard.str_to_column( 'tow_bar_weight', self.text_tow_bar_weight.Value )
         glidercard.str_to_column( 'description', self.text_description.Value )
         glidercard.landing_gear = self.checkbox_gear.Value
         glidercard.winglets = self.checkbox_winglets.Value
@@ -861,9 +913,16 @@ class GliderCardForm(wx.Dialog):
             self.glidercard = glidercard
             self.text_registration.Value = glidercard.column_as_str('registration')
             self.text_competition_number.Value = glidercard.column_as_str('competition_number')
+            self.text_non_lifting_weight.Value = glidercard.column_as_str('certified_weight_non_lifting')
+            self.text_empty_weight.Value = glidercard.column_as_str('certified_empty_weight')
+            self.text_seat_min_weight.Value = glidercard.column_as_str('certified_min_seat_weight')
+            self.text_seat_max_weight.Value = glidercard.column_as_str('certified_max_seat_weight')
+            self.text_glider_weight.Value = glidercard.column_as_str('glider_weight')
+            self.text_pilot_weight.Value = glidercard.column_as_str('pilot_weight')
+            self.text_tow_bar_weight.Value = glidercard.column_as_str('tow_bar_weight')
             self.text_description.Value = glidercard.column_as_str('description')
             self.checkbox_gear.Value = glidercard.landing_gear != None and glidercard.landing_gear or False 
-            self.checkbox_winglets.Value = glidercard.winglets !=None and glidercard.winglets or False
+            self.checkbox_winglets.Value = glidercard.winglets != None and glidercard.winglets or False
             if glidercard.glider_type != None:
                 self.combo_glider_type.SetSelection( self.glider_type_items.index( glidercard.glider_type ) )
             if glidercard.pilot != None:

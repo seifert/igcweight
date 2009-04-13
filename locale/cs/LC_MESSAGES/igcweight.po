@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGC Weight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-03 14:56+0200\n"
-"PO-Revision-Date: 2009-04-03 14:58+0100\n"
+"POT-Creation-Date: 2009-04-09 13:36+0200\n"
+"PO-Revision-Date: 2009-04-10 14:12+0100\n"
 "Last-Translator: Jan Seifert <jan.seifert@centrumholdings.com>\n"
 "Language-Team: JS <jan.seifert@fotkyzcest.net>\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +57,7 @@ msgid "Photo"
 msgstr "Obrázek"
 
 #: gui_forms.py:17
-#: gui_main.py:556
+#: gui_main.py:559
 msgid "Registration"
 msgstr "Imatrikulace"
 
@@ -66,17 +66,17 @@ msgid "Competition number"
 msgstr "Startovní číslo"
 
 #: gui_forms.py:21
-#: gui_main.py:76
+#: gui_main.py:77
 msgid "Glider type"
 msgstr "Typ kluzáku"
 
 #: gui_forms.py:23
-#: gui_main.py:564
+#: gui_main.py:567
 msgid "Add..."
 msgstr "Přidat..."
 
 #: gui_forms.py:24
-#: gui_main.py:104
+#: gui_main.py:105
 msgid "Pilot"
 msgstr "Pilot"
 
@@ -297,72 +297,80 @@ msgstr "Bez vody"
 msgid "Referential w."
 msgstr "Ref. hmotnost"
 
-#: gui_main.py:101
+#: gui_main.py:102
 msgid "Nr."
 msgstr "Č."
 
-#: gui_main.py:303
+#: gui_main.py:304
 msgid "Exit application?"
 msgstr "Chcete opravdu ukončit aplikaci?"
 
-#: gui_main.py:303
+#: gui_main.py:304
 msgid "Exit?"
 msgstr "Ukončit?"
 
-#: gui_main.py:315
+#: gui_main.py:316
 msgid "Final version will be released under open source license"
 msgstr "Finální verze bude uvolněna pod open source licencí"
 
-#: gui_main.py:374
+#: gui_main.py:375
 msgid "Glider card insert error"
 msgstr "Došlo k chybě při vkládání nové karty kluzáku"
 
-#: gui_main.py:413
+#: gui_main.py:414
 msgid "Glider card edit error"
 msgstr "Došlo k chybě při editaci karty kluzáku"
 
-#: gui_main.py:447
+#: gui_main.py:448
 msgid "Glider card delete error"
 msgstr "Došlo k chybě při mazání karty kluzáku"
 
-#: gui_main.py:527
+#: gui_main.py:528
 #, python-format
 msgid "No application is associated to open %s MIME type. Please, choose the program."
 msgstr "Pro zobrazení %s MIME typu není asociován žádný program, vyberte jej ručně."
 
-#: gui_main.py:532
+#: gui_main.py:533
 msgid "Open file"
 msgstr "Otevřít soubor"
 
-#: gui_main.py:575
+#: gui_main.py:556
+msgid "Certified weights"
+msgstr "Protokol o vážení"
+
+#: gui_main.py:557
+msgid "Measured weights"
+msgstr "Vážení"
+
+#: gui_main.py:578
 msgid "Non-lifting parts weight"
-msgstr "Hmotnost nevztlakových částí"
+msgstr "Nevztlakové části"
 
-#: gui_main.py:577
+#: gui_main.py:580
 msgid "Empty glider weight"
-msgstr "Hmotnost prázdného kluzáku"
+msgstr "Prázdný kluzák"
 
-#: gui_main.py:579
+#: gui_main.py:582
 msgid "Seat minimum weight"
-msgstr "Mimimální zatížení sedačky"
+msgstr "Zatížení sedačky min."
 
-#: gui_main.py:581
+#: gui_main.py:584
 msgid "Seat maximum weight"
-msgstr "Maximální zatížení sedačky"
+msgstr "Zatížení sedačky max."
 
-#: gui_main.py:583
+#: gui_main.py:586
 msgid "Glider weight"
-msgstr "Hmotnost kluzáku"
+msgstr "Kluzák"
 
-#: gui_main.py:585
+#: gui_main.py:588
 msgid "Pilot weight"
-msgstr "Hmotnost pilota"
+msgstr "Pilot s padákem"
 
-#: gui_main.py:587
+#: gui_main.py:590
 msgid "Tow bar weight"
 msgstr "Hmotnost na vlečné tyči"
 
-#: gui_main.py:811
+#: gui_main.py:828
 msgid "JPEG files"
 msgstr "obrázky JPEG"
 
