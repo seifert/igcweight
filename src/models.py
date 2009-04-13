@@ -129,7 +129,7 @@ class Pilot(Base):
         if value == '':
             value = None
         elif columnname in ('year_of_birth',):
-            value = locale.atoi(value)
+            value = int(value) #locale.atoi(value)
         setattr( self, columnname, value )
     
     @property
@@ -207,7 +207,7 @@ class GliderType(Base):
         if value == '':
             value = None
         elif columnname in ('weight_non_lifting', 'mtow_without_water', 'mtow', 'weight_referential'):
-            value = locale.atoi(value)
+            value = int(value) #locale.atoi(value)
         elif columnname == 'coefficient':
             # TODO: improve???
             value = decimal.Decimal( str(locale.atof( value.encode('ascii') )) )
@@ -364,7 +364,7 @@ class GliderCard(Base):
                             'pilot_weight',
                             'tow_bar_weight'
                            ):
-            value = locale.atoi(value)
+            value = int(value) #locale.atoi(value)
         setattr( self, columnname, value )
     
     def GetDescription(self, length=50):
