@@ -25,6 +25,27 @@ from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
 
 class Main(wx.Frame):
     " Main application window "
+    
+    NON_LIFTING_OK = _("Non-lifting parts weight are OK.")
+    NON_LIFTING_OVERWEIGHT = _("Non-lifting parts are overweighted over a %d kg!")
+    NON_LIFTING_NO_DATA = _("No data for check non-lifting weights.")
+    MTOW_OK = _("MTOW is OK.")
+    MTOW_OVERWEIGHT = _("MTOW is overweighted over a %d kg!")
+    MTOW_NO_DATA = _("No data for check MTOW weights.")
+    SEAT_OK = _("Seat weighting is OK.")
+    SEAT_OVERWEIGHT = _("Seat weighting is overweighted over a %d kg!")
+    SEAT_UNDERWEIGHT = _("Seat weighting is underweighted over a %d kg!")
+    SEAT_NO_DATA = _("No data for check seat weighting.")
+    REFERENTIAL_OK = _("Referential weight is OK.")
+    REFERENTIAL_OVERWEIGHT = _("Referential weight is overweighted over a %d kg!")
+    REFERENTIAL_NO_DATA = _("No data for check referential weight.")
+    COEFFICIENT = _("Competition coefficient is %s at weight %d kg.")
+    COEFFICIENT_NO_DATA = _("No data for count coefficient.")
+    COLOR_TEXT = wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOWTEXT)
+    COLOR_OK = 'BLACK'
+    COLOR_OVERWEIGHT = 'RED'
+    COLOR_NO_DATA = 'BLUE'
+    
     def __init__(self, *args, **kwds):
         " __init__(self, Window parent, int id=-1) "
         
@@ -100,6 +121,11 @@ class Main(wx.Frame):
         self.text_pilot_weight = wx.StaticText(self.panel_card, -1, "")
         self.label_tow_bar_weight = wx.StaticText(self.panel_card, -1, _("Tow bar weight"))
         self.text_tow_bar_weight = wx.StaticText(self.panel_card, -1, "")
+        self.text_non_lifting_status = wx.StaticText(self.panel_card, -1, self.NON_LIFTING_NO_DATA)
+        self.text_mtow_status = wx.StaticText(self.panel_card, -1, self.MTOW_NO_DATA)
+        self.text_seat_status = wx.StaticText(self.panel_card, -1, self.SEAT_NO_DATA)
+        self.text_referential_status = wx.StaticText(self.panel_card, -1, self.REFERENTIAL_NO_DATA)
+        self.text_coefficient_status = wx.StaticText(self.panel_card, -1, self.COEFFICIENT_NO_DATA)
 
         self.photo = wx.StaticBitmap(self.panel_card, -1)
         self.button_show_photo = wx.Button(self.panel_card, wx.ID_ZOOM_IN, "")
@@ -164,6 +190,8 @@ class Main(wx.Frame):
         
         fontbold = self.label_certified_weights.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
+        self.fontbold = fontbold
+        self.fontnormal = self.label_certified_weights.GetFont()
 
         self.text_registration.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
         self.text_competition_number.SetFont(wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
@@ -249,6 +277,12 @@ class Main(wx.Frame):
         sizer_weights.Add(self.text_pilot_weight, (6, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
         sizer_weights.Add(self.text_tow_bar_weight, (6, 2), (1, 2), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
         sizer_weights.Add(wx.StaticLine(self.panel_card), (7, 0), (1, 4), wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_non_lifting_status, (8, 0), (1, 4), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_mtow_status, (9, 0), (1, 4), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_seat_status, (10, 0), (1, 4), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_referential_status, (11, 0), (1, 4), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_weights.Add(self.text_coefficient_status, (12, 0), (1, 4), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_weights.Add(wx.StaticLine(self.panel_card), (13, 0), (1, 4), wx.TOP|wx.BOTTOM|wx.EXPAND, 2)
         sizer_weights.AddGrowableCol(0, 1)
         sizer_weights.AddGrowableCol(1, 1)
         sizer_weights.AddGrowableCol(2, 1)
@@ -318,6 +352,11 @@ class Main(wx.Frame):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
         self.__sort_glider_card = evt.m_col
         self.SortGliderCardList( self.__sort_glider_card )
+
+    def __set_status_label_data(self, control, colour, text, *args):
+        " __set_status_label_data(self, control, colour, text, *args) - set wx.StaticText text and colour "
+        control.SetLabel(text % args)
+        control.SetForegroundColour(colour)
     
     def SortGliderCardList(self, col):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
@@ -519,6 +558,7 @@ class Main(wx.Frame):
         " ChangeGliderCard(self, Event evt=None) - this method is called when glider card is changed "
         record = self.list_glider_card.current_item
         if record != None:
+            # Base data
             self.text_registration.SetLabel( record.column_as_str('registration') )
             self.text_competition_number.SetLabel( record.column_as_str('competition_number') )
             self.text_glider_type.SetLabel( record.column_as_str('glider_type') )
@@ -526,13 +566,62 @@ class Main(wx.Frame):
             self.text_organization.SetLabel( record.column_as_str('organization') )
             self.text_winglets.SetLabel( record.column_as_str('winglets') )
             self.text_landing_gear.SetLabel( record.column_as_str('landing_gear') )
+            # Certified weights
             self.text_non_lifting_weight.SetLabel( record.column_as_str('certified_weight_non_lifting') )
             self.text_empty_weight.SetLabel( record.column_as_str('certified_empty_weight') )
             self.text_seat_min_weight.SetLabel( record.column_as_str('certified_min_seat_weight') )
             self.text_seat_max_weight.SetLabel( record.column_as_str('certified_max_seat_weight') )
+            # Measured weights
             self.text_glider_weight.SetLabel( record.column_as_str('glider_weight') )
             self.text_pilot_weight.SetLabel( record.column_as_str('pilot_weight') )
             self.text_tow_bar_weight.SetLabel( record.column_as_str('tow_bar_weight') )
+            # Non-lifting parts weight status
+            difference = record.non_lifting_difference
+            if difference != None:
+                if difference > 0:
+                    self.__set_status_label_data(self.text_non_lifting_status, self.COLOR_OVERWEIGHT, self.NON_LIFTING_OVERWEIGHT, difference)
+                else:
+                    self.__set_status_label_data(self.text_non_lifting_status, self.COLOR_OK, self.NON_LIFTING_OK)
+            else:
+                self.__set_status_label_data(self.text_non_lifting_status, self.COLOR_NO_DATA, self.NON_LIFTING_NO_DATA)
+            # MTOW status
+            difference = record.mtow_difference
+            if difference != None:
+                if difference > 0:
+                    self.__set_status_label_data(self.text_mtow_status, self.COLOR_OVERWEIGHT, self.MTOW_OVERWEIGHT, difference)
+                else:
+                    self.__set_status_label_data(self.text_mtow_status, self.COLOR_OK, self.MTOW_OK)
+            else:
+                self.__set_status_label_data(self.text_mtow_status, self.COLOR_NO_DATA, self.MTOW_NO_DATA)
+            # Seat weighting status
+            difference = record.seat_weight_difference
+            if difference != None:
+                if difference > 0:
+                    self.__set_status_label_data(self.text_seat_status, self.COLOR_OVERWEIGHT, self.SEAT_OVERWEIGHT, difference)
+                elif difference < 0:
+                    self.__set_status_label_data(self.text_seat_status, self.COLOR_OVERWEIGHT, self.SEAT_UNDERWEIGHT, difference)
+                else:
+                    self.__set_status_label_data(self.text_seat_status, self.COLOR_OK, self.SEAT_OK)
+            else:
+                self.__set_status_label_data(self.text_seat_status, self.COLOR_NO_DATA, self.SEAT_NO_DATA)
+            # Referential weight status
+            difference = record.referential_difference
+            if difference != None:
+                if difference > 0:
+                    self.__set_status_label_data(self.text_referential_status, self.COLOR_OVERWEIGHT, self.REFERENTIAL_OVERWEIGHT, difference)
+                else:
+                    self.__set_status_label_data(self.text_referential_status, self.COLOR_OK, self.REFERENTIAL_OK)
+            else:
+                self.__set_status_label_data(self.text_referential_status, self.COLOR_NO_DATA, self.REFERENTIAL_NO_DATA)
+            # Coefficient status
+            coefficient = record.coefficient
+            if coefficient != None:
+                self.__set_status_label_data(self.text_coefficient_status, self.COLOR_TEXT, self.COEFFICIENT, record.column_as_str('coefficient'), record.referential_weight)
+                self.text_coefficient_status.SetFont(self.fontbold)
+            else:
+                self.__set_status_label_data(self.text_coefficient_status, self.COLOR_NO_DATA, self.COEFFICIENT_NO_DATA)
+                self.text_coefficient_status.SetFont(self.fontnormal)
+            # Photo
             if record.main_photo != None:
                 self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, record.main_photo.full_path ) )
                 self.button_show_photo.Enable(True)
@@ -548,6 +637,18 @@ class Main(wx.Frame):
             self.text_winglets.Label = ''
             self.text_landing_gear.Label = ''
             self.button_show_photo.Enable(False)
+            self.text_non_lifting_weight.Label = ''
+            self.text_empty_weight.Label = ''
+            self.text_seat_min_weight.Label = ''
+            self.text_seat_max_weight.Label = ''
+            self.text_glider_weight.Label = ''
+            self.text_pilot_weight.Label = ''
+            self.text_tow_bar_weight.Label = ''
+            self.__set_status_label_data(self.text_non_lifting_status, self.COLOR_TEXT, '')
+            self.__set_status_label_data(self.text_mtow_status, self.COLOR_TEXT, '')
+            self.__set_status_label_data(self.text_seat_status, self.COLOR_TEXT, '')
+            self.__set_status_label_data(self.text_referential_status, self.COLOR_TEXT, '')
+            self.__set_status_label_data(self.text_coefficient_status, self.COLOR_TEXT, '')
             self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
 
     def ShowPhoto(self, evt=None):

@@ -348,6 +348,8 @@ class GliderCard(Base):
                             'tow_bar_weight'
                            ):
             return locale.format("%d", value)
+        elif columnname == 'coefficient':
+            return locale.format("%.3f", value)
         else:
             return unicode(value)
     
@@ -409,7 +411,11 @@ class GliderCard(Base):
             winglets_handicap = self.winglets and settings.WINGLETS_HANDICAP or 0
             coefficient = self.glider_type.coefficient + gear_handicap + winglets_handicap
             if referential_difference > 0:
-                coefficient = coefficient + ( ((referential_difference / settings.OWERWEIGHT_STEP) + 1) * settings.OWERWEIGHT_HANDICAP )
+                overweight_handicap = referential_difference / settings.OWERWEIGHT_STEP
+                if overweight_handicap * settings.OWERWEIGHT_STEP < referential_difference:
+                    overweight_handicap = overweight_handicap + 1
+                overweight_handicap = overweight_handicap * settings.OWERWEIGHT_HANDICAP
+                coefficient = coefficient + overweight_handicap
             return coefficient
         else:
             return None
@@ -428,8 +434,8 @@ class GliderCard(Base):
         if self.glider_type.mtow_without_water != None:
             mtow = self.glider_type.mtow_without_water
         else:
-            if self.glider_type.mtow_without_water != None:
-                mtow = self.glider_type.mtow_without_water
+            if self.glider_type.mtow != None:
+                mtow = self.glider_type.mtow
             else:
                 mtow = None
         referential_weight = self.referential_weight

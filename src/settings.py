@@ -2,6 +2,7 @@
 
 from os import mkdir
 from os.path import abspath, dirname, join, expanduser, isdir
+from decimal import Decimal
 
 DEBUG = True
 
@@ -25,9 +26,9 @@ if not isdir(PHOTOS_DIR):
 
 SHOW_PHOTO_APP = None
 
-GEAR_HANDICAP = 0.02
-WINGLETS_HANDICAP = 0.01
-OWERWEIGHT_HANDICAP = 0.005
+GEAR_HANDICAP = Decimal('0.02')
+WINGLETS_HANDICAP = Decimal('0.01')
+OWERWEIGHT_HANDICAP = Decimal('0.005')
 OWERWEIGHT_STEP = 10
 
 DB_ENGINE   = 'sqlite'
