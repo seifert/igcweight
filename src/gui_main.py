@@ -26,12 +26,12 @@ from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
 class Main(wx.Frame):
     " Main application window "
     
-    NON_LIFTING_OK = _("Non-lifting parts weight are OK.")
+    NON_LIFTING_OK = _("Non-lifting parts weight is OK.")
     NON_LIFTING_OVERWEIGHT = _("Non-lifting parts are overweighted over a %d kg!")
-    NON_LIFTING_NO_DATA = _("No data for check non-lifting weights.")
-    MTOW_OK = _("MTOW is OK.")
-    MTOW_OVERWEIGHT = _("MTOW is overweighted over a %d kg!")
-    MTOW_NO_DATA = _("No data for check MTOW weights.")
+    NON_LIFTING_NO_DATA = _("No data for check non-lifting parts weight.")
+    MTOW_OK = _("Maximum takeoff weight is OK.")
+    MTOW_OVERWEIGHT = _("Maximum takeoff weight is overweighted over a %d kg!")
+    MTOW_NO_DATA = _("No data for check maximum takeoff weight.")
     SEAT_OK = _("Seat weighting is OK.")
     SEAT_OVERWEIGHT = _("Seat weighting is overweighted over a %d kg!")
     SEAT_UNDERWEIGHT = _("Seat weighting is underweighted over a %d kg!")
@@ -42,7 +42,7 @@ class Main(wx.Frame):
     COEFFICIENT = _("Competition coefficient is %s at weight %d kg.")
     COEFFICIENT_NO_DATA = _("No data for count coefficient.")
     COLOR_TEXT = wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOWTEXT)
-    COLOR_OK = 'BLACK'
+    COLOR_OK = 'DARK GREEN'
     COLOR_OVERWEIGHT = 'RED'
     COLOR_NO_DATA = 'BLUE'
     
