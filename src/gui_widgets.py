@@ -44,6 +44,7 @@ class VirtualListCtrl(wx.ListCtrl):
     def __init__(self, parent, id):
         wx.ListCtrl.__init__(self, parent=parent, id=id, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_SINGLE_SEL|wx.SUNKEN_BORDER)
         
+        self.GetItemAttrMethod = None
         self.__columns = {}
         self.__column_sum = 0
         
@@ -92,6 +93,14 @@ class VirtualListCtrl(wx.ListCtrl):
     def OnGetItemText(self, item, col):
         " OnGetItemText(self, int item, int col) -> str - get column data from datasource "
         return self.datasource[item].column_as_str( self.__columns[col]['fieldname'] )
+    
+    def OnGetItemAttr(self, item):
+        " OnGetItemAttr(self, item) -> wx.ListItemAttr - get and return item attr "
+        if self.GetItemAttrMethod != None:
+            self.__attr = self.GetItemAttrMethod(self, item)
+            return self.__attr
+        else:
+            return None
     
     @property
     def current_item(self):

@@ -27,17 +27,17 @@ class Main(wx.Frame):
     " Main application window "
     
     NON_LIFTING_OK = _("Non-lifting parts weight is OK.")
-    NON_LIFTING_OVERWEIGHT = _("Non-lifting parts are overweighted over a %d kg!")
+    NON_LIFTING_OVERWEIGHT = _("Non-lifting parts are overweight by %d kg!")
     NON_LIFTING_NO_DATA = _("No data for check non-lifting parts weight.")
     MTOW_OK = _("Maximum takeoff weight is OK.")
-    MTOW_OVERWEIGHT = _("Maximum takeoff weight is overweighted over a %d kg!")
+    MTOW_OVERWEIGHT = _("Maximum takeoff weight is overweight by %d kg!")
     MTOW_NO_DATA = _("No data for check maximum takeoff weight.")
     SEAT_OK = _("Seat weighting is OK.")
-    SEAT_OVERWEIGHT = _("Seat weighting is overweighted over a %d kg!")
-    SEAT_UNDERWEIGHT = _("Seat weighting is underweighted over a %d kg!")
+    SEAT_OVERWEIGHT = _("Seat weighting is overweight by %d kg!")
+    SEAT_UNDERWEIGHT = _("Seat weighting is underweight by %d kg!")
     SEAT_NO_DATA = _("No data for check seat weighting.")
     REFERENTIAL_OK = _("Referential weight is OK.")
-    REFERENTIAL_OVERWEIGHT = _("Referential weight is overweighted over a %d kg!")
+    REFERENTIAL_OVERWEIGHT = _("Referential weight is overweight by %d kg!")
     REFERENTIAL_NO_DATA = _("No data for check referential weight.")
     COEFFICIENT = _("Competition coefficient is %s at weight %d kg.")
     COEFFICIENT_NO_DATA = _("No data for count coefficient.")
@@ -78,19 +78,35 @@ class Main(wx.Frame):
         self.menu_glider_card.AppendItem(self.menu_glider_card_properties)
         self.menu_glider_card_delete = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Delete"), _("Delete glider"), wx.ITEM_NORMAL)
         self.menu_glider_card.AppendItem(self.menu_glider_card_delete)
+        self.menu_glider_card.AppendSeparator()
+        self.menu_glider_card_show_photo = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Show photo"), _("Show photo in the external application"), wx.ITEM_NORMAL)
+        self.menu_glider_card.AppendItem(self.menu_glider_card_show_photo)
         self.main_menu.Append(self.menu_glider_card, _("&Glider card"))
+        self.menu_daily_weight = wx.Menu()
+        self.menu_daily_weight_new = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&New..."), _("Add new daily weight"), wx.ITEM_NORMAL)
+        self.menu_daily_weight.AppendItem(self.menu_daily_weight_new)
+        self.menu_daily_weight_properties = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&Properties..."), _("Edit daily weight properties"), wx.ITEM_NORMAL)
+        self.menu_daily_weight.AppendItem(self.menu_daily_weight_properties)
+        self.menu_daily_weight_delete = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&Delete"), _("Delete daily weight"), wx.ITEM_NORMAL)
+        self.menu_daily_weight.AppendItem(self.menu_daily_weight_delete)
+        self.main_menu.Append(self.menu_daily_weight, _("&Daily weight"))
         self.menu_help = wx.Menu()
         self.menu_about = wx.MenuItem(self.menu_help, wx.NewId(), _("&About\tF1"), _("About this application"), wx.ITEM_NORMAL)
         self.menu_help.AppendItem(self.menu_about)
         self.main_menu.Append(self.menu_help, _("&Help"))
         self.SetMenuBar(self.main_menu)
-        # Menu Bar end
+        
+        # Status bar
         self.statusbar = self.CreateStatusBar(1, wx.ST_SIZEGRIP)
+        
+        # Gliders list
         self.text_find = wx.SearchCtrl(self.panel_gliders, -1, style=wx.TE_PROCESS_ENTER)
         self.list_glider_card = VirtualListCtrl(self.panel_gliders, -1)
         self.button_glider_card_new = wx.Button(self.panel_gliders, wx.ID_NEW, "")
         self.button_glider_card_properties = wx.Button(self.panel_gliders, wx.ID_PROPERTIES, "")
         self.button_glider_card_delete = wx.Button(self.panel_gliders, wx.ID_DELETE, "")
+        
+        # Glider card
         self.label_registration = wx.StaticText(self.panel_card, -1, _("Registration"))
         self.label_competition_number = wx.StaticText(self.panel_card, -1, _("Competition number"))
         self.text_registration = wx.StaticText(self.panel_card, -1, "")
@@ -105,6 +121,10 @@ class Main(wx.Frame):
         self.label_landing_gear = wx.StaticText(self.panel_card, -1, _("Landing gear"))
         self.text_winglets = wx.StaticText(self.panel_card, -1, "")
         self.text_landing_gear = wx.StaticText(self.panel_card, -1, "")
+        # Photo
+        self.photo = wx.StaticBitmap(self.panel_card, -1)
+        self.button_show_photo = wx.Button(self.panel_card, wx.ID_ZOOM_IN, "")
+        # Certified weights
         self.label_certified_weights = wx.StaticText(self.panel_card, -1, _("Certified weights:"))
         self.label_non_lifting_weight = wx.StaticText(self.panel_card, -1, _("Non-lifting parts"))
         self.text_non_lifting_weight = wx.StaticText(self.panel_card, -1, "")
@@ -114,6 +134,7 @@ class Main(wx.Frame):
         self.text_seat_min_weight = wx.StaticText(self.panel_card, -1, "")
         self.label_seat_max_weight = wx.StaticText(self.panel_card, -1, _("Seat max."))
         self.text_seat_max_weight = wx.StaticText(self.panel_card, -1, "")
+        # Measured weights
         self.label_measured_weights = wx.StaticText(self.panel_card, -1, _("Measured weights:"))
         self.label_glider_weight = wx.StaticText(self.panel_card, -1, _("Glider weight"))
         self.text_glider_weight = wx.StaticText(self.panel_card, -1, "")
@@ -126,18 +147,18 @@ class Main(wx.Frame):
         self.text_seat_status = wx.StaticText(self.panel_card, -1, self.SEAT_NO_DATA)
         self.text_referential_status = wx.StaticText(self.panel_card, -1, self.REFERENTIAL_NO_DATA)
         self.text_coefficient_status = wx.StaticText(self.panel_card, -1, self.COEFFICIENT_NO_DATA)
-
-        self.photo = wx.StaticBitmap(self.panel_card, -1)
-        self.button_show_photo = wx.Button(self.panel_card, wx.ID_ZOOM_IN, "")
+        # Daily weights
+        self.label_daily_weight = wx.StaticText(self.panel_card, -1, _("Daily weight"))
+        self.list_daily_weight = VirtualListCtrl(self.panel_card, -1)
+        self.button_daily_weight_new = wx.Button(self.panel_card, wx.ID_NEW, "")
+        self.button_daily_weight_properties = wx.Button(self.panel_card, wx.ID_PROPERTIES, "")
+        self.button_daily_weight_delete = wx.Button(self.panel_card, wx.ID_DELETE, "")
 
         self.__set_properties()
         self.__do_layout()
 
         self.__sort_glider_card = 0
         self.__filtered = False
-
-        self.text_find.ShowSearchButton(True)
-        self.text_find.ShowCancelButton(True)
         
         # Set grid columns
         self.list_glider_card.InsertColumn(0, _("Nr."), 'competition_number', proportion=1)
@@ -150,7 +171,6 @@ class Main(wx.Frame):
         self.datasource_glider_card = self.BASE_QUERY.all()
 
         # Bind events
-        self.list_glider_card.Bind(wx.EVT_CONTEXT_MENU, self.__list_glider_card_popup_menu)
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ChangeGliderCard, self.list_glider_card)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__sort_glider_card_list, self.list_glider_card)
         self.Bind(wx.EVT_CLOSE, self.Exit, self)
@@ -162,13 +182,22 @@ class Main(wx.Frame):
         self.Bind(wx.EVT_MENU, self.GliderCardNew, self.menu_glider_card_new)
         self.Bind(wx.EVT_MENU, self.GliderCardProperties, self.menu_glider_card_properties)
         self.Bind(wx.EVT_MENU, self.GliderCardDelete, self.menu_glider_card_delete)
-        self.Bind(wx.EVT_BUTTON, self.GliderCardNew, self.button_glider_card_new)
-        self.Bind(wx.EVT_BUTTON, self.GliderCardProperties, self.button_glider_card_properties)
-        self.Bind(wx.EVT_BUTTON, self.GliderCardDelete, self.button_glider_card_delete)
+        self.Bind(wx.EVT_MENU, self.ShowPhoto, self.menu_glider_card_show_photo)
+        self.Bind(wx.EVT_MENU, self.DailyWeightNew, self.menu_daily_weight_new)
+        self.Bind(wx.EVT_MENU, self.DailyWeightProperties, self.menu_daily_weight_properties)
+        self.Bind(wx.EVT_MENU, self.DailyWeightDelete, self.menu_daily_weight_delete)
         self.Bind(wx.EVT_BUTTON, self.ShowPhoto, self.button_show_photo)
         self.Bind(wx.EVT_TEXT_ENTER, self.SearchGliderCard, self.text_find)
         self.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.SearchGliderCard, self.text_find)
         self.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.AllGliderCard, self.text_find)
+        self.list_glider_card.Bind(wx.EVT_CONTEXT_MENU, self.__list_glider_card_popup_menu)
+        self.list_daily_weight.Bind(wx.EVT_CONTEXT_MENU, self.__list_daily_weight_popup_menu)
+        self.button_glider_card_new.Bind(wx.EVT_BUTTON, self.GliderCardNew)
+        self.button_glider_card_properties.Bind(wx.EVT_BUTTON, self.GliderCardProperties)
+        self.button_glider_card_delete.Bind(wx.EVT_BUTTON, self.GliderCardDelete)
+        self.button_daily_weight_new.Bind(wx.EVT_BUTTON, self.DailyWeightNew)
+        self.button_daily_weight_properties.Bind(wx.EVT_BUTTON, self.DailyWeightProperties)
+        self.button_daily_weight_delete.Bind(wx.EVT_BUTTON, self.DailyWeightDelete)
 
     def __set_properties(self):
         self.SetTitle(_("IGC Weight"))
@@ -177,8 +206,11 @@ class Main(wx.Frame):
         statusbar_fields = [""]
         for i in range(len(statusbar_fields)):
             self.statusbar.SetStatusText(statusbar_fields[i], i)
-            
+        
         self.list_glider_card.SetFocus()
+
+        self.text_find.ShowSearchButton(True)
+        self.text_find.ShowCancelButton(True)
         
         self.button_glider_card_new.SetToolTipString(_("Add new glider"))
         self.button_glider_card_new.Enable(False)
@@ -187,6 +219,12 @@ class Main(wx.Frame):
         self.button_glider_card_delete.SetToolTipString(_("Delete glider"))
         self.button_glider_card_delete.Enable(False)
         self.button_show_photo.SetToolTipString(_("Show photo"))
+        self.button_daily_weight_new.SetToolTipString(_("Add new daily weight"))
+        self.button_daily_weight_new.Enable(False)
+        self.button_daily_weight_properties.SetToolTipString(_("Edit daily weight properties"))
+        self.button_daily_weight_properties.Enable(False)
+        self.button_daily_weight_delete.SetToolTipString(_("Delete daily weight"))
+        self.button_daily_weight_delete.Enable(False)
         
         fontbold = self.label_certified_weights.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
@@ -209,6 +247,7 @@ class Main(wx.Frame):
         self.text_glider_weight.SetFont(fontbold)
         self.text_pilot_weight.SetFont(fontbold)
         self.text_tow_bar_weight.SetFont(fontbold)
+        self.label_daily_weight.SetFont(fontbold)
         
         self.photo.SetMinSize((180, -1))
         self.split_main.SetSashGravity(0.33)
@@ -287,11 +326,22 @@ class Main(wx.Frame):
         sizer_weights.AddGrowableCol(1, 1)
         sizer_weights.AddGrowableCol(2, 1)
         sizer_weights.AddGrowableCol(3, 1)
+        # Daily weight sizer
+        sizer_daily_weight = wx.GridBagSizer(2, 2)
+        sizer_daily_weight.Add(self.label_daily_weight, (0, 0), (1, 3), wx.EXPAND, 2)
+        sizer_daily_weight.Add(self.list_daily_weight, (1, 0), (1, 3), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_daily_weight.Add(self.button_daily_weight_new, (2, 0), (1, 1), wx.EXPAND, 2)
+        sizer_daily_weight.Add(self.button_daily_weight_properties, (2, 1), (1, 1), wx.EXPAND, 2)
+        sizer_daily_weight.Add(self.button_daily_weight_delete, (2, 2), (1, 1), wx.EXPAND, 2)
+        sizer_daily_weight.AddGrowableCol(0, 1)
+        sizer_daily_weight.AddGrowableCol(1, 1)
+        sizer_daily_weight.AddGrowableCol(2, 1)
+        sizer_daily_weight.AddGrowableRow(1, 1)
         # Card sizer
         sizer_card = wx.BoxSizer(wx.VERTICAL)
         sizer_card.Add(sizer_card_head, 0, wx.EXPAND, 0)
         sizer_card.Add(sizer_weights, 0, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
-        sizer_card.Add(EmptyChild(self.panel_card), 1, wx.ALL|wx.EXPAND, 4)
+        sizer_card.Add(sizer_daily_weight, 1, wx.ALL|wx.EXPAND, 4)
         self.panel_card.SetSizer(sizer_card)
         # Main sizer
         sizer_main = wx.BoxSizer(wx.HORIZONTAL)
@@ -327,9 +377,15 @@ class Main(wx.Frame):
             if count > 0 and self.list_glider_card.current_item:            
                 glider_card_properties = True
                 glider_card_delete = True
+                daily_weight_new = True
+                daily_weight_properties = True
+                daily_weight_delete = True
             else:
                 glider_card_properties = False
                 glider_card_delete =  False
+                daily_weight_new = False
+                daily_weight_properties = False
+                daily_weight_delete = False
         else:
             glider_card_new = False
             glider_card_properties = False
@@ -341,12 +397,21 @@ class Main(wx.Frame):
         self.menu_glider_card_properties.Enable(glider_card_properties)
         self.button_glider_card_delete.Enable(glider_card_delete)
         self.menu_glider_card_delete.Enable(glider_card_delete)
+        self.button_daily_weight_new.Enable(daily_weight_new)
+        self.button_daily_weight_properties.Enable(daily_weight_properties)
+        self.button_daily_weight_delete.Enable(daily_weight_delete)
     
     def __list_glider_card_popup_menu(self, evt):
         " __list_glider_popup_menu(self, Event evt) - show pop-up menu "
         pos = evt.GetPosition()
         pos = self.ScreenToClient(pos)
         self.PopupMenu( self.menu_glider_card, pos )
+    
+    def __list_daily_weight_popup_menu(self, evt):
+        " __list_daily_weight_menu(self, Event evt) - show pop-up menu "
+        pos = evt.GetPosition()
+        pos = self.ScreenToClient(pos)
+        self.PopupMenu( self.menu_daily_weight, pos )
 
     def __sort_glider_card_list(self, evt):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
@@ -529,6 +594,18 @@ class Main(wx.Frame):
                 session.rollback()
                 error_message_dialog( self, _("Glider card delete error"), e )
 
+    def DailyWeightNew(self, evt=None):
+        " DailyWeightNew(self, Event evt=None) - add new daily weight event handler "
+        pass
+
+    def DailyWeightProperties(self, evt=None):
+        " DailyWeightProperties(self, Event evt=None) - edit daily weight event handler "
+        pass
+
+    def DailyWeightDelete(self, evt=None):
+        " DailyWeightDelete(self, Event evt=None) - delete daily weight event handler "
+        pass
+
     def SearchGliderCard(self, evt=None):
         " SearchGliderCard(self, Event evt=None) - filter glider card according to competition number or registration "
         value = self.text_find.Value
@@ -625,9 +702,11 @@ class Main(wx.Frame):
             if record.main_photo != None:
                 self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, record.main_photo.full_path ) )
                 self.button_show_photo.Enable(True)
+                self.menu_glider_card_show_photo.Enable(True)
             else:
                 self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
                 self.button_show_photo.Enable(False)
+                self.menu_glider_card_show_photo.Enable(False)
         else:
             self.text_registration.Label = ''
             self.text_competition_number.Label = ''
@@ -637,6 +716,7 @@ class Main(wx.Frame):
             self.text_winglets.Label = ''
             self.text_landing_gear.Label = ''
             self.button_show_photo.Enable(False)
+            self.menu_glider_card_show_photo.Enable(False)
             self.text_non_lifting_weight.Label = ''
             self.text_empty_weight.Label = ''
             self.text_seat_min_weight.Label = ''
