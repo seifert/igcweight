@@ -14,7 +14,7 @@ except ImportError:
 
 LAST_OPEN_FILE_PATH = USER_DIR
 
-HOME_DIR   = join( USER_DIR, 'igcweight-06' )
+HOME_DIR   = join( USER_DIR, 'igcweight-07' )
 PHOTOS_DIR = join( HOME_DIR, 'photos' )
 BASE_DIR   = abspath( join(dirname(__file__), '..') )
 IMAGES_DIR = join( BASE_DIR, 'images' )
@@ -39,4 +39,4 @@ DB_USERNAME = ''
 DB_PASSWORD = ''
 DB_ARGS     = {}
 
-VERSION = '0.6'
+VERSION = '0.7'

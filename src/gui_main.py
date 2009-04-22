@@ -6,6 +6,7 @@ import sys
 from os import remove, system
 from os.path import isfile, splitext, abspath, dirname
 from shutil import copy
+from hashlib import md5
 
 import wx
 from wx.lib.multisash import EmptyChild
@@ -74,7 +75,7 @@ class Main(wx.Frame):
         self.menu_glider_card = wx.Menu()
         self.menu_glider_card_new = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&New...\tInsert"), _("Add new glider"), wx.ITEM_NORMAL)
         self.menu_glider_card.AppendItem(self.menu_glider_card_new)
-        self.menu_glider_card_properties = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Properties..."), _("Edit glider properties"), wx.ITEM_NORMAL)
+        self.menu_glider_card_properties = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Edit..."), _("Edit glider properties"), wx.ITEM_NORMAL)
         self.menu_glider_card.AppendItem(self.menu_glider_card_properties)
         self.menu_glider_card_delete = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Delete"), _("Delete glider"), wx.ITEM_NORMAL)
         self.menu_glider_card.AppendItem(self.menu_glider_card_delete)
@@ -85,7 +86,7 @@ class Main(wx.Frame):
         self.menu_daily_weight = wx.Menu()
         self.menu_daily_weight_new = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&New..."), _("Add new daily weight"), wx.ITEM_NORMAL)
         self.menu_daily_weight.AppendItem(self.menu_daily_weight_new)
-        self.menu_daily_weight_properties = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&Properties..."), _("Edit daily weight properties"), wx.ITEM_NORMAL)
+        self.menu_daily_weight_properties = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&Edit..."), _("Edit daily weight properties"), wx.ITEM_NORMAL)
         self.menu_daily_weight.AppendItem(self.menu_daily_weight_properties)
         self.menu_daily_weight_delete = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&Delete"), _("Delete daily weight"), wx.ITEM_NORMAL)
         self.menu_daily_weight.AppendItem(self.menu_daily_weight_delete)
@@ -103,7 +104,7 @@ class Main(wx.Frame):
         self.text_find = wx.SearchCtrl(self.panel_gliders, -1, style=wx.TE_PROCESS_ENTER)
         self.list_glider_card = VirtualListCtrl(self.panel_gliders, -1)
         self.button_glider_card_new = wx.Button(self.panel_gliders, wx.ID_NEW, "")
-        self.button_glider_card_properties = wx.Button(self.panel_gliders, wx.ID_PROPERTIES, "")
+        self.button_glider_card_properties = wx.Button(self.panel_gliders, wx.ID_EDIT, "")
         self.button_glider_card_delete = wx.Button(self.panel_gliders, wx.ID_DELETE, "")
         
         # Glider card
@@ -151,7 +152,7 @@ class Main(wx.Frame):
         self.label_daily_weight = wx.StaticText(self.panel_card, -1, _("Daily weight"))
         self.list_daily_weight = VirtualListCtrl(self.panel_card, -1)
         self.button_daily_weight_new = wx.Button(self.panel_card, wx.ID_NEW, "")
-        self.button_daily_weight_properties = wx.Button(self.panel_card, wx.ID_PROPERTIES, "")
+        self.button_daily_weight_properties = wx.Button(self.panel_card, wx.ID_EDIT, "")
         self.button_daily_weight_delete = wx.Button(self.panel_card, wx.ID_DELETE, "")
 
         self.__set_properties()
@@ -488,6 +489,14 @@ class Main(wx.Frame):
         finally:
             dlg.Destroy()
 
+    def __delete_photos(self, paths):
+        " Remove deleted photos from file system "
+        for p in paths:
+            try:
+                remove(p)
+            except:
+                pass
+    
     def GliderCardNew(self, evt=None):
         " GliderCardNew(self, Event evt=None) - add new glider card event handler "
         dlg = GliderCardForm(self)
@@ -499,15 +508,8 @@ class Main(wx.Frame):
                         try:
                             record = dlg.GetData()
                             session.add(record)
-                            
-                            # TODO: improve adding new photo
-                            if dlg.is_photo_changed:
-                                main_photo = Photo(main=True)
-                                record.photos.append(main_photo)
-                                session.flush()
-                                copy( dlg.photo_fullpath, main_photo.full_path )
-                            
                             session.commit()
+                            self.__delete_photos(dlg.deleted_photos)
                             self.datasource_glider_card.append(record)
                             count = len(self.datasource_glider_card)
                             self.list_glider_card.SetItemCount(count)
@@ -535,26 +537,12 @@ class Main(wx.Frame):
                 try:
                     if dlg.ShowModal() == wx.ID_OK:
                         record = dlg.GetData()
-                        
-                        # TODO: improve change or delete photo
-                        if dlg.is_photo_changed:
-                            # Delete old photo
-                            if main_photo != None:
-                                full_path = main_photo.full_path
-                                session.delete(main_photo)
-                                session.flush()
-                                if isfile(full_path):
-                                    remove(full_path)
-                            # Add new photo
-                            if dlg.photo_fullpath != None:
-                                main_photo = Photo(main=True)
-                                record.photos.append(main_photo)
-                                session.flush()
-                                copy( dlg.photo_fullpath, main_photo.full_path )
-                        
                         session.commit()
+                        self.__delete_photos(dlg.deleted_photos)
                         self.list_glider_card.RefreshItem( self.list_glider_card.GetFocusedItem() )
                         self.ChangeGliderCard()
+                    else:
+                        session.rollback()
                     break
                 except Exception, e:
                     session.rollback()
@@ -573,12 +561,12 @@ class Main(wx.Frame):
             try:
                 i = self.datasource_glider_card.index(record)
                 try:
-                    # TODO: improve delete photos
-                    photos_path = [ photo.full_path for photo in record.photos ]
-                    session.delete(record)
-                    session.flush()
-                    for path in photos_path:
-                        remove(path)
+#                    # TODO: improve delete photos
+#                    photos_path = [ photo.full_path for photo in record.photos ]
+#                    session.delete(record)
+#                    session.flush()
+#                    for path in photos_path:
+#                        remove(path)
                     
                     session.commit()
                     del( self.datasource_glider_card[i] )
@@ -773,6 +761,9 @@ class GliderCardForm(wx.Dialog):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
         wx.Dialog.__init__(self, *args, **kwds)
         
+        self.__current_photo_index = None
+        self.deleted_photos = []
+        
         # Base data
         self.staticbox_picture = wx.StaticBox(self, -1, _("Photo"))
         self.staticbox_certified_weights = wx.StaticBox(self, -1, _("Certified weights"))
@@ -792,10 +783,13 @@ class GliderCardForm(wx.Dialog):
         self.button_add_organization = wx.Button(self, -1, _("Add..."), style=wx.BU_EXACTFIT)
         self.checkbox_gear = wx.CheckBox(self, -1, _("Landing gear"))
         self.checkbox_winglets = wx.CheckBox(self, -1, _("Winglets"))
-        # Main photo
+        # Photo box
         self.photo = wx.StaticBitmap(self, -1)
-        self.button_open_photo = wx.Button(self, wx.ID_OPEN, "")
-        self.button_clear_photo = wx.Button(self, wx.ID_CLEAR, "")
+        self.button_photo_prev = wx.Button(self, wx.NewId(), "<", style=wx.BU_EXACTFIT)
+        self.button_photo_add = wx.Button(self, wx.ID_ADD, "")
+        self.button_photo_set_main = wx.Button(self, wx.NewId(), "*", style=wx.BU_EXACTFIT)
+        self.button_photo_delete = wx.Button(self, wx.ID_DELETE, "")
+        self.button_photo_next = wx.Button(self, wx.NewId(), ">", style=wx.BU_EXACTFIT)
         # Weights
         self.label_non_lifting_weight = wx.StaticText(self, -1, _("Non-lifting parts weight"))
         self.text_non_lifting_weight = wx.TextCtrl(self, -1, "")
@@ -827,8 +821,11 @@ class GliderCardForm(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.__add_glider_type, self.button_add_glider_type)
         self.Bind(wx.EVT_BUTTON, self.__add_pilot, self.button_add_pilot)
         self.Bind(wx.EVT_BUTTON, self.__add_organization, self.button_add_organization)
-        self.Bind(wx.EVT_BUTTON, self.__open_photo, self.button_open_photo)
-        self.Bind(wx.EVT_BUTTON, self.__clear_photo, self.button_clear_photo)
+        self.Bind(wx.EVT_BUTTON, self.__photo_prev, self.button_photo_prev)
+        self.Bind(wx.EVT_BUTTON, self.__photo_add, self.button_photo_add)
+        self.Bind(wx.EVT_BUTTON, self.__photo_set_main, self.button_photo_set_main)
+        self.Bind(wx.EVT_BUTTON, self.__photo_delete, self.button_photo_delete)
+        self.Bind(wx.EVT_BUTTON, self.__photo_next, self.button_photo_next)
 
         # Init combo-box data sources
         self.glider_type_items = session.query( GliderType ).all()
@@ -856,25 +853,18 @@ class GliderCardForm(wx.Dialog):
         self.button_add_glider_type.SetToolTipString(_("Add glider type"))
         self.button_add_pilot.SetToolTipString(_("Add pilot"))
         self.button_add_organization.SetToolTipString(_("Add organization or country"))
-        self.button_open_photo.SetToolTipString(_("Open picture from file"))
-        self.button_clear_photo.SetToolTipString(_("Clear picture"))
+        self.button_photo_prev.SetToolTipString(_("Previous photo"))
+        self.button_photo_add.SetToolTipString(_("Add new photo from file"))
+        self.button_photo_set_main.SetToolTipString(_("Set as a main photo"))
+        self.button_photo_delete.SetToolTipString(_("Delete photo"))
+        self.button_photo_next.SetToolTipString(_("Next photo"))
         
         self.text_competition_number.SetFocus()
         self.button_ok.SetDefault()
 
     def __do_layout(self):
-        sizer_main = wx.BoxSizer(wx.VERTICAL)
-        sizer_glider_card = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_description = wx.BoxSizer(wx.VERTICAL)
-        sizer_data = wx.GridBagSizer(2, 2)
-        sizer_certified_weights = wx.GridBagSizer(2, 2)
-        sizer_measured_weights = wx.GridBagSizer(2, 2)
-        sizer_photo = wx.StaticBoxSizer(self.staticbox_picture, wx.VERTICAL)
-        sizer_certified_weights_staticbox = wx.StaticBoxSizer(self.staticbox_certified_weights, wx.VERTICAL)
-        sizer_measured_weights_staticbox = wx.StaticBoxSizer(self.staticbox_measured_weights, wx.VERTICAL)
-        sizer_photo_buttons = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_buttons = wx.StdDialogButtonSizer()
         # Glider base data sizer
+        sizer_data = wx.GridBagSizer(2, 2)
         sizer_data.Add(self.label_competition_number, (0, 0), (1, 3), wx.RIGHT|wx.EXPAND, 2)
         sizer_data.Add(self.label_registration, (0, 3), (1, 3), wx.LEFT|wx.EXPAND, 2)
         sizer_data.Add(self.text_competition_number, (1, 0), (1, 3), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
@@ -896,7 +886,22 @@ class GliderCardForm(wx.Dialog):
         sizer_data.AddGrowableCol(3, 1)
         sizer_data.AddGrowableCol(4, 1)
         sizer_data.AddGrowableCol(5, 1)
+        # Photo sizer
+        sizer_photo_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_photo_buttons.Add(self.button_photo_prev, 0, wx.RIGHT|wx.EXPAND, 2)
+        sizer_photo_buttons.Add(self.button_photo_add, 1, wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_photo_buttons.Add(self.button_photo_set_main, 0, wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_photo_buttons.Add(self.button_photo_delete, 1, wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
+        sizer_photo_buttons.Add(self.button_photo_next, 0, wx.LEFT|wx.EXPAND, 2)
+        sizer_photo = wx.StaticBoxSizer(self.staticbox_picture, wx.VERTICAL)
+        sizer_photo.Add(self.photo, 1, wx.ALL|wx.EXPAND, 4)
+        sizer_photo.Add(sizer_photo_buttons, 0, wx.ALL|wx.EXPAND, 4)
+        # Base data and photos
+        sizer_glider_card = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_glider_card.Add(sizer_data, 1, wx.RIGHT|wx.TOP|wx.EXPAND, 4)
+        sizer_glider_card.Add(sizer_photo, 0, wx.TOP|wx.EXPAND, 4)
         # Certified weights sizer
+        sizer_certified_weights = wx.GridBagSizer(2, 2)
         sizer_certified_weights.Add(self.label_non_lifting_weight, (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
         sizer_certified_weights.Add(self.label_empty_weight, (0, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
         sizer_certified_weights.Add(self.label_seat_min_weight, (0, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
@@ -909,7 +914,10 @@ class GliderCardForm(wx.Dialog):
         sizer_certified_weights.AddGrowableCol(1, 1)
         sizer_certified_weights.AddGrowableCol(2, 1)
         sizer_certified_weights.AddGrowableCol(3, 1)
+        sizer_certified_weights_staticbox = wx.StaticBoxSizer(self.staticbox_certified_weights, wx.VERTICAL)
+        sizer_certified_weights_staticbox.Add(sizer_certified_weights, 0, wx.ALL|wx.EXPAND, 4)
         # Measured weights sizer
+        sizer_measured_weights = wx.GridBagSizer(2, 2)
         sizer_measured_weights.Add(self.label_glider_weight, (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
         sizer_measured_weights.Add(self.label_pilot_weight, (0, 1), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
         sizer_measured_weights.Add(self.label_tow_bar_weight, (0, 2), (1, 1), wx.RIGHT|wx.LEFT|wx.EXPAND, 2)
@@ -921,25 +929,19 @@ class GliderCardForm(wx.Dialog):
         sizer_measured_weights.AddGrowableCol(1, 1)
         sizer_measured_weights.AddGrowableCol(2, 1)
         sizer_measured_weights.AddGrowableCol(3, 1)
-        # Photo sizer
-        sizer_photo.Add(self.photo, 1, wx.ALL|wx.EXPAND, 4)
-        sizer_photo_buttons.Add(self.button_open_photo, 1, wx.RIGHT|wx.EXPAND, 2)
-        sizer_photo_buttons.Add(self.button_clear_photo, 1, wx.LEFT|wx.EXPAND, 2)
-        sizer_photo.Add(sizer_photo_buttons, 0, wx.ALL|wx.EXPAND, 4)
+        sizer_measured_weights_staticbox = wx.StaticBoxSizer(self.staticbox_measured_weights, wx.VERTICAL)
+        sizer_measured_weights_staticbox.Add(sizer_measured_weights, 0, wx.ALL|wx.EXPAND, 4)
         # Description sizer
+        sizer_description = wx.BoxSizer(wx.VERTICAL)
         sizer_description.Add(self.label_description, 0, wx.BOTTOM|wx.EXPAND, 2)
         sizer_description.Add(self.text_description, 1, wx.BOTTOM|wx.EXPAND, 2)
         # Dialog buttons sizer
+        sizer_buttons = wx.StdDialogButtonSizer()
         sizer_buttons.AddButton(self.button_ok)
         sizer_buttons.AddButton(self.button_cancel)
         sizer_buttons.Realize()
-        
-        sizer_glider_card.Add(sizer_data, 1, wx.RIGHT|wx.TOP|wx.EXPAND, 4)
-        sizer_glider_card.Add(sizer_photo, 0, wx.TOP|wx.EXPAND, 4)
-        
-        sizer_certified_weights_staticbox.Add(sizer_certified_weights, 0, wx.ALL|wx.EXPAND, 4)
-        sizer_measured_weights_staticbox.Add(sizer_measured_weights, 0, wx.ALL|wx.EXPAND, 4)
-        
+        # Main sizer
+        sizer_main = wx.BoxSizer(wx.VERTICAL)
         sizer_main.Add(sizer_glider_card, 0, wx.LEFT|wx.RIGHT|wx.EXPAND, 4)
         sizer_main.Add(sizer_certified_weights_staticbox, 0, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
         sizer_main.Add(sizer_measured_weights_staticbox, 0, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
@@ -1038,42 +1040,112 @@ class GliderCardForm(wx.Dialog):
                     error_message_dialog( self, ORGANIZATION_INSERT_ERROR, e )
         finally:
             dlg.Destroy()
-        
-    def __open_photo(self, evt):
-        " __open_photo(self, evt) - open photo event handler "
+    
+    def __photo_add(self, evt):
+        " __add_photo(self, evt) - add photo event handler "
         dlg = wx.FileDialog( self, defaultDir=settings.LAST_OPEN_FILE_PATH, message=_("Open file"),
                              wildcard=_("JPEG files")+" (*.jpg;*.jpeg)|*.jpg;*.jpeg;*.JPG;*.JPEG",
                              style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST|wx.FD_PREVIEW )
         try:
             if dlg.ShowModal() == wx.ID_OK:
                 self.__photo_changed = True
-                self.photo_fullpath = abspath( dlg.GetPath() )
-                settings.LAST_OPEN_FILE_PATH = dirname(self.photo_fullpath)
-                self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, self.photo_fullpath ) )
+                src_fullpath = abspath( dlg.GetPath() )
+                settings.LAST_OPEN_FILE_PATH = dirname( src_fullpath )
+                # Sum MD5
+                f = open( src_fullpath, 'r' )
+                try:
+                    photo_md5 = md5( f.read() ).hexdigest()
+                finally:
+                    f.close()
+                self.glidercard = getattr( self, 'glidercard', GliderCard() ) 
+                # Does photo exist?
+                if [ p.md5 for p in self.glidercard.photos ].count( photo_md5 ) > 0:
+                    error_message_dialog( self, _("Photo already exists!") )
+                    return
+                # Add photo into database
+                photo = Photo( md5=photo_md5, main=False )
+                self.glidercard.photos.append( photo )
+                # Copy photo into photos dir
+                copy( src_fullpath, photo.full_path )
+                # Show thumbnail
+                self.__set_photo( photo )
         finally:
             dlg.Destroy()
 
-    def __clear_photo(self, evt):
-        " __clear_photo(self, evt) - clear photo event handler "
-        if getattr(self, 'photo_fullpath', None) != None:
-            self.__photo_changed = True
-            self.photo_fullpath = None
-            self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
-    
-    def __init_photo(self, photo=None):
-        " __init_photo(self, Photo photo=None) - show photo thumbnail or empty photo "
-        self.__photo_changed = False
-        if photo == None:
-            # Show empty photo
-            self.photo_fullpath = None
-            self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
+    def __photo_delete(self, evt):
+        " __delete_photo(self, evt) - delete photo event handler "
+        index = self.__current_photo_index
+        photo = self.glidercard.photos[index]
+        self.deleted_photos.append( photo.full_path )
+        session.delete( photo )
+        del( self.glidercard.photos[index] )
+        count = len( self.glidercard.photos )
+        if count > 0:
+            index = index - 1
+            self.__set_photo( index = index >= 0 and index or 0 )
         else:
-            self.photo_fullpath = photo.full_path
-            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, self.photo_fullpath ) )
+            self.__set_photo( index = None )
     
-    @property
-    def is_photo_changed(self):
-        return self.__photo_changed
+    def __photo_set_main(self, evt):
+        " __photo_set(self, evt) - set current photo as a main photo "
+        for i, p in enumerate(self.glidercard.photos):
+            if i == self.__current_photo_index:
+                p.main = True
+            else:
+                p.main = False
+        self.__set_photo( index=self.__current_photo_index )
+    
+    def __photo_prev(self, evt):
+        " __photo_prev(self, evt) - show prev photo "
+        index = self.__current_photo_index - 1
+        if index < 0:
+            index = 0
+        self.__set_photo( index=index )
+    
+    def __photo_next(self, evt):
+        " __photo_next(self, evt) - show next photo "
+        index = self.__current_photo_index + 1
+        count = len( self.glidercard.photos )
+        if index > count - 1:
+            index = count
+        self.__set_photo( index=index )
+
+    def __set_photo(self, photo=None, index=None):
+        " __set_photo(self, Photo photo=None, int index=None) - show photo thumbnail or empty photo and enable or disable buttons "
+        if photo != None:
+            self.__current_photo_index = [ p.md5 for p in self.glidercard.photos ].index( photo.md5 )
+            self.button_photo_set_main.Enable( not photo.main )
+            self.button_photo_delete.Enable(True)
+            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, photo.full_path ) )
+        elif index != None:
+            self.__current_photo_index = index
+            photo = self.glidercard.photos[index]
+            self.button_photo_set_main.Enable( not photo.main )
+            self.button_photo_delete.Enable(True)
+            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, photo.full_path ) )
+        else:
+            self.__current_photo_index = None
+            self.button_photo_set_main.Enable(False)
+            self.button_photo_delete.Enable(False)
+            self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
+        # Enable or disable prev and next buttons
+        if self.__current_photo_index == None:
+            self.button_photo_prev.Enable(False)
+            self.button_photo_next.Enable(False)
+        else:
+            count = len( self.glidercard.photos )
+            if count <= 1:
+                self.button_photo_prev.Enable(False)
+                self.button_photo_next.Enable(False)
+            elif self.__current_photo_index == 0:
+                self.button_photo_prev.Enable(False)
+                self.button_photo_next.Enable(True)
+            elif self.__current_photo_index == count - 1:
+                self.button_photo_prev.Enable(True)
+                self.button_photo_next.Enable(False)
+            else:
+                self.button_photo_prev.Enable(True)
+                self.button_photo_next.Enable(True)
         
     def GetData(self):
         " GetData(self) -> GliderCard - get cleaned form data "
@@ -1099,6 +1171,7 @@ class GliderCardForm(wx.Dialog):
         " SetData(self, glidercard=None) - set form data "
         if glidercard != None:
             self.glidercard = glidercard
+            # Labels
             self.text_registration.Value = glidercard.column_as_str('registration')
             self.text_competition_number.Value = glidercard.column_as_str('competition_number')
             self.text_non_lifting_weight.Value = glidercard.column_as_str('certified_weight_non_lifting')
@@ -1109,14 +1182,20 @@ class GliderCardForm(wx.Dialog):
             self.text_pilot_weight.Value = glidercard.column_as_str('pilot_weight')
             self.text_tow_bar_weight.Value = glidercard.column_as_str('tow_bar_weight')
             self.text_description.Value = glidercard.column_as_str('description')
+            # Checkboxes
             self.checkbox_gear.Value = glidercard.landing_gear != None and glidercard.landing_gear or False 
             self.checkbox_winglets.Value = glidercard.winglets != None and glidercard.winglets or False
+            # Combo boxes
             if glidercard.glider_type != None:
                 self.combo_glider_type.SetSelection( self.glider_type_items.index( glidercard.glider_type ) )
             if glidercard.pilot != None:
                 self.combo_pilot.SetSelection( self.pilot_items.index( glidercard.pilot ) )
             if glidercard.organization != None:
                 self.combo_organization.SetSelection( self.organization_items.index( glidercard.organization ) )
-            self.__init_photo(glidercard.main_photo)
+            # Photos
+            if len(glidercard.photos) > 0:
+                self.__set_photo( index=0 )
+            else:
+                self.__set_photo()
         else:
-            self.__init_photo()
+            self.__set_photo()

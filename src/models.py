@@ -229,9 +229,10 @@ class Photo(Base):
     __table__ = Table('photo', Base.metadata,
         Column( 'photo_id', Integer, Sequence('photo_seq', optional=True), key='id', nullable=False ),
         Column( 'glider_card_id', Integer, nullable=False ),
+        Column( 'md5', String(32), nullable=False ),
         Column( 'main', Boolean, nullable=False ),
-        Column( 'description', Text ),
         PrimaryKeyConstraint( 'id', name='pk_photo' ),
+        UniqueConstraint( 'md5', name='uq_photo_md5' ),
         ForeignKeyConstraint( ('glider_card_id',), ('glider_card.id',), name='fk_photo_glider_card' )
     )
 
@@ -244,7 +245,7 @@ class Photo(Base):
                 raise AttributeError( "'%s' object has no attribute '%s'" % (self.__class__.__name__, key) )
         
     def __repr__(self):
-        return "<Photo: #%s %s>" % ( str(self.id), self.full_path )
+        return "<Photo: #%s %s>" % ( str(self.id), self.md5 )
     
     def __unicode__(self):
         return "%d - %s" % ( str(self.id), self.glider_card )
@@ -266,19 +267,10 @@ class Photo(Base):
             value = None
         setattr( self, columnname, value )
     
-    def GetDescription(self, length=50):
-        " GetDescription(self, int length=50) -> str - get short description "
-        return get_short_description(self.description, length)
-    
-    @property
-    def short_description(self):
-        " Return shorts description, max. length is 50 chars "
-        return self.GetDescription()
-    
     @property
     def full_path(self):
         " Returns photo full path "
-        return join( settings.PHOTOS_DIR, "%08d.jpg" % self.id )
+        return join( settings.PHOTOS_DIR, "%s.jpg" % self.md5 )
 
 
 class GliderCard(Base):
@@ -313,7 +305,7 @@ class GliderCard(Base):
     glider_type = relation( GliderType, order_by=GliderType.name, backref='glider_type' )
     pilot = relation( Pilot, order_by=Pilot.surname, backref='pilot' )
     organization = relation( Organization, order_by=Organization.name, backref='organization' )
-    photos = relation(Photo, backref=backref('photo', order_by='id'), cascade="all, delete, delete-orphan")
+    photos = relation(Photo, backref=backref('photo'), order_by=Photo.id, cascade="all, delete, delete-orphan")
 
     def __init__(self, **kwargs):
         """ GliderCard(self, str registration=None, str competition_number=None, GliderType glider_type=None,
@@ -380,10 +372,11 @@ class GliderCard(Base):
 
     @property
     def main_photo(self):
-        " main_photo -> Photo - return main photo "
-        for photo in self.photos:
-            if photo.main == True:
-                return photo
+        " main_photo -> Photo - return main photo or None "
+        if len(self.photos) > 0:
+            for p in self.photos:
+                if p.main == True: 
+                    return p
         return None
     
     @property

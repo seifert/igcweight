@@ -5,7 +5,7 @@
 
 from os.path import join
 
-from settings import BASE_DIR
+from settings import BASE_DIR, DEBUG
 
 def main():
     " main() - start application "
@@ -35,6 +35,9 @@ def main():
         from wx import GetTranslation as _
         
         error_message_dialog(None, _("Some error during starting application"), e)
+        
+        if DEBUG:
+            raise
 
 if __name__ == '__main__':
     main()

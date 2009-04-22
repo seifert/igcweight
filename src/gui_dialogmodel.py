@@ -24,7 +24,7 @@ class DialogModel(gui_forms.DialogModel):
         self.menu_popup = wx.Menu()
         self.menu_new = wx.MenuItem(self.menu_popup, wx.NewId(), _("&New...\tInsert"))
         self.menu_popup.AppendItem(self.menu_new)
-        self.menu_properties = wx.MenuItem(self.menu_popup, wx.NewId(), _("&Properties...\tEnter"))
+        self.menu_properties = wx.MenuItem(self.menu_popup, wx.NewId(), _("&Edit...\tEnter"))
         self.menu_popup.AppendItem(self.menu_properties)
         self.menu_delete = wx.MenuItem(self.menu_popup, wx.NewId(), _("&Delete\tCtrl+Delete"))
         self.menu_popup.AppendItem(self.menu_delete)
