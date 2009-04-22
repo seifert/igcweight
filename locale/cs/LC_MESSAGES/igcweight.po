@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGC Weight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-15 11:56+0200\n"
-"PO-Revision-Date: 2009-04-15 12:05+0100\n"
+"POT-Creation-Date: 2009-04-22 15:41+0200\n"
+"PO-Revision-Date: 2009-04-22 15:59+0100\n"
 "Last-Translator: Jan Seifert <jan.seifert@centrumholdings.com>\n"
 "Language-Team: JS <jan.seifert@fotkyzcest.net>\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +35,7 @@ msgid "&New...\tInsert"
 msgstr "&Nový...\tInsert"
 
 #: gui_dialogmodel.py:27
-msgid "&Properties...\tEnter"
+msgid "&Edit...\tEnter"
 msgstr "&Upravit...\tEnter"
 
 #: gui_dialogmodel.py:29
@@ -57,7 +57,7 @@ msgid "Photo"
 msgstr "Obrázek"
 
 #: gui_forms.py:17
-#: gui_main.py:702
+#: gui_main.py:780
 msgid "Registration"
 msgstr "Imatrikulace"
 
@@ -66,17 +66,17 @@ msgid "Competition number"
 msgstr "Startovní číslo"
 
 #: gui_forms.py:21
-#: gui_main.py:98
+#: gui_main.py:115
 msgid "Glider type"
 msgstr "Typ kluzáku"
 
 #: gui_forms.py:23
-#: gui_main.py:710
+#: gui_main.py:788
 msgid "Add..."
 msgstr "Přidat..."
 
 #: gui_forms.py:24
-#: gui_main.py:146
+#: gui_main.py:168
 msgid "Pilot"
 msgstr "Pilot"
 
@@ -297,172 +297,232 @@ msgstr "Bez vody"
 msgid "Referential w."
 msgstr "Ref. hmotnost"
 
-#: gui_main.py:29
-msgid "Non-lifting parts weight are OK."
+#: gui_main.py:30
+msgid "Non-lifting parts weight is OK."
 msgstr "Hmotnost nevztlakových částí je v limitu."
 
-#: gui_main.py:30
+#: gui_main.py:31
 #, python-format
-msgid "Non-lifting parts are overweighted over a %d kg!"
+msgid "Non-lifting parts are overweight by %d kg!"
 msgstr "Hmotnost nevztlakových částí je překročena o %d kg!"
 
-#: gui_main.py:31
-msgid "No data for check non-lifting weights."
+#: gui_main.py:32
+msgid "No data for check non-lifting parts weight."
 msgstr "Nejsou údaje pro kontrolu hmotnosti nevztlakových částí."
 
-#: gui_main.py:32
-msgid "MTOW is OK."
+#: gui_main.py:33
+msgid "Maximum takeoff weight is OK."
 msgstr "Maximální vzletová hmotnost je v limitu."
 
-#: gui_main.py:33
+#: gui_main.py:34
 #, python-format
-msgid "MTOW is overweighted over a %d kg!"
+msgid "Maximum takeoff weight is overweight by %d kg!"
 msgstr "Maximální vzletová hmotnost je překročena o %d kg!"
 
-#: gui_main.py:34
-msgid "No data for check MTOW weights."
+#: gui_main.py:35
+msgid "No data for check maximum takeoff weight."
 msgstr "Nejsou údaje pro kontrolu maximální vzletové hmotnosti."
 
-#: gui_main.py:35
+#: gui_main.py:36
 msgid "Seat weighting is OK."
 msgstr "Zatížení sedačky je v limitu."
 
-#: gui_main.py:36
-#, python-format
-msgid "Seat weighting is overweighted over a %d kg!"
-msgstr "Maximální zatížení sedačky je překročeno o %d kg!"
-
 #: gui_main.py:37
 #, python-format
-msgid "Seat weighting is underweighted over a %d kg!"
-msgstr "Minimální zatížení sedačky je nižší o %d kg!"
+msgid "Seat weighting is overweight by %d kg!"
+msgstr "Maximální zatížení sedačky je překročeno o %d kg!"
 
 #: gui_main.py:38
+#, python-format
+msgid "Seat weighting is underweight by %d kg!"
+msgstr "Minimální zatížení sedačky je nižší o %d kg!"
+
+#: gui_main.py:39
 msgid "No data for check seat weighting."
 msgstr "Nejsou údaje pro kontrolu zatížení sedačky."
 
-#: gui_main.py:39
+#: gui_main.py:40
 msgid "Referential weight is OK."
 msgstr "Referenční hmotnost je v limitu."
 
-#: gui_main.py:40
+#: gui_main.py:41
 #, python-format
-msgid "Referential weight is overweighted over a %d kg!"
+msgid "Referential weight is overweight by %d kg!"
 msgstr "Referenční hmotnost je překročena o %d kg!"
 
-#: gui_main.py:41
+#: gui_main.py:42
 msgid "No data for check referential weight."
 msgstr "Nejsou údaje pro kontrolu referenční hmotnosti."
 
-#: gui_main.py:42
-#, python-format
-msgid "Competition coefficient is %s at weight %d kg."
-msgstr "Soutěžní koeficient je %s při referenční hmotnosti %d kg."
-
 #: gui_main.py:43
+#, python-format
+msgid "Competition coefficient is %(coefficient)s at weight %(weight)d kg."
+msgstr "Soutěžní koeficient je %(coefficient)s při referenční hmotnosti %(weight)d kg."
+
+#: gui_main.py:44
 msgid "No data for count coefficient."
 msgstr "Nejsou údaje pro výpočet koeficientu."
 
-#: gui_main.py:108
+#: gui_main.py:78
+msgid "&Edit..."
+msgstr "&Editovat..."
+
+#: gui_main.py:83
+msgid "&Show photo"
+msgstr "&Zobrazit fotografii"
+
+#: gui_main.py:83
+msgid "Show photo in the external application"
+msgstr "Zobrazit fotografii v externí aplikaci"
+
+#: gui_main.py:87
+msgid "&New..."
+msgstr "&Nový..."
+
+#: gui_main.py:87
+msgid "Add new daily weight"
+msgstr "Přidat denní vážení"
+
+#: gui_main.py:89
+msgid "Edit daily weight properties"
+msgstr "Editovat denní vážení"
+
+#: gui_main.py:91
+msgid "Delete daily weight"
+msgstr "Smazat denní vážení"
+
+#: gui_main.py:93
+msgid "&Daily weight"
+msgstr "&Denní vážení"
+
+#: gui_main.py:129
 msgid "Certified weights:"
 msgstr "Protokol o vážení:"
 
-#: gui_main.py:109
+#: gui_main.py:130
 msgid "Non-lifting parts"
 msgstr "Nevztlakové části"
 
-#: gui_main.py:111
+#: gui_main.py:132
 msgid "Empty glider"
 msgstr "Prázdný kluzák"
 
-#: gui_main.py:113
+#: gui_main.py:134
 msgid "Seat min."
 msgstr "Sedačka min."
 
-#: gui_main.py:115
+#: gui_main.py:136
 msgid "Seat max."
 msgstr "Sedačka max."
 
-#: gui_main.py:117
+#: gui_main.py:139
 msgid "Measured weights:"
 msgstr "Vážení:"
 
-#: gui_main.py:118
+#: gui_main.py:140
 msgid "Glider weight"
 msgstr "Kluzák"
 
-#: gui_main.py:120
+#: gui_main.py:142
 msgid "Pilot weight"
 msgstr "Pilot s padákem"
 
-#: gui_main.py:122
+#: gui_main.py:144
 msgid "Tow bar weight"
 msgstr "Hmotnost na vlečné tyči"
 
-#: gui_main.py:143
+#: gui_main.py:152
+msgid "Daily weight"
+msgstr "Denní vážení"
+
+#: gui_main.py:165
 msgid "Nr."
 msgstr "Č."
 
-#: gui_main.py:386
+#: gui_main.py:460
 msgid "Exit application?"
 msgstr "Chcete opravdu ukončit aplikaci?"
 
-#: gui_main.py:386
+#: gui_main.py:460
 msgid "Exit?"
 msgstr "Ukončit?"
 
-#: gui_main.py:398
+#: gui_main.py:472
 msgid "Final version will be released under open source license"
 msgstr "Finální verze bude uvolněna pod open source licencí"
 
-#: gui_main.py:457
+#: gui_main.py:532
 msgid "Glider card insert error"
 msgstr "Došlo k chybě při vkládání nové karty kluzáku"
 
-#: gui_main.py:496
+#: gui_main.py:557
 msgid "Glider card edit error"
 msgstr "Došlo k chybě při editaci karty kluzáku"
 
-#: gui_main.py:530
+#: gui_main.py:591
 msgid "Glider card delete error"
 msgstr "Došlo k chybě při mazání karty kluzáku"
 
-#: gui_main.py:671
+#: gui_main.py:746
 #, python-format
 msgid "No application is associated to open %s MIME type. Please, choose the program."
 msgstr "Pro zobrazení %s MIME typu není asociován žádný program, vyberte jej ručně."
 
-#: gui_main.py:676
+#: gui_main.py:751
 msgid "Open file"
 msgstr "Otevřít soubor"
 
-#: gui_main.py:699
+#: gui_main.py:777
 msgid "Certified weights"
 msgstr "Protokol o vážení"
 
-#: gui_main.py:700
+#: gui_main.py:778
 msgid "Measured weights"
 msgstr "Vážení"
 
-#: gui_main.py:721
+#: gui_main.py:802
 msgid "Non-lifting parts weight"
 msgstr "Nevztlakové části"
 
-#: gui_main.py:723
+#: gui_main.py:804
 msgid "Empty glider weight"
 msgstr "Prázdný kluzák"
 
-#: gui_main.py:725
+#: gui_main.py:806
 msgid "Seat minimum weight"
 msgstr "Zatížení sedačky min."
 
-#: gui_main.py:727
+#: gui_main.py:808
 msgid "Seat maximum weight"
 msgstr "Zatížení sedačky max."
 
-#: gui_main.py:966
+#: gui_main.py:864
+msgid "Previous photo"
+msgstr "Předchozí fotografie"
+
+#: gui_main.py:865
+msgid "Add new photo from file"
+msgstr "Přidat fotografii ze souboru"
+
+#: gui_main.py:866
+msgid "Set as a main photo"
+msgstr "Nastavit jako hlavní fotografii"
+
+#: gui_main.py:867
+msgid "Delete photo"
+msgstr "Smazat fotografii"
+
+#: gui_main.py:868
+msgid "Next photo"
+msgstr "Další fotografie"
+
+#: gui_main.py:1055
 msgid "JPEG files"
 msgstr "obrázky JPEG"
+
+#: gui_main.py:1071
+msgid "Photo already exists!"
+msgstr "Fotografie již existuje!"
 
 #: gui_organizations.py:11
 msgid "Organization insert error"
@@ -508,18 +568,22 @@ msgstr "Chyba"
 msgid "Some error during starting application"
 msgstr "Došlo k chybě během spouštění aplikace"
 
-#: models.py:259
+#: models.py:260
 msgid "True"
 msgstr "Ano"
 
-#: models.py:259
+#: models.py:260
 msgid "False"
 msgstr "Ne"
 
+#~ msgid "MTOW is OK."
+#~ msgstr "Maximální vzletová hmotnost je v limitu."
+#~ msgid "MTOW is overweighted over a %d kg!"
+#~ msgstr "Maximální vzletová hmotnost je překročena o %d kg!"
+#~ msgid "No data for check MTOW weights."
+#~ msgstr "Nejsou údaje pro kontrolu maximální vzletové hmotnosti."
 #~ msgid "&Properties"
 #~ msgstr "&Upravit"
-#~ msgid "&New"
-#~ msgstr "&Nový"
 #~ msgid "&Close"
 #~ msgstr "&Zavřít"
 #~ msgid "Zoom &In"

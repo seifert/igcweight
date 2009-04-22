@@ -40,7 +40,7 @@ class Main(wx.Frame):
     REFERENTIAL_OK = _("Referential weight is OK.")
     REFERENTIAL_OVERWEIGHT = _("Referential weight is overweight by %d kg!")
     REFERENTIAL_NO_DATA = _("No data for check referential weight.")
-    COEFFICIENT = _("Competition coefficient is %s at weight %d kg.")
+    COEFFICIENT = _("Competition coefficient is %(coefficient)s at weight %(weight)d kg.")
     COEFFICIENT_NO_DATA = _("No data for count coefficient.")
     COLOR_TEXT = wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOWTEXT)
     COLOR_OK = 'DARK GREEN'
@@ -421,7 +421,14 @@ class Main(wx.Frame):
 
     def __set_status_label_data(self, control, colour, text, *args):
         " __set_status_label_data(self, control, colour, text, *args) - set wx.StaticText text and colour "
-        control.SetLabel(text % args)
+        args_len = len(args)
+        if args_len > 1:
+            params = args
+        elif args_len == 1:
+            params = args[0]
+        else:
+            params = ()
+        control.SetLabel( text % params )
         control.SetForegroundColour(colour)
     
     def SortGliderCardList(self, col):
@@ -681,7 +688,7 @@ class Main(wx.Frame):
             # Coefficient status
             coefficient = record.coefficient
             if coefficient != None:
-                self.__set_status_label_data(self.text_coefficient_status, self.COLOR_TEXT, self.COEFFICIENT, record.column_as_str('coefficient'), record.referential_weight)
+                self.__set_status_label_data(self.text_coefficient_status, self.COLOR_TEXT, self.COEFFICIENT, {'coefficient': record.column_as_str('coefficient'), 'weight': record.referential_weight})
                 self.text_coefficient_status.SetFont(self.fontbold)
             else:
                 self.__set_status_label_data(self.text_coefficient_status, self.COLOR_NO_DATA, self.COEFFICIENT_NO_DATA)
