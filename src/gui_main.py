@@ -12,7 +12,7 @@ import wx
 from wx.lib.multisash import EmptyChild
 from wx import GetTranslation as _
 
-from sqlalchemy import or_
+from sqlalchemy import or_, desc
 from sqlalchemy.orm import eagerload, join
 
 import settings
@@ -52,6 +52,9 @@ class Main(wx.Frame):
         
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
+        
+        self.__current_photo_index = None
+        self.__photos = None
         
         self.split_main = wx.SplitterWindow(self, -1, style=wx.SP_3D|wx.SP_BORDER)
         self.panel_card = wx.Panel(self.split_main, -1)
@@ -124,7 +127,9 @@ class Main(wx.Frame):
         self.text_landing_gear = wx.StaticText(self.panel_card, -1, "")
         # Photo
         self.photo = wx.StaticBitmap(self.panel_card, -1)
-        self.button_show_photo = wx.Button(self.panel_card, wx.ID_ZOOM_IN, "")
+        self.button_photo_prev = wx.Button(self.panel_card, wx.NewId(), "<", style=wx.BU_EXACTFIT)
+        self.button_photo_show = wx.Button(self.panel_card, wx.ID_ZOOM_IN, "")
+        self.button_photo_next = wx.Button(self.panel_card, wx.NewId(), ">", style=wx.BU_EXACTFIT)
         # Certified weights
         self.label_certified_weights = wx.StaticText(self.panel_card, -1, _("Certified weights:"))
         self.label_non_lifting_weight = wx.StaticText(self.panel_card, -1, _("Non-lifting parts"))
@@ -187,7 +192,9 @@ class Main(wx.Frame):
         self.Bind(wx.EVT_MENU, self.DailyWeightNew, self.menu_daily_weight_new)
         self.Bind(wx.EVT_MENU, self.DailyWeightProperties, self.menu_daily_weight_properties)
         self.Bind(wx.EVT_MENU, self.DailyWeightDelete, self.menu_daily_weight_delete)
-        self.Bind(wx.EVT_BUTTON, self.ShowPhoto, self.button_show_photo)
+        self.Bind(wx.EVT_BUTTON, self.PrevPhoto, self.button_photo_prev)
+        self.Bind(wx.EVT_BUTTON, self.ShowPhoto, self.button_photo_show)
+        self.Bind(wx.EVT_BUTTON, self.NextPhoto, self.button_photo_next)
         self.Bind(wx.EVT_TEXT_ENTER, self.SearchGliderCard, self.text_find)
         self.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.SearchGliderCard, self.text_find)
         self.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.AllGliderCard, self.text_find)
@@ -219,7 +226,9 @@ class Main(wx.Frame):
         self.button_glider_card_properties.Enable(False)
         self.button_glider_card_delete.SetToolTipString(_("Delete glider"))
         self.button_glider_card_delete.Enable(False)
-        self.button_show_photo.SetToolTipString(_("Show photo"))
+        self.button_photo_prev.SetToolTipString(_("Previous photo"))
+        self.button_photo_show.SetToolTipString(_("Show photo"))
+        self.button_photo_next.SetToolTipString(_("Next photo"))
         self.button_daily_weight_new.SetToolTipString(_("Add new daily weight"))
         self.button_daily_weight_new.Enable(False)
         self.button_daily_weight_properties.SetToolTipString(_("Edit daily weight properties"))
@@ -290,9 +299,13 @@ class Main(wx.Frame):
         sizer_card_base.AddGrowableCol(0, 1)
         sizer_card_base.AddGrowableCol(1, 1)
         # Photo sizer
+        sizer_photo_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_photo_buttons.Add(self.button_photo_prev, 0, wx.RIGHT|wx.EXPAND, 2)
+        sizer_photo_buttons.Add(self.button_photo_show, 1, wx.LEFT|wx.RIGHT|wx.EXPAND, 2)
+        sizer_photo_buttons.Add(self.button_photo_next, 0, wx.LEFT|wx.EXPAND, 2)
         sizer_photo = wx.StaticBoxSizer(self.sizer_photo_staticbox, wx.VERTICAL)
         sizer_photo.Add(self.photo, 1, wx.ALL|wx.EXPAND, 4)
-        sizer_photo.Add(self.button_show_photo, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.EXPAND, 4)
+        sizer_photo.Add(sizer_photo_buttons, 0, wx.ALL|wx.EXPAND, 4)
         # Card head (top) sizer
         sizer_card_head = wx.BoxSizer(wx.HORIZONTAL)
         sizer_card_head.Add(sizer_card_base, 1, wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
@@ -516,7 +529,7 @@ class Main(wx.Frame):
                             record = dlg.GetData()
                             session.add(record)
                             session.commit()
-                            self.__delete_photos(dlg.deleted_photos)
+# TODO:                           self.__delete_photos(dlg.deleted_photos)
                             self.datasource_glider_card.append(record)
                             count = len(self.datasource_glider_card)
                             self.list_glider_card.SetItemCount(count)
@@ -545,7 +558,7 @@ class Main(wx.Frame):
                     if dlg.ShowModal() == wx.ID_OK:
                         record = dlg.GetData()
                         session.commit()
-                        self.__delete_photos(dlg.deleted_photos)
+# TODO:                       self.__delete_photos(dlg.deleted_photos)
                         self.list_glider_card.RefreshItem( self.list_glider_card.GetFocusedItem() )
                         self.ChangeGliderCard()
                     else:
@@ -568,14 +581,10 @@ class Main(wx.Frame):
             try:
                 i = self.datasource_glider_card.index(record)
                 try:
-#                    # TODO: improve delete photos
-#                    photos_path = [ photo.full_path for photo in record.photos ]
-#                    session.delete(record)
-#                    session.flush()
-#                    for path in photos_path:
-#                        remove(path)
-                    
+                    photos_path = [ photo.full_path for photo in record.photos ]
+                    session.delete(record)
                     session.commit()
+                    self.__delete_photos(photos_path)
                     del( self.datasource_glider_card[i] )
                     i = i - 1
                     i = i >= 0 and i or 0
@@ -694,14 +703,12 @@ class Main(wx.Frame):
                 self.__set_status_label_data(self.text_coefficient_status, self.COLOR_NO_DATA, self.COEFFICIENT_NO_DATA)
                 self.text_coefficient_status.SetFont(self.fontnormal)
             # Photo
-            if record.main_photo != None:
-                self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, record.main_photo.full_path ) )
-                self.button_show_photo.Enable(True)
-                self.menu_glider_card_show_photo.Enable(True)
+            self.__photos = session.query(Photo).filter( Photo.glider_card==record ).order_by( desc(Photo.main) ).order_by( Photo.id ).all()
+            count = len(self.__photos)
+            if count > 0:
+                self.__set_photo(0)
             else:
-                self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
-                self.button_show_photo.Enable(False)
-                self.menu_glider_card_show_photo.Enable(False)
+                self.__set_photo(None)
         else:
             self.text_registration.Label = ''
             self.text_competition_number.Label = ''
@@ -710,8 +717,6 @@ class Main(wx.Frame):
             self.text_organization.Label = ''
             self.text_winglets.Label = ''
             self.text_landing_gear.Label = ''
-            self.button_show_photo.Enable(False)
-            self.menu_glider_card_show_photo.Enable(False)
             self.text_non_lifting_weight.Label = ''
             self.text_empty_weight.Label = ''
             self.text_seat_min_weight.Label = ''
@@ -724,11 +729,58 @@ class Main(wx.Frame):
             self.__set_status_label_data(self.text_seat_status, self.COLOR_TEXT, '')
             self.__set_status_label_data(self.text_referential_status, self.COLOR_TEXT, '')
             self.__set_status_label_data(self.text_coefficient_status, self.COLOR_TEXT, '')
+            self.__set_photo(None)
+
+    def __set_photo(self, index=None):
+        " __set_photo(self, int index) - show photo thumbnail or empty photo and enable or disable buttons "
+        self.__current_photo_index = index
+        if index != None:
+            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, self.__photos[index].full_path ) )
+        else:
             self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
+        # Enable or disable prev and next buttons
+        if index == None:
+            self.button_photo_prev.Enable(False)
+            self.button_photo_next.Enable(False)
+            self.button_photo_show.Enable(False)
+            self.menu_glider_card_show_photo.Enable(False)
+        else:
+            self.button_photo_show.Enable(True)
+            self.menu_glider_card_show_photo.Enable(True)
+            count = len( self.__photos )
+            if count <= 1:
+                self.button_photo_prev.Enable(False)
+                self.button_photo_next.Enable(False)
+            elif index == 0:
+                self.button_photo_prev.Enable(False)
+                self.button_photo_next.Enable(True)
+            elif index == count - 1:
+                self.button_photo_prev.Enable(True)
+                self.button_photo_next.Enable(False)
+            else:
+                self.button_photo_prev.Enable(True)
+                self.button_photo_next.Enable(True)
+
+    def PrevPhoto(self, evt=None):
+        " PrevPhoto(self, Event evt=None) - show previous photo "
+        index = self.__current_photo_index
+        index = index - 1
+        if index < 0:
+            index = 0
+        self.__set_photo(index)
+
+    def NextPhoto(self, evt=None):
+        " NextPhoto(self, Event evt=None) - show next photo "
+        count = len(self.__photos)
+        index = self.__current_photo_index
+        index = index + 1
+        if index >= count:
+            index = count - 1
+        self.__set_photo(index)
 
     def ShowPhoto(self, evt=None):
         " ShowPhoto(self, Event evt=None) - show photo in associated application "
-        full_path = self.list_glider_card.current_item.main_photo.full_path
+        full_path = self.__photos[ self.__current_photo_index ].full_path
         
         try:
             os.startfile(full_path)

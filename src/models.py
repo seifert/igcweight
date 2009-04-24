@@ -235,7 +235,7 @@ class Photo(Base):
         UniqueConstraint( 'md5', name='uq_photo_md5' ),
         ForeignKeyConstraint( ('glider_card_id',), ('glider_card.id',), name='fk_photo_glider_card' )
     )
-
+    
     def __init__(self, **kwargs):
         " Photo(self, GliderCard glider_card=None, bool main=None, str description=None) "
         for key in kwargs.keys():
@@ -305,7 +305,7 @@ class GliderCard(Base):
     glider_type = relation( GliderType, order_by=GliderType.name, backref='glider_type' )
     pilot = relation( Pilot, order_by=Pilot.surname, backref='pilot' )
     organization = relation( Organization, order_by=Organization.name, backref='organization' )
-    photos = relation(Photo, backref=backref('photo'), order_by=Photo.id, cascade="all, delete, delete-orphan")
+    photos = relation(Photo, backref=backref('glider_card'), order_by=Photo.id, cascade="all, delete, delete-orphan")
 
     def __init__(self, **kwargs):
         """ GliderCard(self, str registration=None, str competition_number=None, GliderType glider_type=None,
