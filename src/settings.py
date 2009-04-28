@@ -14,7 +14,7 @@ except ImportError:
 
 LAST_OPEN_FILE_PATH = USER_DIR
 
-HOME_DIR   = join( USER_DIR, 'igcweight-07' )
+HOME_DIR   = join( USER_DIR, 'igcweight-08' )
 PHOTOS_DIR = join( HOME_DIR, 'photos' )
 BASE_DIR   = abspath( join(dirname(__file__), '..') )
 IMAGES_DIR = join( BASE_DIR, 'images' )
@@ -30,6 +30,7 @@ GEAR_HANDICAP = Decimal('0.02')
 WINGLETS_HANDICAP = Decimal('0.01')
 OWERWEIGHT_HANDICAP = Decimal('0.005')
 OWERWEIGHT_STEP = 10
+DAILY_DIFFERENCE_LIMIT = 2
 
 DB_ENGINE   = 'sqlite'
 DB_HOST     = ''
@@ -39,4 +40,4 @@ DB_USERNAME = ''
 DB_PASSWORD = ''
 DB_ARGS     = {}
 
-VERSION = '0.7'
+VERSION = '0.8'

@@ -4,7 +4,7 @@ import locale
 import decimal
 
 from os.path import join
-from datetime import date
+from datetime import time
 
 from wx import GetTranslation as _
 
@@ -12,6 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Table, MetaData, Column
 from sqlalchemy import Integer, SmallInteger, String, Text, Date, Numeric, Boolean, CHAR, ForeignKey, Sequence
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstraint
+from sqlalchemy import desc
 from sqlalchemy.orm import relation, backref
 
 import settings
@@ -248,7 +249,7 @@ class Photo(Base):
         return "<Photo: #%s %s>" % ( str(self.id), self.md5 )
     
     def __unicode__(self):
-        return "%d - %s" % ( str(self.id), self.glider_card )
+        return "%s - %s" % ( str(self.id), self.glider_card )
 
     def column_as_str(self, columnname):
         " column_as_str(self, str columnname) -> str - return column value as string "
@@ -271,6 +272,65 @@ class Photo(Base):
     def full_path(self):
         " Returns photo full path "
         return join( settings.PHOTOS_DIR, "%s.jpg" % self.md5 )
+
+
+class DailyWeight(Base):
+    " Model DailyWeight "
+
+    __table__ = Table('daily_weight', Base.metadata,
+        Column( 'daily_weight_id', Integer, Sequence('daily_weight_seq', optional=True), key='id', nullable=False ),
+        Column( 'glider_card_id', Integer, nullable=False ),
+        Column( 'date', Date, nullable=False ),
+        Column( 'tow_bar_weight', SmallInteger, nullable=False ),
+        PrimaryKeyConstraint( 'id', name='pk_daily_weight' ),
+        UniqueConstraint( 'glider_card_id', 'date', name='uq_daily_weight_date' ),
+        ForeignKeyConstraint( ('glider_card_id',), ('glider_card.id',), name='fk_daily_weight_glider_card' )
+    )
+    
+    def __init__(self, **kwargs):
+        " GliderCard(self, GliderCard glider_card=None, date date=None, int weight=None) "
+        for key in kwargs.keys():
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
+            else:
+                raise AttributeError( "'%s' object has no attribute '%s'" % (self.__class__.__name__, key) )
+        
+    def __repr__(self):
+        return "<DailyWeight: #%s %s %d>" % ( str(self.id), self.date, self.tow_bar_weight )
+    
+    def __unicode__(self):
+        return "%s, %s, %d kg" % ( self.glider_card, self.date, self.tow_bar_weight )
+
+    def column_as_str(self, columnname):
+        " column_as_str(self, str columnname) -> str - return column value as string "
+        value = getattr( self, columnname )
+        
+        if value == None:
+            return ''
+        elif columnname == 'tow_bar_weight':
+            return locale.format("%d", value)
+        elif columnname == 'date':
+            return value.strftime('%x')
+        else:
+            return unicode(value)
+    
+    def str_to_column(self, columnname, value):
+        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
+        if value == '':
+            value = None
+        elif columnname == 'tow_bar_weight':
+            value = int(value) #locale.atoi(value)
+        elif columnname == 'date':
+            value = time.strptime(value, '%x')
+        setattr( self, columnname, value )
+
+    @property
+    def tow_bar_difference(self):
+        " tow_bar_difference -> int or None - return difference between glider card and current tow bar weights "
+        if self.tow_bar_weight != None and self.glider_card.tow_bar_weight != None:
+            return self.tow_bar_weight - self.glider_card.tow_bar_weight
+        else:
+            return None
 
 
 class GliderCard(Base):
@@ -306,6 +366,7 @@ class GliderCard(Base):
     pilot = relation( Pilot, order_by=Pilot.surname, backref='pilot' )
     organization = relation( Organization, order_by=Organization.name, backref='organization' )
     photos = relation(Photo, backref=backref('glider_card'), order_by=Photo.id, cascade="all, delete, delete-orphan")
+    daily_weight = relation(DailyWeight, backref=backref('glider_card'), order_by=desc(DailyWeight.date), cascade="all, delete, delete-orphan")
 
     def __init__(self, **kwargs):
         """ GliderCard(self, str registration=None, str competition_number=None, GliderType glider_type=None,

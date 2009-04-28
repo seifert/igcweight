@@ -18,7 +18,7 @@ from sqlalchemy.orm import eagerload, join
 import settings
 
 from database import session
-from models import GliderCard, Pilot, Organization, GliderType, Photo
+from models import GliderCard, Pilot, Organization, GliderType, Photo , DailyWeight
 from gui_widgets import error_message_dialog, VirtualListCtrl, GetPhotoBitmap
 from gui_igchandicap import IgcHandicapList, IgcHandicapForm, GLIDER_TYPE_INSERT_ERROR
 from gui_organizations import OrganizationList, OrganizationForm, ORGANIZATION_INSERT_ERROR
@@ -42,6 +42,9 @@ class Main(wx.Frame):
     REFERENTIAL_NO_DATA = _("No data for check referential weight.")
     COEFFICIENT = _("Competition coefficient is %(coefficient)s at weight %(weight)d kg.")
     COEFFICIENT_NO_DATA = _("No data for count coefficient.")
+    TOW_BAR_OK = _("Tow bar weight is OK.")
+    TOW_BAR_OVERWEIGHT = _("Tow bar weight is overweight by %d kg!")
+    TOW_BAR_NO_DATA = _("No data for check tow bar weight.")
     COLOR_TEXT = wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOWTEXT)
     COLOR_OK = 'DARK GREEN'
     COLOR_OVERWEIGHT = 'RED'
@@ -53,6 +56,7 @@ class Main(wx.Frame):
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
         
+        self.__old_record = None
         self.__current_photo_index = None
         self.__photos = None
         
@@ -172,7 +176,10 @@ class Main(wx.Frame):
         self.list_glider_card.InsertColumn(2, _("Glider type"), 'glider_type', proportion=3)
         self.list_glider_card.InsertColumn(3, _("Pilot"), 'pilot', proportion=4)
 
-        # Open data source
+        self.list_daily_weight.InsertColumn(0, _("Date"), 'date', proportion=1)
+        self.list_daily_weight.InsertColumn(1, _("Status"), 'status', proportion=3)
+
+        # Open data sources
         self.BASE_QUERY = session.query(GliderCard).join( (Pilot, GliderCard.pilot_id==Pilot.id), (GliderType, GliderCard.glider_type_id==GliderType.id) )
         self.datasource_glider_card = self.BASE_QUERY.all()
 
@@ -391,15 +398,9 @@ class Main(wx.Frame):
             if count > 0 and self.list_glider_card.current_item:            
                 glider_card_properties = True
                 glider_card_delete = True
-                daily_weight_new = True
-                daily_weight_properties = True
-                daily_weight_delete = True
             else:
                 glider_card_properties = False
                 glider_card_delete =  False
-                daily_weight_new = False
-                daily_weight_properties = False
-                daily_weight_delete = False
         else:
             glider_card_new = False
             glider_card_properties = False
@@ -411,9 +412,30 @@ class Main(wx.Frame):
         self.menu_glider_card_properties.Enable(glider_card_properties)
         self.button_glider_card_delete.Enable(glider_card_delete)
         self.menu_glider_card_delete.Enable(glider_card_delete)
+    
+    def __set_enabled_disabled_daily(self):
+        " __set_enabled_disabled_daily(self) - enable or disable daily weight controls "
+        datasource = getattr( self.list_daily_weight, 'datasource', None)
+        if datasource != None:
+            daily_weight_new = True
+            count = len(datasource)
+            if count > 0 and self.list_glider_card.current_item:            
+                daily_weight_properties = True
+                daily_weight_delete = True
+            else:
+                daily_weight_properties = False
+                daily_weight_delete =  False
+        else:
+            daily_weight_new = False
+            daily_weight_properties = False
+            daily_weight_delete = False
+        
         self.button_daily_weight_new.Enable(daily_weight_new)
+        self.menu_daily_weight_new.Enable(daily_weight_new)
         self.button_daily_weight_properties.Enable(daily_weight_properties)
+        self.menu_daily_weight_properties.Enable(daily_weight_properties)
         self.button_daily_weight_delete.Enable(daily_weight_delete)
+        self.menu_daily_weight_delete.Enable(daily_weight_delete)
     
     def __list_glider_card_popup_menu(self, evt):
         " __list_glider_popup_menu(self, Event evt) - show pop-up menu "
@@ -600,7 +622,11 @@ class Main(wx.Frame):
 
     def DailyWeightNew(self, evt=None):
         " DailyWeightNew(self, Event evt=None) - add new daily weight event handler "
-        pass
+        dlg = DialogDailyWeight(self)
+        try:
+            dlg.ShowModal()
+        finally:
+            dlg.Destroy()
 
     def DailyWeightProperties(self, evt=None):
         " DailyWeightProperties(self, Event evt=None) - edit daily weight event handler "
@@ -635,9 +661,43 @@ class Main(wx.Frame):
             self.__filtered = False
             self.ChangeGliderCard()
 
+    def __set_photo(self, index=None):
+        " __set_photo(self, int index) - show photo thumbnail or empty photo and enable or disable buttons "
+        self.__current_photo_index = index
+        if index != None:
+            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, self.__photos[index].full_path ) )
+        else:
+            self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
+        # Enable or disable prev and next buttons
+        if index == None:
+            self.button_photo_prev.Enable(False)
+            self.button_photo_next.Enable(False)
+            self.button_photo_show.Enable(False)
+            self.menu_glider_card_show_photo.Enable(False)
+        else:
+            self.button_photo_show.Enable(True)
+            self.menu_glider_card_show_photo.Enable(True)
+            count = len( self.__photos )
+            if count <= 1:
+                self.button_photo_prev.Enable(False)
+                self.button_photo_next.Enable(False)
+            elif index == 0:
+                self.button_photo_prev.Enable(False)
+                self.button_photo_next.Enable(True)
+            elif index == count - 1:
+                self.button_photo_prev.Enable(True)
+                self.button_photo_next.Enable(False)
+            else:
+                self.button_photo_prev.Enable(True)
+                self.button_photo_next.Enable(True)
+
     def ChangeGliderCard(self, evt=None):
         " ChangeGliderCard(self, Event evt=None) - this method is called when glider card is changed "
         record = self.list_glider_card.current_item
+        if record == self.__old_record:
+            return
+        self.__old_record = record
+        
         if record != None:
             # Base data
             self.text_registration.SetLabel( record.column_as_str('registration') )
@@ -709,6 +769,14 @@ class Main(wx.Frame):
                 self.__set_photo(0)
             else:
                 self.__set_photo(None)
+            # Daily weight
+            self.list_daily_weight.datasource = record.daily_weight
+            count = len(record.daily_weight)
+            self.list_daily_weight.SetItemCount(count)
+            if count > 0:
+                self.list_daily_weight.Select(0)
+                self.list_daily_weight.Focus(0)
+            self.__set_enabled_disabled_daily()
         else:
             self.text_registration.Label = ''
             self.text_competition_number.Label = ''
@@ -730,36 +798,9 @@ class Main(wx.Frame):
             self.__set_status_label_data(self.text_referential_status, self.COLOR_TEXT, '')
             self.__set_status_label_data(self.text_coefficient_status, self.COLOR_TEXT, '')
             self.__set_photo(None)
-
-    def __set_photo(self, index=None):
-        " __set_photo(self, int index) - show photo thumbnail or empty photo and enable or disable buttons "
-        self.__current_photo_index = index
-        if index != None:
-            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, self.__photos[index].full_path ) )
-        else:
-            self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
-        # Enable or disable prev and next buttons
-        if index == None:
-            self.button_photo_prev.Enable(False)
-            self.button_photo_next.Enable(False)
-            self.button_photo_show.Enable(False)
-            self.menu_glider_card_show_photo.Enable(False)
-        else:
-            self.button_photo_show.Enable(True)
-            self.menu_glider_card_show_photo.Enable(True)
-            count = len( self.__photos )
-            if count <= 1:
-                self.button_photo_prev.Enable(False)
-                self.button_photo_next.Enable(False)
-            elif index == 0:
-                self.button_photo_prev.Enable(False)
-                self.button_photo_next.Enable(True)
-            elif index == count - 1:
-                self.button_photo_prev.Enable(True)
-                self.button_photo_next.Enable(False)
-            else:
-                self.button_photo_prev.Enable(True)
-                self.button_photo_next.Enable(True)
+            self.list_daily_weight.SetItemCount(0)
+            self.list_daily_weight.datasource = None
+            self.__set_enabled_disabled_daily()
 
     def PrevPhoto(self, evt=None):
         " PrevPhoto(self, Event evt=None) - show previous photo "
@@ -1011,7 +1052,6 @@ class GliderCardForm(wx.Dialog):
         self.SetMinSize( (750, self.GetBestSize().height) )
         sizer_main.Fit(self)
         self.Layout()
-        self.SetMinSize(self.Size)
         self.CenterOnParent()
 
     def __init_combo_glider_type(self):
@@ -1205,7 +1245,7 @@ class GliderCardForm(wx.Dialog):
             else:
                 self.button_photo_prev.Enable(True)
                 self.button_photo_next.Enable(True)
-        
+    
     def GetData(self):
         " GetData(self) -> GliderCard - get cleaned form data "
         glidercard = getattr( self, 'glidercard', GliderCard() )
@@ -1258,3 +1298,64 @@ class GliderCardForm(wx.Dialog):
                 self.__set_photo()
         else:
             self.__set_photo()
+
+
+class DialogDailyWeight(wx.Dialog):
+    def __init__(self, *args, **kwds):
+        kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
+        wx.Dialog.__init__(self, *args, **kwds)
+        self.label_date = wx.StaticText(self, -1, _("Date"))
+        self.label_tow_bar_weight = wx.StaticText(self, -1, _("Tow bar weight"))
+        self.text_date = wx.TextCtrl(self, -1, "")
+        self.text_tow_bar_weight = wx.TextCtrl(self, -1, "")
+        self.button_ok = wx.Button(self, wx.ID_OK, "")
+        self.button_cancel = wx.Button(self, wx.ID_CANCEL, "")
+
+        self.__set_properties()
+        self.__do_layout()
+
+    def __set_properties(self):
+        self.SetTitle(_("Daily weight"))
+        self.label_date.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
+        self.label_tow_bar_weight.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
+        self.text_date.SetFocus()
+        self.button_ok.SetDefault()
+
+    def __do_layout(self):
+        grid_sizer = wx.GridBagSizer(2, 2)
+        grid_sizer.Add(self.label_date,  (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
+        grid_sizer.Add(self.label_tow_bar_weight,  (0, 1), (1, 1), wx.LEFT|wx.EXPAND, 0)
+        grid_sizer.Add(self.text_date,  (1, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 0)
+        grid_sizer.Add(self.text_tow_bar_weight,  (1, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 0)
+        grid_sizer.AddGrowableCol(0, 1)
+        grid_sizer.AddGrowableCol(1, 1)
+
+        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_buttons.Add(self.button_ok, 0, wx.RIGHT, 2)
+        sizer_buttons.Add(self.button_cancel, 0, wx.LEFT, 2)
+
+        sizer_main = wx.BoxSizer(wx.VERTICAL)
+        sizer_main.Add(grid_sizer, 0, wx.ALL|wx.EXPAND, 4)
+        sizer_main.Add(sizer_buttons, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.TOP|wx.ALIGN_RIGHT, 4)
+
+        self.SetSizer(sizer_main)
+        self.SetMinSize( (self.GetSize().width, self.GetBestSize().height) )
+        self.SetMaxSize( (-1, self.GetBestSize().height) )
+        
+        sizer_main.Fit(self)
+        self.Layout()
+        self.CenterOnParent()
+    
+    def GetData(self):
+        " GetData(self) -> DailyWeight - get cleaned form data "
+        dailyweight = getattr( self, 'dailyweight', DailyWeight() )
+        dailyweight.str_to_column( 'date', self.text_date.Value )
+        dailyweight.str_to_column( 'tow_bar_weight', self.text_tow_bar_weight.Value )
+        return dailyweight
+    
+    def SetData(self, dailyweight=None):
+        " SetData(self, DailyWeight dailyweight=None) - set form data "
+        if dailyweight != None:
+            self.dailyweight = dailyweight
+            self.text_date.Value = dailyweight.column_as_str('date')
+            self.text_tow_bar_weight.Value = dailyweight.column_as_str('tow_bar_weight')
