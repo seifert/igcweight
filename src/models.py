@@ -4,7 +4,7 @@ import locale
 import decimal
 
 from os.path import join
-from datetime import time
+from datetime import datetime
 
 from wx import GetTranslation as _
 
@@ -299,7 +299,7 @@ class DailyWeight(Base):
         return "<DailyWeight: #%s %s %d>" % ( str(self.id), self.date, self.tow_bar_weight )
     
     def __unicode__(self):
-        return "%s, %s, %d kg" % ( self.glider_card, self.date, self.tow_bar_weight )
+        return "%s, %s" % ( self.glider_card, self.date )
 
     def column_as_str(self, columnname):
         " column_as_str(self, str columnname) -> str - return column value as string "
@@ -321,7 +321,7 @@ class DailyWeight(Base):
         elif columnname == 'tow_bar_weight':
             value = int(value) #locale.atoi(value)
         elif columnname == 'date':
-            value = time.strptime(value, '%x')
+            value = datetime.strptime( str(value), '%x' )
         setattr( self, columnname, value )
 
     @property

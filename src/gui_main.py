@@ -7,6 +7,8 @@ from os import remove, system
 from os.path import isfile, splitext, abspath, dirname
 from shutil import copy
 from hashlib import md5
+from datetime import datetime
+from math import fabs
 
 import wx
 from wx.lib.multisash import EmptyChild
@@ -42,8 +44,9 @@ class Main(wx.Frame):
     REFERENTIAL_NO_DATA = _("No data for check referential weight.")
     COEFFICIENT = _("Competition coefficient is %(coefficient)s at weight %(weight)d kg.")
     COEFFICIENT_NO_DATA = _("No data for count coefficient.")
-    TOW_BAR_OK = _("Tow bar weight is OK.")
+    TOW_BAR_OK = _("Tow bar weight is in the limit.")
     TOW_BAR_OVERWEIGHT = _("Tow bar weight is overweight by %d kg!")
+    TOW_BAR_UNDERWEIGHT = _("Tow bar weight is underweight by %d kg.")
     TOW_BAR_NO_DATA = _("No data for check tow bar weight.")
     COLOR_TEXT = wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOWTEXT)
     COLOR_OK = 'DARK GREEN'
@@ -160,6 +163,8 @@ class Main(wx.Frame):
         # Daily weights
         self.label_daily_weight = wx.StaticText(self.panel_card, -1, _("Daily weight"))
         self.list_daily_weight = VirtualListCtrl(self.panel_card, -1)
+        self.list_daily_weight.GetItemTextMethod = self.__list_daily_weigh_get_item_text
+        self.list_daily_weight.GetItemAttrMethod = self.__list_daily_weigh_get_item_attr
         self.button_daily_weight_new = wx.Button(self.panel_card, wx.ID_NEW, "")
         self.button_daily_weight_properties = wx.Button(self.panel_card, wx.ID_EDIT, "")
         self.button_daily_weight_delete = wx.Button(self.panel_card, wx.ID_DELETE, "")
@@ -176,8 +181,9 @@ class Main(wx.Frame):
         self.list_glider_card.InsertColumn(2, _("Glider type"), 'glider_type', proportion=3)
         self.list_glider_card.InsertColumn(3, _("Pilot"), 'pilot', proportion=4)
 
-        self.list_daily_weight.InsertColumn(0, _("Date"), 'date', proportion=1)
-        self.list_daily_weight.InsertColumn(1, _("Status"), 'status', proportion=3)
+        self.list_daily_weight.InsertColumn(0, _("Date"), 'date', proportion=2)
+        self.list_daily_weight.InsertColumn(1, _("Tow bar weight"), 'tow_bar_weight', proportion=3)
+        self.list_daily_weight.InsertColumn(2, _("Status"), 'status', proportion=6)
 
         # Open data sources
         self.BASE_QUERY = session.query(GliderCard).join( (Pilot, GliderCard.pilot_id==Pilot.id), (GliderType, GliderCard.glider_type_id==GliderType.id) )
@@ -465,6 +471,35 @@ class Main(wx.Frame):
             params = ()
         control.SetLabel( text % params )
         control.SetForegroundColour(colour)
+
+    def __list_daily_weigh_get_item_text(self, item, colname):
+        " __list_daily_weigh_get_item_text(self, int item, str colname) -> str - get column data as text "
+        daily_weight = self.list_glider_card.current_item.daily_weight[item]
+        if colname == 'status':
+            difference = daily_weight.tow_bar_difference
+            if difference == None:
+                return self.TOW_BAR_NO_DATA
+            difference_abs = fabs(difference)
+            if difference_abs <= settings.DAILY_DIFFERENCE_LIMIT:
+                return self.TOW_BAR_OK
+            elif difference > 0:
+                return self.TOW_BAR_OVERWEIGHT % difference_abs
+            elif difference < 0:
+                return self.TOW_BAR_UNDERWEIGHT % difference_abs
+        else:
+            return daily_weight.column_as_str(colname)
+
+    def __list_daily_weigh_get_item_attr(self, item):
+        " __list_daily_weigh_get_item_text(self, int item, str colname) -> str - get column data as text "
+        daily_weight = self.list_glider_card.current_item.daily_weight[item]
+        difference = daily_weight.tow_bar_difference
+        if difference == None:
+            return wx.ListItemAttr(colText=self.COLOR_NO_DATA)
+        difference_abs = fabs(difference)
+        if difference_abs <= settings.DAILY_DIFFERENCE_LIMIT:
+            return wx.ListItemAttr(colText=self.COLOR_OK)
+        else:
+            return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT)
     
     def SortGliderCardList(self, col):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
@@ -622,20 +657,79 @@ class Main(wx.Frame):
 
     def DailyWeightNew(self, evt=None):
         " DailyWeightNew(self, Event evt=None) - add new daily weight event handler "
-        dlg = DialogDailyWeight(self)
+        dlg = DailyWeightForm(self)
         try:
-            dlg.ShowModal()
+            while True:
+                try:
+                    dlg.SetData()
+                    if dlg.ShowModal() == wx.ID_OK:
+                        try:
+                            record = dlg.GetData()
+                            glider_card = self.list_glider_card.current_item
+                            glider_card.daily_weight.append(record)
+                            session.commit()
+                            self.list_daily_weight.datasource = glider_card.daily_weight
+                            i = glider_card.daily_weight.index(record)
+                            count = len(glider_card.daily_weight)
+                            self.list_daily_weight.SetItemCount(count)
+                            self.list_daily_weight.Select(i)
+                            self.list_daily_weight.Focus(i)
+                        finally:
+                            self.__set_enabled_disabled_daily()
+                    break
+                except Exception, e:
+                    session.rollback()
+                    error_message_dialog( self, _("Daily weight insert error"), e )
         finally:
             dlg.Destroy()
 
     def DailyWeightProperties(self, evt=None):
         " DailyWeightProperties(self, Event evt=None) - edit daily weight event handler "
-        pass
+        dlg = DailyWeightForm(self)
+        try:
+            record = self.list_daily_weight.current_item
+            dlg.SetData(record)
+            while True:
+                try:
+                    if dlg.ShowModal() == wx.ID_OK:
+                        record = dlg.GetData()
+                        session.commit()
+                        self.list_daily_weight.RefreshItem( self.list_daily_weight.GetFocusedItem() )
+                    else:
+                        session.rollback()
+                    break
+                except Exception, e:
+                    session.rollback()
+                    error_message_dialog( self, _("Daily weight edit error"), e )
+        finally:
+            dlg.Destroy()
 
     def DailyWeightDelete(self, evt=None):
         " DailyWeightDelete(self, Event evt=None) - delete daily weight event handler "
-        pass
-
+        record = self.list_daily_weight.current_item
+        if wx.MessageDialog(self,
+                            _("Are you sure to delete %s?") % record,
+                            _("Delete %s?") % record,
+                            wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING
+                           ).ShowModal() == wx.ID_YES:
+            try:
+                glider_card = self.list_glider_card.current_item
+                i = glider_card.daily_weight.index(record)
+                try:
+                    glider_card.daily_weight.remove(record)
+                    session.commit()
+                    i = i - 1
+                    i = i >= 0 and i or 0
+                    self.list_daily_weight.datasource = glider_card.daily_weight
+                    self.list_daily_weight.SetItemCount( len(glider_card.daily_weight) )
+                    self.list_daily_weight.Select(i)
+                    self.list_daily_weight.Focus(i)
+                finally:
+                    self.__set_enabled_disabled_daily()
+            except Exception, e:
+                session.rollback()
+                error_message_dialog( self, _("Daily weight delete error"), e )
+    
     def SearchGliderCard(self, evt=None):
         " SearchGliderCard(self, Event evt=None) - filter glider card according to competition number or registration "
         value = self.text_find.Value
@@ -694,8 +788,8 @@ class Main(wx.Frame):
     def ChangeGliderCard(self, evt=None):
         " ChangeGliderCard(self, Event evt=None) - this method is called when glider card is changed "
         record = self.list_glider_card.current_item
-        if record == self.__old_record:
-            return
+#        if record == self.__old_record:
+#            return
         self.__old_record = record
         
         if record != None:
@@ -1300,13 +1394,14 @@ class GliderCardForm(wx.Dialog):
             self.__set_photo()
 
 
-class DialogDailyWeight(wx.Dialog):
+class DailyWeightForm(wx.Dialog):
     def __init__(self, *args, **kwds):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
         wx.Dialog.__init__(self, *args, **kwds)
-        self.label_date = wx.StaticText(self, -1, _("Date"))
+        self.label_date = wx.StaticText(self, -1, _("Date") )
         self.label_tow_bar_weight = wx.StaticText(self, -1, _("Tow bar weight"))
         self.text_date = wx.TextCtrl(self, -1, "")
+        self.button_now = wx.Button(self, -1, _("Today"), style=wx.BU_EXACTFIT)
         self.text_tow_bar_weight = wx.TextCtrl(self, -1, "")
         self.button_ok = wx.Button(self, wx.ID_OK, "")
         self.button_cancel = wx.Button(self, wx.ID_CANCEL, "")
@@ -1314,8 +1409,12 @@ class DialogDailyWeight(wx.Dialog):
         self.__set_properties()
         self.__do_layout()
 
+        # Bind events
+        self.Bind(wx.EVT_BUTTON, self.__now, self.button_now)
+
     def __set_properties(self):
         self.SetTitle(_("Daily weight"))
+        self.button_now.SetToolTipString(_("Set today date"))
         self.label_date.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
         self.label_tow_bar_weight.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
         self.text_date.SetFocus()
@@ -1323,12 +1422,13 @@ class DialogDailyWeight(wx.Dialog):
 
     def __do_layout(self):
         grid_sizer = wx.GridBagSizer(2, 2)
-        grid_sizer.Add(self.label_date,  (0, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
-        grid_sizer.Add(self.label_tow_bar_weight,  (0, 1), (1, 1), wx.LEFT|wx.EXPAND, 0)
-        grid_sizer.Add(self.text_date,  (1, 0), (1, 1), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 0)
-        grid_sizer.Add(self.text_tow_bar_weight,  (1, 1), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 0)
-        grid_sizer.AddGrowableCol(0, 1)
-        grid_sizer.AddGrowableCol(1, 1)
+        grid_sizer.Add(self.label_date,  (0, 0), (1, 2), wx.RIGHT|wx.EXPAND, 2)
+        grid_sizer.Add(self.label_tow_bar_weight,  (0, 2), (1, 1), wx.LEFT|wx.EXPAND, 2)
+        grid_sizer.Add(self.text_date,  (1, 0), (1, 1), wx.BOTTOM|wx.EXPAND, 2)
+        grid_sizer.Add(self.button_now,  (1, 1), (1, 1), wx.BOTTOM|wx.RIGHT|wx.EXPAND, 2)
+        grid_sizer.Add(self.text_tow_bar_weight,  (1, 2), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
+        grid_sizer.AddGrowableCol(0, 2)
+        grid_sizer.AddGrowableCol(2, 3)
 
         sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
         sizer_buttons.Add(self.button_ok, 0, wx.RIGHT, 2)
@@ -1345,6 +1445,11 @@ class DialogDailyWeight(wx.Dialog):
         sizer_main.Fit(self)
         self.Layout()
         self.CenterOnParent()
+    
+    def __now(self, evt):
+        " __now(self, evt) - put current date into text_date control "
+        self.text_date.Value = datetime.now().strftime('%x')
+        self.text_tow_bar_weight.SetFocus()
     
     def GetData(self):
         " GetData(self) -> DailyWeight - get cleaned form data "
