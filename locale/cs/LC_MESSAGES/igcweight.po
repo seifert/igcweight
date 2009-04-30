@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGC Weight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-29 11:54+0200\n"
-"PO-Revision-Date: 2009-04-29 11:56+0100\n"
+"POT-Creation-Date: 2009-04-29 14:07+0200\n"
+"PO-Revision-Date: 2009-04-29 14:08+0100\n"
 "Last-Translator: Jan Seifert <jan.seifert@centrumholdings.com>\n"
 "Language-Team: JS <jan.seifert@fotkyzcest.net>\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +57,6 @@ msgid "Date"
 msgstr "Datum"
 
 #: gui_forms.py:17
-#: gui_main.py:1402
 msgid "Tow bar weight"
 msgstr "Hmotnost na vlečné tyči"
 
@@ -377,22 +376,22 @@ msgid "No data for count coefficient."
 msgstr "Nejsou údaje pro výpočet koeficientu."
 
 #: gui_main.py:47
-msgid "Tow bar weight is in the limit."
-msgstr "Hmotnost na vlečné tyči je v limitu."
+msgid "* In the limit"
+msgstr "* V limitu"
 
 #: gui_main.py:48
 #, python-format
-msgid "Tow bar weight is overweight by %d kg!"
-msgstr "Hmotnost na vlečné je překročena o %d kg!"
+msgid "! Overweight by %d kg !"
+msgstr "! Překročeno o %d kg !"
 
 #: gui_main.py:49
 #, python-format
-msgid "Tow bar weight is underweight by %d kg."
-msgstr "Hmotnost na vlečné je nižší o %d kg!"
+msgid "! Underweight by %d kg"
+msgstr "! Nižší o %d kg"
 
 #: gui_main.py:50
-msgid "No data for check tow bar weight."
-msgstr "Nejsou údaje pro kontrolu hmotnosti na vlečné tyči."
+msgid "? No data"
+msgstr "? Nejsou údaje"
 
 #: gui_main.py:88
 msgid "&Edit..."
@@ -458,9 +457,17 @@ msgstr "Kluzák"
 msgid "Pilot weight"
 msgstr "Pilot s padákem"
 
+#: gui_main.py:164
+msgid "Daily tow bar weight"
+msgstr "Denní vážení na vlečné tyči"
+
 #: gui_main.py:179
 msgid "Nr."
 msgstr "Č."
+
+#: gui_main.py:185
+msgid "Weight"
+msgstr "Hmotnost"
 
 #: gui_main.py:186
 msgid "Status"
@@ -623,10 +630,18 @@ msgstr "Ano"
 msgid "False"
 msgstr "Ne"
 
+#~ msgid "Tow bar weight status"
+#~ msgstr "Stav vážení na vlečné tyči"
+#~ msgid "Tow bar weight is in the limit."
+#~ msgstr "Hmotnost na vlečné tyči je v limitu."
+#~ msgid "Tow bar weight is overweight by %d kg!"
+#~ msgstr "Hmotnost na vlečné je překročena o %d kg!"
+#~ msgid "Tow bar weight is underweight by %d kg."
+#~ msgstr "Hmotnost na vlečné je nižší o %d kg!"
+#~ msgid "No data for check tow bar weight."
+#~ msgstr "Nejsou údaje pro kontrolu hmotnosti na vlečné tyči."
 #~ msgid "MTOW is OK."
 #~ msgstr "Maximální vzletová hmotnost je v limitu."
-#~ msgid "MTOW is overweighted over a %d kg!"
-#~ msgstr "Maximální vzletová hmotnost je překročena o %d kg!"
 #~ msgid "No data for check MTOW weights."
 #~ msgstr "Nejsou údaje pro kontrolu maximální vzletové hmotnosti."
 #~ msgid "&Properties"

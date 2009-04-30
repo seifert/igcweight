@@ -44,10 +44,10 @@ class Main(wx.Frame):
     REFERENTIAL_NO_DATA = _("No data for check referential weight.")
     COEFFICIENT = _("Competition coefficient is %(coefficient)s at weight %(weight)d kg.")
     COEFFICIENT_NO_DATA = _("No data for count coefficient.")
-    TOW_BAR_OK = _("Tow bar weight is in the limit.")
-    TOW_BAR_OVERWEIGHT = _("Tow bar weight is overweight by %d kg!")
-    TOW_BAR_UNDERWEIGHT = _("Tow bar weight is underweight by %d kg.")
-    TOW_BAR_NO_DATA = _("No data for check tow bar weight.")
+    TOW_BAR_OK = _("* In the limit")
+    TOW_BAR_OVERWEIGHT = _("! Overweight by %d kg !")
+    TOW_BAR_UNDERWEIGHT = _("! Underweight by %d kg")
+    TOW_BAR_NO_DATA = _("? No data")
     COLOR_TEXT = wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOWTEXT)
     COLOR_OK = 'DARK GREEN'
     COLOR_OVERWEIGHT = 'RED'
@@ -161,7 +161,7 @@ class Main(wx.Frame):
         self.text_referential_status = wx.StaticText(self.panel_card, -1, self.REFERENTIAL_NO_DATA)
         self.text_coefficient_status = wx.StaticText(self.panel_card, -1, self.COEFFICIENT_NO_DATA)
         # Daily weights
-        self.label_daily_weight = wx.StaticText(self.panel_card, -1, _("Daily weight"))
+        self.label_daily_weight = wx.StaticText(self.panel_card, -1, _("Daily tow bar weight"))
         self.list_daily_weight = VirtualListCtrl(self.panel_card, -1)
         self.list_daily_weight.GetItemTextMethod = self.__list_daily_weigh_get_item_text
         self.list_daily_weight.GetItemAttrMethod = self.__list_daily_weigh_get_item_attr
@@ -181,9 +181,9 @@ class Main(wx.Frame):
         self.list_glider_card.InsertColumn(2, _("Glider type"), 'glider_type', proportion=3)
         self.list_glider_card.InsertColumn(3, _("Pilot"), 'pilot', proportion=4)
 
-        self.list_daily_weight.InsertColumn(0, _("Date"), 'date', proportion=2)
-        self.list_daily_weight.InsertColumn(1, _("Tow bar weight"), 'tow_bar_weight', proportion=3)
-        self.list_daily_weight.InsertColumn(2, _("Status"), 'status', proportion=6)
+        self.list_daily_weight.InsertColumn(0, _("Date"), 'date', proportion=1)
+        self.list_daily_weight.InsertColumn(1, _("Weight"), 'tow_bar_weight', proportion=1)
+        self.list_daily_weight.InsertColumn(2, _("Status"), 'status', proportion=2)
 
         # Open data sources
         self.BASE_QUERY = session.query(GliderCard).join( (Pilot, GliderCard.pilot_id==Pilot.id), (GliderType, GliderCard.glider_type_id==GliderType.id) )
@@ -499,7 +499,7 @@ class Main(wx.Frame):
         if difference_abs <= settings.DAILY_DIFFERENCE_LIMIT:
             return wx.ListItemAttr(colText=self.COLOR_OK)
         else:
-            return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT)
+            return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT, font=self.fontbold)
     
     def SortGliderCardList(self, col):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
