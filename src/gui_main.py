@@ -866,10 +866,14 @@ class Main(wx.Frame):
             # Daily weight
             self.list_daily_weight.datasource = record.daily_weight
             count = len(record.daily_weight)
-            self.list_daily_weight.SetItemCount(count)
             if count > 0:
+                self.list_daily_weight.DeleteAllItems()
+                self.list_daily_weight.SetItemCount(count)
                 self.list_daily_weight.Select(0)
                 self.list_daily_weight.Focus(0)
+            else:
+                self.list_daily_weight.SetItemCount(0)
+                self.list_daily_weight.DeleteAllItems()
             self.__set_enabled_disabled_daily()
         else:
             self.text_registration.Label = ''
