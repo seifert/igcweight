@@ -190,7 +190,7 @@ class Main(wx.Frame):
         self.datasource_glider_card = self.BASE_QUERY.all()
 
         # Bind events
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ChangeGliderCard, self.list_glider_card)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.GliderCardChange, self.list_glider_card)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__sort_glider_card_list, self.list_glider_card)
         self.Bind(wx.EVT_CLOSE, self.Exit, self)
         self.Bind(wx.EVT_MENU, self.Exit, self.menu_exit)
@@ -212,7 +212,9 @@ class Main(wx.Frame):
         self.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.SearchGliderCard, self.text_find)
         self.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.AllGliderCard, self.text_find)
         self.list_glider_card.Bind(wx.EVT_CONTEXT_MENU, self.__list_glider_card_popup_menu)
+        self.list_glider_card.Bind(wx.EVT_LEFT_DCLICK, self.GliderCardProperties)
         self.list_daily_weight.Bind(wx.EVT_CONTEXT_MENU, self.__list_daily_weight_popup_menu)
+        self.list_daily_weight.Bind(wx.EVT_LEFT_DCLICK, self.DailyWeightProperties)
         self.button_glider_card_new.Bind(wx.EVT_BUTTON, self.GliderCardNew)
         self.button_glider_card_properties.Bind(wx.EVT_BUTTON, self.GliderCardProperties)
         self.button_glider_card_delete.Bind(wx.EVT_BUTTON, self.GliderCardDelete)
@@ -393,7 +395,7 @@ class Main(wx.Frame):
             self.list_glider_card.Select(0)
             self.list_glider_card.Focus(0)
         self.__set_enabled_disabled()
-        self.ChangeGliderCard()
+        self.RefreshGliderCard()
     datasource_glider_card = property(get_datasource_glider_card, set_datasource_glider_card)
     
     def __set_enabled_disabled(self):
@@ -648,12 +650,19 @@ class Main(wx.Frame):
                     self.list_glider_card.SetItemCount( len(self.datasource_glider_card) )
                     self.list_glider_card.Select(i)
                     self.list_glider_card.Focus(i)
-                    self.ChangeGliderCard()
+                    self.RefreshGliderCard()
                 finally:
                     self.__set_enabled_disabled()
             except Exception, e:
                 session.rollback()
                 error_message_dialog( self, _("Glider card delete error"), e )
+
+    def GliderCardChange(self, evt=None):
+        " GliderCardChange(self, Event evt=None) - this method is called when glider card is changed "
+        record = self.list_glider_card.current_item
+        if record == self.__old_record:
+            return
+        self.RefreshGliderCard()
 
     def DailyWeightNew(self, evt=None):
         " DailyWeightNew(self, Event evt=None) - add new daily weight event handler "
@@ -743,7 +752,7 @@ class Main(wx.Frame):
                     Pilot.surname.ilike(value)
                 )).all()
             self.__filtered = True
-            self.ChangeGliderCard()
+            self.RefreshGliderCard()
         else:
             self.AllGliderCard()
 
@@ -753,7 +762,7 @@ class Main(wx.Frame):
             self.text_find.SetValue('')
             self.datasource_glider_card = self.BASE_QUERY.all()
             self.__filtered = False
-            self.ChangeGliderCard()
+            self.RefreshGliderCard()
 
     def __set_photo(self, index=None):
         " __set_photo(self, int index) - show photo thumbnail or empty photo and enable or disable buttons "
@@ -785,11 +794,9 @@ class Main(wx.Frame):
                 self.button_photo_prev.Enable(True)
                 self.button_photo_next.Enable(True)
 
-    def ChangeGliderCard(self, evt=None):
-        " ChangeGliderCard(self, Event evt=None) - this method is called when glider card is changed "
+    def RefreshGliderCard(self):
+        " RefreshGliderCard(self) - refresh data in the glider card "
         record = self.list_glider_card.current_item
-#        if record == self.__old_record:
-#            return
         self.__old_record = record
         
         if record != None:
@@ -1402,7 +1409,7 @@ class DailyWeightForm(wx.Dialog):
     def __init__(self, *args, **kwds):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
         wx.Dialog.__init__(self, *args, **kwds)
-        self.label_date = wx.StaticText(self, -1, _("Date") )
+        self.label_date = wx.StaticText(self, -1, _("Date"))
         self.label_tow_bar_weight = wx.StaticText(self, -1, _("Tow bar weight"))
         self.text_date = wx.TextCtrl(self, -1, "")
         self.button_now = wx.Button(self, -1, _("Today"), style=wx.BU_EXACTFIT)
@@ -1423,6 +1430,11 @@ class DailyWeightForm(wx.Dialog):
         self.label_tow_bar_weight.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
         self.text_date.SetFocus()
         self.button_ok.SetDefault()
+        
+        self.__now()
+        self.text_date.SetEditable(False)
+        self.text_date.Enable(False)
+        self.button_now.Enable(False)
 
     def __do_layout(self):
         grid_sizer = wx.GridBagSizer(2, 2)
@@ -1450,8 +1462,8 @@ class DailyWeightForm(wx.Dialog):
         self.Layout()
         self.CenterOnParent()
     
-    def __now(self, evt):
-        " __now(self, evt) - put current date into text_date control "
+    def __now(self, evt=None):
+        " __now(self, evt=None) - put current date into text_date control "
         self.text_date.Value = datetime.now().strftime('%x')
         self.text_tow_bar_weight.SetFocus()
     
