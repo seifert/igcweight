@@ -25,6 +25,7 @@ from gui_widgets import error_message_dialog, VirtualListCtrl, GetPhotoBitmap
 from gui_igchandicap import IgcHandicapList, IgcHandicapForm, GLIDER_TYPE_INSERT_ERROR
 from gui_organizations import OrganizationList, OrganizationForm, ORGANIZATION_INSERT_ERROR
 from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
+from importexport import Export
 
 class Main(wx.Frame):
     " Main application window "
@@ -71,6 +72,9 @@ class Main(wx.Frame):
         # Menu Bar
         self.main_menu = wx.MenuBar()
         self.menu_file = wx.Menu()
+        self.menu_export = wx.MenuItem(self.menu_file, wx.NewId(), _("&Export..."), _("Export data into archive file"), wx.ITEM_NORMAL)
+        self.menu_file.AppendItem(self.menu_export)
+        self.menu_file.AppendSeparator()
         self.menu_exit = wx.MenuItem(self.menu_file, wx.NewId(), _("E&xit\tAlt-F4"), _("Exit application"), wx.ITEM_NORMAL)
         self.menu_file.AppendItem(self.menu_exit)
         self.main_menu.Append(self.menu_file, _("&File"))
@@ -193,6 +197,7 @@ class Main(wx.Frame):
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.GliderCardChange, self.list_glider_card)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__sort_glider_card_list, self.list_glider_card)
         self.Bind(wx.EVT_CLOSE, self.Exit, self)
+        self.Bind(wx.EVT_MENU, self.Export, self.menu_export)
         self.Bind(wx.EVT_MENU, self.Exit, self.menu_exit)
         self.Bind(wx.EVT_MENU, self.About, self.menu_about)
         self.Bind(wx.EVT_MENU, self.IgcHandicapList, self.menu_coefficients)
@@ -519,6 +524,18 @@ class Main(wx.Frame):
                 self.list_glider_card.SetItemCount(count)
                 self.list_glider_card.Select(i)
                 self.list_glider_card.Focus(i)
+    
+    def Export(self, evt):
+        " Export(self, Event evt) - export data into archive file "
+        dlg = wx.FileDialog( self, message=_("Export data"),
+                             wildcard=_("TAR files")+" (*.tar)|*.tar;*.TAR",
+                             style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT )
+        try:
+            if dlg.ShowModal() == wx.ID_OK:
+                fullpath = abspath( dlg.GetPath() )
+                Export(fullpath)
+        finally:
+            dlg.Destroy()
     
     def Exit(self, evt=None):
         " Exit(self, Event evt=None) - exit application event handler "
