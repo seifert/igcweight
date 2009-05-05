@@ -185,9 +185,9 @@ class Main(wx.Frame):
         self.list_glider_card.InsertColumn(2, _("Glider type"), 'glider_type', proportion=3)
         self.list_glider_card.InsertColumn(3, _("Pilot"), 'pilot', proportion=4)
 
-        self.list_daily_weight.InsertColumn(0, _("Date"), 'date', proportion=1)
-        self.list_daily_weight.InsertColumn(1, _("Weight"), 'tow_bar_weight', proportion=1)
-        self.list_daily_weight.InsertColumn(2, _("Status"), 'status', proportion=2)
+        self.list_daily_weight.InsertColumn(0, _("Date"), 'date', proportion=3)
+        self.list_daily_weight.InsertColumn(1, _("Weight"), 'tow_bar_weight', proportion=2)
+        self.list_daily_weight.InsertColumn(2, _("Status"), 'status', proportion=4)
 
         # Open data sources
         self.BASE_QUERY = session.query(GliderCard).join( (Pilot, GliderCard.pilot_id==Pilot.id), (GliderType, GliderCard.glider_type_id==GliderType.id) )
@@ -506,7 +506,8 @@ class Main(wx.Frame):
         if difference_abs <= settings.DAILY_DIFFERENCE_LIMIT:
             return wx.ListItemAttr(colText=self.COLOR_OK)
         else:
-            return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT, font=self.fontbold)
+#            return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT, font=self.fontbold)
+            return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT)
     
     def SortGliderCardList(self, col):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
@@ -688,6 +689,7 @@ class Main(wx.Frame):
             while True:
                 try:
                     dlg.SetData()
+                    dlg.SetNow()
                     if dlg.ShowModal() == wx.ID_OK:
                         try:
                             record = dlg.GetData()
@@ -713,6 +715,7 @@ class Main(wx.Frame):
         " DailyWeightProperties(self, Event evt=None) - edit daily weight event handler "
         dlg = DailyWeightForm(self)
         try:
+            dlg.text_tow_bar_weight.SetFocus()
             record = self.list_daily_weight.current_item
             dlg.SetData(record)
             while True:
@@ -1428,7 +1431,7 @@ class DailyWeightForm(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         self.label_date = wx.StaticText(self, -1, _("Date"))
         self.label_tow_bar_weight = wx.StaticText(self, -1, _("Tow bar weight"))
-        self.text_date = wx.TextCtrl(self, -1, "")
+        self.text_date = wx.TextCtrl(self, -1, "") #, style=wx.BORDER_NONE)
         self.button_now = wx.Button(self, -1, _("Today"), style=wx.BU_EXACTFIT)
         self.text_tow_bar_weight = wx.TextCtrl(self, -1, "")
         self.button_ok = wx.Button(self, wx.ID_OK, "")
@@ -1438,7 +1441,7 @@ class DailyWeightForm(wx.Dialog):
         self.__do_layout()
 
         # Bind events
-        self.Bind(wx.EVT_BUTTON, self.__now, self.button_now)
+        self.Bind(wx.EVT_BUTTON, self.SetNow, self.button_now)
 
     def __set_properties(self):
         self.SetTitle(_("Daily weight"))
@@ -1448,7 +1451,6 @@ class DailyWeightForm(wx.Dialog):
         self.text_date.SetFocus()
         self.button_ok.SetDefault()
         
-        self.__now()
         self.text_date.SetEditable(False)
         self.text_date.Enable(False)
         self.button_now.Enable(False)
@@ -1460,8 +1462,8 @@ class DailyWeightForm(wx.Dialog):
         grid_sizer.Add(self.text_date,  (1, 0), (1, 1), wx.BOTTOM|wx.EXPAND, 2)
         grid_sizer.Add(self.button_now,  (1, 1), (1, 1), wx.BOTTOM|wx.RIGHT|wx.EXPAND, 2)
         grid_sizer.Add(self.text_tow_bar_weight,  (1, 2), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
-        grid_sizer.AddGrowableCol(0, 2)
-        grid_sizer.AddGrowableCol(2, 3)
+        grid_sizer.AddGrowableCol(0, 1)
+        grid_sizer.AddGrowableCol(2, 1)
 
         sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
         sizer_buttons.Add(self.button_ok, 0, wx.RIGHT, 2)
@@ -1477,11 +1479,12 @@ class DailyWeightForm(wx.Dialog):
         
         sizer_main.Fit(self)
         self.Layout()
+        self.SetMinSize( (400 ,-1) )
         self.CenterOnParent()
     
-    def __now(self, evt=None):
-        " __now(self, evt=None) - put current date into text_date control "
-        self.text_date.Value = datetime.now().strftime('%x')
+    def SetNow(self, evt=None):
+        " SetNow(self, evt=None) - put current date into text_date control "
+        self.text_date.Value = datetime.now().strftime('%x %X')
         self.text_tow_bar_weight.SetFocus()
     
     def GetData(self):

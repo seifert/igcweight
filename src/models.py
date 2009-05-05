@@ -10,7 +10,7 @@ from wx import GetTranslation as _
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Table, MetaData, Column
-from sqlalchemy import Integer, SmallInteger, String, Text, Date, Numeric, Boolean, CHAR, ForeignKey, Sequence
+from sqlalchemy import Integer, SmallInteger, String, Text, DateTime, Numeric, Boolean, CHAR, ForeignKey, Sequence
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy import desc
 from sqlalchemy.orm import relation, backref
@@ -280,7 +280,7 @@ class DailyWeight(Base):
     __table__ = Table('daily_weight', Base.metadata,
         Column( 'daily_weight_id', Integer, Sequence('daily_weight_seq', optional=True), key='id', nullable=False ),
         Column( 'glider_card_id', Integer, nullable=False ),
-        Column( 'date', Date, nullable=False ),
+        Column( 'date', DateTime, nullable=False ),
         Column( 'tow_bar_weight', SmallInteger, nullable=False ),
         PrimaryKeyConstraint( 'id', name='pk_daily_weight' ),
         UniqueConstraint( 'glider_card_id', 'date', name='uq_daily_weight_date' ),
@@ -310,7 +310,7 @@ class DailyWeight(Base):
         elif columnname == 'tow_bar_weight':
             return locale.format("%d", value)
         elif columnname == 'date':
-            return value.strftime('%x')
+            return value.strftime('%x %X')
         else:
             return unicode(value)
     
@@ -321,7 +321,7 @@ class DailyWeight(Base):
         elif columnname == 'tow_bar_weight':
             value = int(value) #locale.atoi(value)
         elif columnname == 'date':
-            value = datetime.strptime( str(value), '%x' )
+            value = datetime.strptime( str(value), '%x %X' )
         setattr( self, columnname, value )
 
     @property
