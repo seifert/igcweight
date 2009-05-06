@@ -1,5 +1,6 @@
 " Database models "
 
+import re
 import locale
 import decimal
 
@@ -16,6 +17,12 @@ from sqlalchemy import desc
 from sqlalchemy.orm import relation, backref
 
 import settings
+
+pat = re.compile( locale.localeconv()['decimal_point'] )
+
+def str_to_decimal(val):
+    " str_to_decimal(str val) -> Decimal - convert string to Decimal "
+    return decimal.Decimal( pat.sub('.', val) )
 
 def get_short_description(description, length):
     " get_short_description(str description, int length) -> str - get short description "
@@ -130,7 +137,7 @@ class Pilot(Base):
         if value == '':
             value = None
         elif columnname in ('year_of_birth',):
-            value = int(value) #locale.atoi(value)
+            value = int(value)
         setattr( self, columnname, value )
     
     @property
@@ -199,7 +206,7 @@ class GliderType(Base):
         elif columnname in ('weight_non_lifting', 'mtow_without_water', 'mtow', 'weight_referential'):
             return locale.format("%d", value)
         elif columnname == 'coefficient':
-            return locale.format("%.2f", value)
+            return locale.str(value) #format("%.2f", value)
         else:
             return unicode(value)
     
@@ -208,10 +215,9 @@ class GliderType(Base):
         if value == '':
             value = None
         elif columnname in ('weight_non_lifting', 'mtow_without_water', 'mtow', 'weight_referential'):
-            value = int(value) #locale.atoi(value)
+            value = int(value)
         elif columnname == 'coefficient':
-            # TODO: improve???
-            value = decimal.Decimal( str(locale.atof( value.encode('ascii') )) )
+            value = str_to_decimal(value)
         setattr( self, columnname, value )
     
     def GetDescription(self, length=50):
@@ -319,7 +325,7 @@ class DailyWeight(Base):
         if value == '':
             value = None
         elif columnname == 'tow_bar_weight':
-            value = int(value) #locale.atoi(value)
+            value = int(value)
         elif columnname == 'date':
             value = datetime.strptime( str(value), '%x %X' )
         setattr( self, columnname, value )
@@ -419,7 +425,7 @@ class GliderCard(Base):
                             'pilot_weight',
                             'tow_bar_weight'
                            ):
-            value = int(value) #locale.atoi(value)
+            value = int(value)
         setattr( self, columnname, value )
     
     def GetDescription(self, length=50):
