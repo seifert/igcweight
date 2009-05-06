@@ -64,7 +64,7 @@ class Preferences(wx.Dialog):
         self.text_winglets_handicap = wx.TextCtrl(self, -1, "")
         self.label_overweight_handicap = wx.StaticText(self, -1, _("Overweight handicap:"))
         self.text_overweight_handicap = wx.TextCtrl(self, -1, "")
-        self.label_step = wx.StaticText(self, -1, _("per:"))
+        self.label_step = wx.StaticText(self, -1, _("/"))
         self.text_overweight_step = wx.TextCtrl(self, -1, "")
         self.label_unit = wx.StaticText(self, -1, _("kg"))
         self.label_allowed_difference = wx.StaticText(self, -1, _("Allowed difference:"))
