@@ -25,6 +25,7 @@ from gui_widgets import error_message_dialog, VirtualListCtrl, GetPhotoBitmap
 from gui_igchandicap import IgcHandicapList, IgcHandicapForm, GLIDER_TYPE_INSERT_ERROR
 from gui_organizations import OrganizationList, OrganizationForm, ORGANIZATION_INSERT_ERROR
 from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
+from gui_preferences import Preferences
 from importexport import Export
 
 class Main(wx.Frame):
@@ -79,12 +80,15 @@ class Main(wx.Frame):
         self.menu_file.AppendItem(self.menu_exit)
         self.main_menu.Append(self.menu_file, _("&File"))
         self.menu_edit = wx.Menu()
-        self.menu_coefficients = wx.MenuItem(self.menu_edit, wx.NewId(), _("&IGC handicap list..."), _("Edit gliders and IGC handicap list"), wx.ITEM_NORMAL)
+        self.menu_coefficients = wx.MenuItem(self.menu_edit, wx.NewId(), _("IGC &handicap list..."), _("Edit gliders and IGC handicap list"), wx.ITEM_NORMAL)
         self.menu_edit.AppendItem(self.menu_coefficients)
         self.menu_pilots = wx.MenuItem(self.menu_edit, wx.NewId(), _("&Pilots..."), _("Edit pilots list"), wx.ITEM_NORMAL)
         self.menu_edit.AppendItem(self.menu_pilots)
         self.menu_organizations = wx.MenuItem(self.menu_edit, wx.NewId(), _("&Organizations or countries..."), _("Edit organizations or coutries list"), wx.ITEM_NORMAL)
         self.menu_edit.AppendItem(self.menu_organizations)
+        self.menu_edit.AppendSeparator()
+        self.menu_preferences = wx.MenuItem(self.menu_edit, wx.NewId(), _("Pr&eferences..."), _("Edit preferences"), wx.ITEM_NORMAL)
+        self.menu_edit.AppendItem(self.menu_preferences)
         self.main_menu.Append(self.menu_edit, _("&Edit"))
         self.menu_glider_card = wx.Menu()
         self.menu_glider_card_new = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&New...\tInsert"), _("Add new glider"), wx.ITEM_NORMAL)
@@ -203,6 +207,7 @@ class Main(wx.Frame):
         self.Bind(wx.EVT_MENU, self.IgcHandicapList, self.menu_coefficients)
         self.Bind(wx.EVT_MENU, self.Pilots, self.menu_pilots)
         self.Bind(wx.EVT_MENU, self.Organizations, self.menu_organizations)
+        self.Bind(wx.EVT_MENU, self.Preferences, self.menu_preferences)
         self.Bind(wx.EVT_MENU, self.GliderCardNew, self.menu_glider_card_new)
         self.Bind(wx.EVT_MENU, self.GliderCardProperties, self.menu_glider_card_properties)
         self.Bind(wx.EVT_MENU, self.GliderCardDelete, self.menu_glider_card_delete)
@@ -581,6 +586,14 @@ class Main(wx.Frame):
     def Organizations(self, evt=None):
         " Organizations(self, Event evt=None) - open edit organizations list window event handler "
         dlg = OrganizationList(self)
+        try:
+            dlg.ShowModal()
+        finally:
+            dlg.Destroy()
+
+    def Preferences(self, evt=None):
+        " Preferences(self, Event evt=None) - open preferences window event handler "
+        dlg = Preferences(self)
         try:
             dlg.ShowModal()
         finally:

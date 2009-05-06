@@ -8,9 +8,9 @@ from gui_widgets import VirtualListCtrl
 # end wxGlade
 
 
-class DialogDailyWeight(wx.Dialog):
+class DailyWeightForm(wx.Dialog):
     def __init__(self, *args, **kwds):
-        # begin wxGlade: DialogDailyWeight.__init__
+        # begin wxGlade: DailyWeightForm.__init__
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
         wx.Dialog.__init__(self, *args, **kwds)
         self.label_date = wx.StaticText(self, -1, _("Date"))
@@ -25,7 +25,7 @@ class DialogDailyWeight(wx.Dialog):
         # end wxGlade
 
     def __set_properties(self):
-        # begin wxGlade: DialogDailyWeight.__set_properties
+        # begin wxGlade: DailyWeightForm.__set_properties
         self.SetTitle(_("Daily weight"))
         self.label_date.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
         self.label_tow_bar_weight.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
@@ -33,7 +33,7 @@ class DialogDailyWeight(wx.Dialog):
         # end wxGlade
 
     def __do_layout(self):
-        # begin wxGlade: DialogDailyWeight.__do_layout
+        # begin wxGlade: DailyWeightForm.__do_layout
         sizer_main = wx.BoxSizer(wx.VERTICAL)
         sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
         grid_sizer = wx.GridSizer(2, 2, 2, 2)
@@ -49,6 +49,82 @@ class DialogDailyWeight(wx.Dialog):
         sizer_main.Fit(self)
         self.Layout()
         # end wxGlade
+
+# end of class DailyWeightForm
+
+
+class Preferences(wx.Dialog):
+    def __init__(self, *args, **kwds):
+        # begin wxGlade: Preferences.__init__
+        kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
+        wx.Dialog.__init__(self, *args, **kwds)
+        self.label_gear_handicap = wx.StaticText(self, -1, _("Gear handicap:"))
+        self.text_gear_handicap = wx.TextCtrl(self, -1, "")
+        self.label_winglets_handicap = wx.StaticText(self, -1, _("Winglets handicap:"))
+        self.text_winglets_handicap = wx.TextCtrl(self, -1, "")
+        self.label_overweight_handicap = wx.StaticText(self, -1, _("Overweight handicap:"))
+        self.text_overweight_handicap = wx.TextCtrl(self, -1, "")
+        self.label_step = wx.StaticText(self, -1, _("per:"))
+        self.text_overweight_step = wx.TextCtrl(self, -1, "")
+        self.label_unit = wx.StaticText(self, -1, _("kg"))
+        self.label_allowed_difference = wx.StaticText(self, -1, _("Allowed difference:"))
+        self.text_allowed_difference = wx.TextCtrl(self, -1, "")
+        self.button_ok = wx.Button(self, wx.ID_OK, "")
+        self.button_cancel = wx.Button(self, wx.ID_CANCEL, "")
+
+        self.__set_properties()
+        self.__do_layout()
+        # end wxGlade
+
+    def __set_properties(self):
+        # begin wxGlade: Preferences.__set_properties
+        self.SetTitle(_("Preferences"))
+        self.button_ok.SetDefault()
+        # end wxGlade
+
+    def __do_layout(self):
+        # begin wxGlade: Preferences.__do_layout
+        sizer_main = wx.BoxSizer(wx.VERTICAL)
+        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        grid_sizer = wx.FlexGridSizer(5, 2, 4, 4)
+        sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
+        grid_sizer.Add(self.label_gear_handicap, 0, wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(self.text_gear_handicap, 0, wx.EXPAND, 0)
+        grid_sizer.Add(self.label_winglets_handicap, 0, wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(self.text_winglets_handicap, 0, wx.EXPAND, 0)
+        grid_sizer.Add(self.label_overweight_handicap, 0, wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
+        sizer_1.Add(self.text_overweight_handicap, 1, 0, 0)
+        sizer_1.Add(self.label_step, 0, wx.LEFT|wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
+        sizer_1.Add(self.text_overweight_step, 1, 0, 0)
+        sizer_1.Add(self.label_unit, 0, wx.LEFT|wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(sizer_1, 1, wx.EXPAND, 0)
+        grid_sizer.Add(self.label_allowed_difference, 0, wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(self.text_allowed_difference, 0, wx.EXPAND, 0)
+        grid_sizer.AddGrowableCol(1)
+        sizer_main.Add(grid_sizer, 1, wx.ALL|wx.EXPAND, 4)
+        sizer_buttons.Add(self.button_ok, 0, wx.RIGHT, 2)
+        sizer_buttons.Add(self.button_cancel, 0, wx.LEFT, 2)
+        sizer_main.Add(sizer_buttons, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.ALIGN_RIGHT, 4)
+        self.SetSizer(sizer_main)
+        sizer_main.Fit(self)
+        self.Layout()
+        # end wxGlade
+
+# end of class Preferences
+
+
+class DialogDailyWeight(wx.Dialog):
+    def __init__(self, *args, **kwds):
+        # content of this block not found: did you rename this class?
+        pass
+
+    def __set_properties(self):
+        # content of this block not found: did you rename this class?
+        pass
+
+    def __do_layout(self):
+        # content of this block not found: did you rename this class?
+        pass
 
 # end of class DialogDailyWeight
 
