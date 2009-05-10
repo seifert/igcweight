@@ -492,7 +492,7 @@ class Main(wx.Frame):
             if difference == None:
                 return self.TOW_BAR_NO_DATA
             difference_abs = fabs(difference)
-            if difference_abs <= settings.DAILY_DIFFERENCE_LIMIT:
+            if difference_abs <= settings.configuration.ALLOWED_DIFFERENCE:
                 return self.TOW_BAR_OK
             elif difference > 0:
                 return self.TOW_BAR_OVERWEIGHT % difference_abs
@@ -508,7 +508,7 @@ class Main(wx.Frame):
         if difference == None:
             return wx.ListItemAttr(colText=self.COLOR_NO_DATA)
         difference_abs = fabs(difference)
-        if difference_abs <= settings.DAILY_DIFFERENCE_LIMIT:
+        if difference_abs <= settings.configuration.ALLOWED_DIFFERENCE:
             return wx.ListItemAttr(colText=self.COLOR_OK)
         else:
 #            return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT, font=self.fontbold)
@@ -595,7 +595,24 @@ class Main(wx.Frame):
         " Preferences(self, Event evt=None) - open preferences window event handler "
         dlg = Preferences(self)
         try:
-            dlg.ShowModal()
+            dlg.gear_handicap = settings.configuration.GEAR_HANDICAP
+            dlg.winglets_handicap = settings.configuration.WINGLETS_HANDICAP
+            dlg.overweight_handicap = settings.configuration.OVERWEIGHT_HANDICAP
+            dlg.overweight_step = settings.configuration.OVERWEIGHT_STEP
+            dlg.allowed_difference = settings.configuration.ALLOWED_DIFFERENCE
+            while True:
+                try:
+                    if dlg.ShowModal() == wx.ID_OK:
+                        settings.configuration.GEAR_HANDICAP = dlg.gear_handicap
+                        settings.configuration.WINGLETS_HANDICAP = dlg.winglets_handicap
+                        settings.configuration.OVERWEIGHT_HANDICAP = dlg.overweight_handicap
+                        settings.configuration.OVERWEIGHT_STEP = dlg.overweight_step
+                        settings.configuration.ALLOWED_DIFFERENCE = dlg.allowed_difference
+                        settings.configuration.save()
+                        self.RefreshGliderCard()
+                    break
+                except Exception, e:
+                    error_message_dialog( self, _("Preferences save error"), e )
         finally:
             dlg.Destroy()
 

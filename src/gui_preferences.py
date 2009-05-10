@@ -45,17 +45,17 @@ class Preferences(wx.Dialog):
         sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
         grid_sizer = wx.FlexGridSizer(5, 2, 4, 4)
         sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
-        grid_sizer.Add(self.label_gear_handicap, 0, wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(self.label_gear_handicap, 0, wx.RIGHT|wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
         grid_sizer.Add(self.text_gear_handicap, 0, wx.EXPAND, 0)
-        grid_sizer.Add(self.label_winglets_handicap, 0, wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(self.label_winglets_handicap, 0, wx.RIGHT|wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
         grid_sizer.Add(self.text_winglets_handicap, 0, wx.EXPAND, 0)
-        grid_sizer.Add(self.label_overweight_handicap, 0, wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(self.label_overweight_handicap, 0, wx.RIGHT|wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
         sizer_1.Add(self.text_overweight_handicap, 1, 0, 0)
         sizer_1.Add(self.label_step, 0, wx.LEFT|wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
         sizer_1.Add(self.text_overweight_step, 1, 0, 0)
         sizer_1.Add(self.label_unit, 0, wx.LEFT|wx.ALIGN_CENTER_VERTICAL, 4)
         grid_sizer.Add(sizer_1, 1, wx.EXPAND, 0)
-        grid_sizer.Add(self.label_allowed_difference, 0, wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(self.label_allowed_difference, 0, wx.RIGHT|wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
         grid_sizer.Add(self.text_allowed_difference, 0, wx.EXPAND, 0)
         grid_sizer.AddGrowableCol(1)
         sizer_main.Add(grid_sizer, 1, wx.ALL|wx.EXPAND, 4)
@@ -70,32 +70,32 @@ class Preferences(wx.Dialog):
         self.Layout()
         self.CenterOnParent()
 
-    def get_gear_handicap(self):
+    def __get_gear_handicap(self):
         return str_to_decimal(self.text_gear_handicap.Value)
-    def set_gear_handicap(self, value):
+    def __set_gear_handicap(self, value):
         self.text_gear_handicap.Value =  locale.str(value)
-    gear_handicap = property(get_gear_handicap, set_gear_handicap)
+    gear_handicap = property(__get_gear_handicap, __set_gear_handicap)
 
-    def get_winglets_handicap(self):
+    def __get_winglets_handicap(self):
         return str_to_decimal(self.text_winglets_handicap.Value)
-    def set_winglets_handicap(self, value):
+    def __set_winglets_handicap(self, value):
         self.text_winglets_handicap.Value =  locale.str(value)
-    winglets_handicap = property(get_winglets_handicap, set_winglets_handicap)
+    winglets_handicap = property(__get_winglets_handicap, __set_winglets_handicap)
 
-    def get_overweight_handicap(self):
+    def __get_overweight_handicap(self):
         return str_to_decimal(self.text_overweight_handicap.Value)
-    def set_overweight_handicap(self, value):
+    def __set_overweight_handicap(self, value):
         self.text_overweight_handicap.Value =  locale.str(value)
-    overweight_handicap = property(get_overweight_handicap, set_overweight_handicap)
+    overweight_handicap = property(__get_overweight_handicap, __set_overweight_handicap)
 
-    def get_overweight_step(self):
+    def __get_overweight_step(self):
         return int(self.text_overweight_step.Value)
-    def set_overweight_step(self, value):
+    def __set_overweight_step(self, value):
         self.text_overweight_step.Value =  locale.format('%d', value)
-    overweight_step = property(get_overweight_step, set_overweight_step)
+    overweight_step = property(__get_overweight_step, __set_overweight_step)
 
-    def get_allowed_difference(self):
+    def __get_allowed_difference(self):
         return int(self.text_allowed_difference.Value)
-    def set_allowed_difference(self, value):
+    def __set_allowed_difference(self, value):
         self.text_allowed_difference.Value =  locale.format('%d', value)
-    allowed_difference = property(get_allowed_difference, set_allowed_difference)
+    allowed_difference = property(__get_allowed_difference, __set_allowed_difference)

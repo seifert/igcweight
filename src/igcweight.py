@@ -4,9 +4,6 @@
 " Main program module "
 
 from os.path import join
-from datetime import datetime
-
-from settings import BASE_DIR, DEBUG
 
 def main():
     " main() - start application "
@@ -15,6 +12,7 @@ def main():
     app = wx.App()
 
     try:
+        from settings import BASE_DIR
         
         mylocale = wx.Locale(wx.LANGUAGE_DEFAULT)
         mylocale.AddCatalogLookupPathPrefix( join(BASE_DIR, 'locale') )
@@ -32,13 +30,12 @@ def main():
         app.MainLoop()
         
     except Exception, e:
-        from gui_widgets import error_message_dialog
         from wx import GetTranslation as _
-        
-        error_message_dialog(None, _("Some error during starting application"), e)
-        
-        if DEBUG:
-            raise
+
+        message = "%s\n\n%s" % ( _("Some error during starting application"),
+                                 unicode(str(e), 'utf-8') )
+        wx.MessageBox( message, _("Error"), wx.OK | wx.ICON_ERROR, None )
+        raise
 
 if __name__ == '__main__':
     main()

@@ -467,14 +467,14 @@ class GliderCard(Base):
         " coefficient -> int or None - return competition coefficient "
         referential_difference = self.referential_difference
         if referential_difference != None:
-            gear_handicap = self.landing_gear and settings.GEAR_HANDICAP or 0
-            winglets_handicap = self.winglets and settings.WINGLETS_HANDICAP or 0
+            gear_handicap = self.landing_gear and settings.configuration.GEAR_HANDICAP or 0
+            winglets_handicap = self.winglets and settings.configuration.WINGLETS_HANDICAP or 0
             coefficient = self.glider_type.coefficient + gear_handicap + winglets_handicap
             if referential_difference > 0:
-                overweight_handicap = referential_difference / settings.OWERWEIGHT_STEP
-                if overweight_handicap * settings.OWERWEIGHT_STEP < referential_difference:
+                overweight_handicap = referential_difference / settings.configuration.OVERWEIGHT_STEP
+                if overweight_handicap * settings.configuration.OVERWEIGHT_STEP < referential_difference:
                     overweight_handicap = overweight_handicap + 1
-                overweight_handicap = overweight_handicap * settings.OWERWEIGHT_HANDICAP
+                overweight_handicap = overweight_handicap * settings.configuration.OVERWEIGHT_HANDICAP
                 coefficient = coefficient + overweight_handicap
             return coefficient
         else:

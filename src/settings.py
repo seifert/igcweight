@@ -1,10 +1,13 @@
 " Settings of igcweight "
 
 from os import mkdir
-from os.path import abspath, dirname, join, expanduser, isdir
+from os.path import abspath, dirname, join, expanduser, isdir, isfile
 from sys import argv
 from getopt import getopt
-from decimal import Decimal
+
+from configuration import Configuration
+
+VERSION = '0.8'
 
 DEBUG = True
 
@@ -23,13 +26,11 @@ except ImportError:
 
 LAST_OPEN_FILE_PATH = USER_DIR
 
-HOME_DIR   = HOME_DIR == None and join( USER_DIR, 'igcweight-08' ) or HOME_DIR
-PHOTOS_DIR = join( HOME_DIR, 'photos' )
-BASE_DIR   = abspath( join(dirname(__file__), '..') )
-IMAGES_DIR = join( BASE_DIR, 'images' )
-
-print HOME_DIR
-aaa
+HOME_DIR    = HOME_DIR == None and join( USER_DIR, 'igcweight-08' ) or HOME_DIR
+PHOTOS_DIR  = join( HOME_DIR, 'photos' )
+BASE_DIR    = abspath( join(dirname(__file__), '..') )
+IMAGES_DIR  = join( BASE_DIR, 'images' )
+CONFIG_FILE = join( HOME_DIR, 'igcweight.conf' )
 
 if not isdir(HOME_DIR):
     mkdir(HOME_DIR)
@@ -37,12 +38,6 @@ if not isdir(PHOTOS_DIR):
     mkdir(PHOTOS_DIR)
 
 SHOW_PHOTO_APP = None
-
-GEAR_HANDICAP = Decimal('0.02')
-WINGLETS_HANDICAP = Decimal('0.01')
-OWERWEIGHT_HANDICAP = Decimal('0.005')
-OWERWEIGHT_STEP = 10
-DAILY_DIFFERENCE_LIMIT = 2
 
 DB_ENGINE   = 'sqlite'
 DB_HOST     = ''
@@ -52,4 +47,4 @@ DB_USERNAME = ''
 DB_PASSWORD = ''
 DB_ARGS     = {}
 
-VERSION = '0.8'
+configuration = Configuration( CONFIG_FILE )
