@@ -275,9 +275,14 @@ class Photo(Base):
         setattr( self, columnname, value )
     
     @property
+    def file_name(self):
+        " Returns photo file name "
+        return "%s.jpg" % self.md5
+    
+    @property
     def full_path(self):
         " Returns photo full path "
-        return join( settings.PHOTOS_DIR, "%s.jpg" % self.md5 )
+        return join( settings.PHOTOS_DIR, self.file_name )
 
 
 class DailyWeight(Base):
