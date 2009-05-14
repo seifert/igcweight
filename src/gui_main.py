@@ -26,7 +26,7 @@ from gui_igchandicap import IgcHandicapList, IgcHandicapForm, GLIDER_TYPE_INSERT
 from gui_organizations import OrganizationList, OrganizationForm, ORGANIZATION_INSERT_ERROR
 from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
 from gui_preferences import Preferences
-from importexport import Export
+from importexport import patternt_tar, Export, Import
 
 class Main(wx.Frame):
     " Main application window "
@@ -73,6 +73,8 @@ class Main(wx.Frame):
         # Menu Bar
         self.main_menu = wx.MenuBar()
         self.menu_file = wx.Menu()
+        self.menu_import = wx.MenuItem(self.menu_file, wx.NewId(), _("&Import..."), _("Import data from archive file"), wx.ITEM_NORMAL)
+        self.menu_file.AppendItem(self.menu_import)
         self.menu_export = wx.MenuItem(self.menu_file, wx.NewId(), _("&Export..."), _("Export data into archive file"), wx.ITEM_NORMAL)
         self.menu_file.AppendItem(self.menu_export)
         self.menu_file.AppendSeparator()
@@ -201,6 +203,7 @@ class Main(wx.Frame):
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.GliderCardChange, self.list_glider_card)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__sort_glider_card_list, self.list_glider_card)
         self.Bind(wx.EVT_CLOSE, self.Exit, self)
+        self.Bind(wx.EVT_MENU, self.Import, self.menu_import)
         self.Bind(wx.EVT_MENU, self.Export, self.menu_export)
         self.Bind(wx.EVT_MENU, self.Exit, self.menu_exit)
         self.Bind(wx.EVT_MENU, self.About, self.menu_about)
@@ -398,12 +401,15 @@ class Main(wx.Frame):
     def set_datasource_glider_card(self, value):
         " datasource_glider_card(self, list value) - set datasource, value is SQLAlchemy query "
         self.list_glider_card.datasource = value
-        count = len(self.datasource_glider_card)
-        self.list_glider_card.SetItemCount(count)
-        if count > 0:
-            self.SortGliderCardList(self.__sort_glider_card)
-            self.list_glider_card.Select(0)
-            self.list_glider_card.Focus(0)
+        if value != None:
+            count = len(self.datasource_glider_card)
+            self.list_glider_card.SetItemCount(count)
+            if count > 0:
+                self.SortGliderCardList(self.__sort_glider_card)
+                self.list_glider_card.Select(0)
+                self.list_glider_card.Focus(0)
+        else:
+            self.list_glider_card.SetItemCount(0)
         self.__set_enabled_disabled()
         self.RefreshGliderCard()
     datasource_glider_card = property(get_datasource_glider_card, set_datasource_glider_card)
@@ -492,7 +498,7 @@ class Main(wx.Frame):
             if difference == None:
                 return self.TOW_BAR_NO_DATA
             difference_abs = fabs(difference)
-            if difference_abs <= settings.configuration.ALLOWED_DIFFERENCE:
+            if difference_abs <= settings.configuration.allowed_difference:
                 return self.TOW_BAR_OK
             elif difference > 0:
                 return self.TOW_BAR_OVERWEIGHT % difference_abs
@@ -508,7 +514,7 @@ class Main(wx.Frame):
         if difference == None:
             return wx.ListItemAttr(colText=self.COLOR_NO_DATA)
         difference_abs = fabs(difference)
-        if difference_abs <= settings.configuration.ALLOWED_DIFFERENCE:
+        if difference_abs <= settings.configuration.allowed_difference:
             return wx.ListItemAttr(colText=self.COLOR_OK)
         else:
 #            return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT, font=self.fontbold)
@@ -531,14 +537,32 @@ class Main(wx.Frame):
                 self.list_glider_card.Select(i)
                 self.list_glider_card.Focus(i)
     
+    def Import(self, evt):
+        " Import(self, Event evt) - import data from archive file "
+        dlg = wx.FileDialog( self, defaultDir=settings.USER_DIR, message=_("Import data"),
+                             wildcard=_("TAR files")+" (*.tar)|*.tar;*.TAR",
+                             style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST )
+        try:
+            if dlg.ShowModal() == wx.ID_OK:
+                self.datasource_glider_card = None
+                try:
+                    fullpath = abspath( dlg.GetPath() )
+                    Import(fullpath)
+                finally:
+                    self.datasource_glider_card = self.BASE_QUERY.all()
+        finally:
+            dlg.Destroy()
+    
     def Export(self, evt):
         " Export(self, Event evt) - export data into archive file "
-        dlg = wx.FileDialog( self, message=_("Export data"),
+        dlg = wx.FileDialog( self, defaultDir=settings.USER_DIR, message=_("Export data"),
                              wildcard=_("TAR files")+" (*.tar)|*.tar;*.TAR",
                              style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT )
         try:
             if dlg.ShowModal() == wx.ID_OK:
                 fullpath = abspath( dlg.GetPath() )
+                if not patternt_tar.search(fullpath):
+                    fullpath = "%s.tar" % fullpath
                 Export(fullpath)
         finally:
             dlg.Destroy()
@@ -595,19 +619,19 @@ class Main(wx.Frame):
         " Preferences(self, Event evt=None) - open preferences window event handler "
         dlg = Preferences(self)
         try:
-            dlg.gear_handicap = settings.configuration.GEAR_HANDICAP
-            dlg.winglets_handicap = settings.configuration.WINGLETS_HANDICAP
-            dlg.overweight_handicap = settings.configuration.OVERWEIGHT_HANDICAP
-            dlg.overweight_step = settings.configuration.OVERWEIGHT_STEP
-            dlg.allowed_difference = settings.configuration.ALLOWED_DIFFERENCE
+            dlg.gear_handicap = settings.configuration.gear_handicap
+            dlg.winglets_handicap = settings.configuration.winglets_handicap
+            dlg.overweight_handicap = settings.configuration.overweight_handicap
+            dlg.overweight_step = settings.configuration.overweight_step
+            dlg.allowed_difference = settings.configuration.allowed_difference
             while True:
                 try:
                     if dlg.ShowModal() == wx.ID_OK:
-                        settings.configuration.GEAR_HANDICAP = dlg.gear_handicap
-                        settings.configuration.WINGLETS_HANDICAP = dlg.winglets_handicap
-                        settings.configuration.OVERWEIGHT_HANDICAP = dlg.overweight_handicap
-                        settings.configuration.OVERWEIGHT_STEP = dlg.overweight_step
-                        settings.configuration.ALLOWED_DIFFERENCE = dlg.allowed_difference
+                        settings.configuration.set_gear_handicap(dlg.gear_handicap)
+                        settings.configuration.set_winglets_handicap(dlg.winglets_handicap)
+                        settings.configuration.set_overweight_handicap(dlg.overweight_handicap)
+                        settings.configuration.set_overweight_step(dlg.overweight_step)
+                        settings.configuration.set_allowed_difference(dlg.allowed_difference)
                         settings.configuration.save()
                         self.RefreshGliderCard()
                     break
@@ -642,7 +666,7 @@ class Main(wx.Frame):
                             self.list_glider_card.SetItemCount(count)
                             self.list_glider_card.Select(count-1)
                             self.list_glider_card.Focus(count-1)
-                            self.ChangeGliderCard()
+                            self.RefreshGliderCard()
                         finally:
                             self.__set_enabled_disabled()
                     break
@@ -667,7 +691,7 @@ class Main(wx.Frame):
                         session.commit()
 # TODO:                       self.__delete_photos(dlg.deleted_photos)
                         self.list_glider_card.RefreshItem( self.list_glider_card.GetFocusedItem() )
-                        self.ChangeGliderCard()
+                        self.RefreshGliderCard()
                     else:
                         session.rollback()
                     break
@@ -856,8 +880,8 @@ class Main(wx.Frame):
             self.text_glider_type.SetLabel( record.column_as_str('glider_type') )
             self.text_pilot.SetLabel( record.column_as_str('pilot') )
             self.text_organization.SetLabel( record.column_as_str('organization') )
-            self.text_winglets.SetLabel( record.column_as_str('winglets') )
-            self.text_landing_gear.SetLabel( record.column_as_str('landing_gear') )
+            self.text_winglets.SetLabel( record.winglets == True and _("True") or _("False") )
+            self.text_landing_gear.SetLabel( record.landing_gear == True and _("True") or _("False") )
             # Certified weights
             self.text_non_lifting_weight.SetLabel( record.column_as_str('certified_weight_non_lifting') )
             self.text_empty_weight.SetLabel( record.column_as_str('certified_empty_weight') )
@@ -1509,7 +1533,7 @@ class DailyWeightForm(wx.Dialog):
         
         sizer_main.Fit(self)
         self.Layout()
-        self.SetMinSize( (400 ,-1) )
+        self.SetMinSize( (500 ,-1) )
         self.CenterOnParent()
     
     def SetNow(self, evt=None):
