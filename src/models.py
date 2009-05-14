@@ -82,7 +82,10 @@ class Conversion():
             value = int(value)
         elif isinstance( column_type, sqltypes.Numeric ):
             # Numeric
-            value = use_locale == True and str_to_decimal(value) or str(column)
+            value = use_locale == True and str_to_decimal(value) or decimal.Decimal(value)
+        elif isinstance( column_type, sqltypes.Boolean ):
+            # Boolean
+            value = value == "True" and True or False
         elif isinstance( column_type, sqltypes.Date ):
             # Date
             value = use_locale == True and datetime.strptime( str(value), '%x' ) or datetime.strptime( str(value), '%Y-%m-%d' )
