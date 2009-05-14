@@ -3,18 +3,18 @@
 import re
 import locale
 import decimal
+import types
 
 from os.path import join
-from datetime import datetime
-
-from wx import GetTranslation as _
+from datetime import date, time, datetime
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, MetaData, Column
-from sqlalchemy import Integer, SmallInteger, String, Text, DateTime, Numeric, Boolean, CHAR, ForeignKey, Sequence
+from sqlalchemy import Table, MetaData, Column, ForeignKey, Sequence
+from sqlalchemy import Integer, SmallInteger, String, Text, DateTime, Numeric, Boolean, CHAR
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy import desc
 from sqlalchemy.orm import relation, backref
+from sqlalchemy import types as sqltypes
 
 import settings
 
@@ -35,11 +35,71 @@ def get_short_description(description, length):
         return '...'
     return l > length and '%s...' % description[0:length-3] or description
 
+class Conversion():
+
+    def column_as_str(self, columnname, use_locale=True):
+        " column_as_str(self, str columnname, use_locale=False) -> str - return column value as string "
+        column = getattr( self, columnname )
+        column_type = type(column)
+
+        if column_type == types.NoneType:
+            # None
+            value = ''
+        elif column_type == types.IntType:
+            # Int
+            value = str(column)
+        elif column_type == decimal.Decimal:
+            # Decimal
+            value = use_locale == True and locale.format("%.3f", column) or str(column)
+        elif column_type == types.BooleanType:
+            # Boolean
+            value = column == True and "True" or "False"
+        elif column_type == date:
+            # date
+            value = use_locale == True and column.strftime('%x') or column.strftime('%Y-%m-%d')
+        elif column_type == time:
+            # time
+            value = use_locale == True and column.strftime('%X') or column.strftime('%H:%M:%S')
+        elif column_type == datetime:
+            # datetime
+            value = use_locale == True and column.strftime('%x %X') or column.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            # Other datatypes
+            value = unicode(column)
+        
+        return unicode(value)
+    
+    def str_to_column(self, columnname, value, use_locale=True):
+        " str_to_column(self, str columnname, str value, use_locale=True) - convert str value and store it in the column "
+        column = self.__table__.columns[columnname]
+        column_type = column.type
+        
+        if value == '':
+            # None
+            value = None
+        elif isinstance( column_type, (sqltypes.Integer, sqltypes.SmallInteger,) ):
+            # Integer, SmallInteger
+            value = int(value)
+        elif isinstance( column_type, sqltypes.Numeric ):
+            # Numeric
+            value = use_locale == True and str_to_decimal(value) or str(column)
+        elif isinstance( column_type, sqltypes.Date ):
+            # Date
+            value = use_locale == True and datetime.strptime( str(value), '%x' ) or datetime.strptime( str(value), '%Y-%m-%d' )
+        elif isinstance( column_type, sqltypes.Time ):
+            # Time
+            value = use_locale == True and datetime.strptime( str(value), '%X' ) or datetime.strptime( str(value), '%H:%M:%S' )
+        elif isinstance( column_type, sqltypes.DateTime ):
+            # DateTime
+            value = use_locale == True and datetime.strptime( str(value), '%x %X' ) or datetime.strptime( str(value), '%Y-%m-%d %H:%M:%S' )
+        
+        setattr( self, columnname, value )
+
 
 Base = declarative_base()
 
 
-class Organization(Base):
+class Organization(Base, Conversion):
     " Model Organization "
     
     __table__ = Table('organization', Base.metadata,
@@ -66,21 +126,6 @@ class Organization(Base):
     def __unicode__(self):
         return self.name
 
-    def column_as_str(self, columnname):
-        " column_as_str(self, str columnname) -> str - return column value as string "
-        value = getattr( self, columnname )
-        
-        if value == None:
-            return ''
-        else:
-            return unicode(value)
-    
-    def str_to_column(self, columnname, value):
-        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
-        if value == '':
-            value = None
-        setattr( self, columnname, value )
-
     def GetDescription(self, length=50):
         " GetDescription(self, int length=50) -> str - get short description "
         return get_short_description(self.description, length)
@@ -91,7 +136,7 @@ class Organization(Base):
         return self.GetDescription()
 
 
-class Pilot(Base):
+class Pilot(Base, Conversion):
     " Model Pilot "
 
     __table__ = Table('pilot', Base.metadata,
@@ -120,25 +165,6 @@ class Pilot(Base):
     
     def __unicode__(self):
         return self.fullname
-
-    def column_as_str(self, columnname):
-        " column_as_str(self, str columnname) -> str - return column value as string "
-        value = getattr( self, columnname )
-        
-        if value == None:
-            return ''
-        elif columnname in ('year_of_birth',):
-            return locale.format("%d", value)
-        else:
-            return unicode(value)
-    
-    def str_to_column(self, columnname, value):
-        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
-        if value == '':
-            value = None
-        elif columnname in ('year_of_birth',):
-            value = int(value)
-        setattr( self, columnname, value )
     
     @property
     def fullname(self):
@@ -166,7 +192,7 @@ class Pilot(Base):
         return self.GetDescription()
 
 
-class GliderType(Base):
+class GliderType(Base, Conversion):
     " Model GliderType "
 
     __table__ = Table('glider_type', Base.metadata,
@@ -196,29 +222,6 @@ class GliderType(Base):
     
     def __unicode__(self):
         return self.name
-
-    def column_as_str(self, columnname):
-        " column_as_str(self, str columnname) -> str - return column value as string "
-        value = getattr( self, columnname )
-        
-        if value == None:
-            return ''
-        elif columnname in ('weight_non_lifting', 'mtow_without_water', 'mtow', 'weight_referential'):
-            return locale.format("%d", value)
-        elif columnname == 'coefficient':
-            return locale.str(value) #format("%.2f", value)
-        else:
-            return unicode(value)
-    
-    def str_to_column(self, columnname, value):
-        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
-        if value == '':
-            value = None
-        elif columnname in ('weight_non_lifting', 'mtow_without_water', 'mtow', 'weight_referential'):
-            value = int(value)
-        elif columnname == 'coefficient':
-            value = str_to_decimal(value)
-        setattr( self, columnname, value )
     
     def GetDescription(self, length=50):
         " GetDescription(self, int length=50) -> str - get short description "
@@ -230,7 +233,7 @@ class GliderType(Base):
         return self.GetDescription()
 
 
-class Photo(Base):
+class Photo(Base, Conversion):
     " Model Photo "
 
     __table__ = Table('photo', Base.metadata,
@@ -256,23 +259,6 @@ class Photo(Base):
     
     def __unicode__(self):
         return "%s - %s" % ( str(self.id), self.glider_card )
-
-    def column_as_str(self, columnname):
-        " column_as_str(self, str columnname) -> str - return column value as string "
-        value = getattr( self, columnname )
-        
-        if value == None:
-            return ''
-        elif columnname == 'main':
-            return value == True and _("True") or _("False")
-        else:
-            return unicode(value)
-    
-    def str_to_column(self, columnname, value):
-        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
-        if value == '':
-            value = None
-        setattr( self, columnname, value )
     
     @property
     def file_name(self):
@@ -285,7 +271,7 @@ class Photo(Base):
         return join( settings.PHOTOS_DIR, self.file_name )
 
 
-class DailyWeight(Base):
+class DailyWeight(Base, Conversion):
     " Model DailyWeight "
 
     __table__ = Table('daily_weight', Base.metadata,
@@ -312,29 +298,6 @@ class DailyWeight(Base):
     def __unicode__(self):
         return "%s, %s" % ( self.glider_card, self.date )
 
-    def column_as_str(self, columnname):
-        " column_as_str(self, str columnname) -> str - return column value as string "
-        value = getattr( self, columnname )
-        
-        if value == None:
-            return ''
-        elif columnname == 'tow_bar_weight':
-            return locale.format("%d", value)
-        elif columnname == 'date':
-            return value.strftime('%x %X')
-        else:
-            return unicode(value)
-    
-    def str_to_column(self, columnname, value):
-        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
-        if value == '':
-            value = None
-        elif columnname == 'tow_bar_weight':
-            value = int(value)
-        elif columnname == 'date':
-            value = datetime.strptime( str(value), '%x %X' )
-        setattr( self, columnname, value )
-
     @property
     def tow_bar_difference(self):
         " tow_bar_difference -> int or None - return difference between glider card and current tow bar weights "
@@ -344,7 +307,7 @@ class DailyWeight(Base):
             return None
 
 
-class GliderCard(Base):
+class GliderCard(Base, Conversion):
     " Model GliderCard "
 
     __table__ = Table('glider_card', Base.metadata,
@@ -393,45 +356,6 @@ class GliderCard(Base):
     
     def __unicode__(self):
         return "%s, %s" % ( self.registration, self.competition_number )
-
-    def column_as_str(self, columnname):
-        " column_as_str(self, str columnname) -> str - return column value as string "
-        value = getattr( self, columnname )
-        
-        if value == None:
-            return ''
-        elif columnname in ('landing_gear', 'winglets'):
-            return value == True and _("True") or _("False")
-        elif columnname in (
-                            'certified_weight_non_lifting',
-                            'certified_empty_weight',
-                            'certified_min_seat_weight',
-                            'certified_max_seat_weight',
-                            'glider_weight',
-                            'pilot_weight',
-                            'tow_bar_weight'
-                           ):
-            return locale.format("%d", value)
-        elif columnname == 'coefficient':
-            return locale.format("%.3f", value)
-        else:
-            return unicode(value)
-    
-    def str_to_column(self, columnname, value):
-        " str_to_column(self, str columnname, str value) - convert str value and store it in the columnt "
-        if value == '':
-            value = None
-        elif columnname in (
-                            'certified_weight_non_lifting',
-                            'certified_empty_weight',
-                            'certified_min_seat_weight',
-                            'certified_max_seat_weight',
-                            'glider_weight',
-                            'pilot_weight',
-                            'tow_bar_weight'
-                           ):
-            value = int(value)
-        setattr( self, columnname, value )
     
     def GetDescription(self, length=50):
         " GetDescription(self, int length=50) -> str - get short description "
