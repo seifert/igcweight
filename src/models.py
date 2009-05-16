@@ -339,11 +339,11 @@ class GliderCard(Base, Conversion):
         UniqueConstraint( 'pilot_id', name='uq_glider_card_pilot' )
     )
 
-    glider_type = relation( GliderType, order_by=GliderType.name, backref='glider_type' )
-    pilot = relation( Pilot, order_by=Pilot.surname, backref='pilot' )
-    organization = relation( Organization, order_by=Organization.name, backref='organization' )
-    photos = relation(Photo, backref=backref('glider_card'), order_by=Photo.id, cascade="all, delete, delete-orphan")
-    daily_weight = relation(DailyWeight, backref=backref('glider_card'), order_by=desc(DailyWeight.date), cascade="all, delete, delete-orphan")
+    glider_type = relation( GliderType, order_by=GliderType.name )
+    pilot = relation( Pilot, order_by=Pilot.surname )
+    organization = relation( Organization, order_by=Organization.name )
+    photos = relation( Photo, order_by=Photo.id, backref='glider_card', cascade='all' )
+    daily_weight = relation(DailyWeight, order_by=desc(DailyWeight.date), backref='glider_card', cascade='all' )
 
     def __init__(self, **kwargs):
         """ GliderCard(self, str registration=None, str competition_number=None, GliderType glider_type=None,
