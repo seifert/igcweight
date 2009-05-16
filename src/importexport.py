@@ -6,7 +6,6 @@ from os.path import join
 from shutil import copyfileobj
 from datetime import datetime
 from tarfile import open as taropen
-#from xml.dom.no
 from xml.dom.minidom import getDOMImplementation, parse, Node
 
 import settings
@@ -58,9 +57,12 @@ def Export(fullpath):
         model_name = model.__name__
         table_name = model.__table__.name
         element_table = xml.createElement('model')
-        element = xml.createElement('name')
-        element.appendChild( xml.createTextNode(model_name) )
-        element_table.appendChild(element)
+        attribute = xml.createAttribute('name')
+        element_table.setAttributeNode(attribute)
+        element_table.setAttribute('name', table_name)
+        attribute = xml.createAttribute('type')
+        element_table.setAttributeNode(attribute)
+        element_table.setAttribute('type', model_name)
         query = session.query(model).all()
         for row in query:
             element_row = xml.createElement(table_name)
@@ -125,18 +127,30 @@ def Import(fullpath, overwrite=False):
                             settings.configuration.read()
                             raise
                     # Data
+                    for model in document.getElementsByTagName('model'):
+                        model_name = model.attributes['type'].value
+                        table_name = model.attributes['name'].value
+                        model_obj  = globals()[model_name]
+                        for row in model.getElementsByTagName(table_name):
+                            record = model_obj()
+                            for attr in row.childNodes:
+                                if attr.firstChild and attr.firstChild.nodeValue:
+                                    record.str_to_column( attr.nodeName, attr.firstChild.nodeValue, use_locale=False )
+                            session.merge(record)
+                            session.flush()
+                    session.commit()
                 finally:
                     src.close()
-#            if patternt_jpg.search(file):
-#                # Import photos
-#                dst = open( join( settings.PHOTOS_DIR, file ), 'wb' )
-#                try:
-#                    src = tar.extractfile(file)
-#                    try:
-#                        copyfileobj( src, dst )
-#                    finally:
-#                        src.close()
-#                finally:
-#                    dst.close()
+            if patternt_jpg.search(file):
+                # Import photos
+                dst = open( join( settings.PHOTOS_DIR, file ), 'wb' )
+                try:
+                    src = tar.extractfile(file)
+                    try:
+                        copyfileobj( src, dst )
+                    finally:
+                        src.close()
+                finally:
+                    dst.close()
     finally:
         tar.close()
