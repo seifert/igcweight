@@ -14,6 +14,10 @@ def error_message_dialog(parent, message, exception=None):
                message += "\n\n%s" % exception.args[0]
     wx.MessageBox( message, _("Error"), wx.OK | wx.ICON_ERROR, parent )
 
+def info_message_dialog(parent, message):
+    " info_message_dialog(Window parent, str message) - show information message dialog "
+    wx.MessageBox( message, _("Information"), wx.OK | wx.ICON_INFORMATION, parent )
+
 def GetPhotoBitmap(max_size, full_path=None):
     " __get_photo(self, Size max_size, str full_path='') -> Bitmap - load photo file and return bitmap "
     # Create bitmap from file

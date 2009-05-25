@@ -1,6 +1,7 @@
 " Import and export data module "
 
 import re
+import codecs
 
 from os.path import join
 from shutil import copyfileobj
@@ -74,9 +75,9 @@ def Export(fullpath):
             element_table.appendChild(element_row)
         top_element.appendChild(element_table)
     # Save XML
-    f = open( settings.XML_DATA, 'wb' )
+    f = codecs.open( settings.XML_DATA, 'w', encoding='utf-8' )
     try:
-        xml.writexml(f, encoding='UTF-8')
+        xml.writexml(f, encoding='utf-8')
     finally:
         f.close()
     
@@ -86,7 +87,7 @@ def Export(fullpath):
         tar.add( settings.XML_DATA, 'igcweight.xml' )
         query = session.query(Photo).all()
         for photo in query:
-            tar.add( photo.full_path, photo.file_name )
+            tar.add( str(photo.full_path), str(photo.file_name) )
     finally:
         tar.close()
 

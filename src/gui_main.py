@@ -21,7 +21,7 @@ import settings
 
 from database import session
 from models import GliderCard, Pilot, Organization, GliderType, Photo , DailyWeight
-from gui_widgets import error_message_dialog, VirtualListCtrl, GetPhotoBitmap
+from gui_widgets import error_message_dialog, info_message_dialog, VirtualListCtrl, GetPhotoBitmap
 from gui_igchandicap import IgcHandicapList, IgcHandicapForm, GLIDER_TYPE_INSERT_ERROR
 from gui_organizations import OrganizationList, OrganizationForm, ORGANIZATION_INSERT_ERROR
 from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
@@ -539,33 +539,45 @@ class Main(wx.Frame):
     
     def Import(self, evt):
         " Import(self, Event evt) - import data from archive file "
-        dlg = wx.FileDialog( self, defaultDir=settings.USER_DIR, message=_("Import data"),
-                             wildcard=_("TAR files")+" (*.tar)|*.tar;*.TAR",
-                             style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST )
         try:
-            if dlg.ShowModal() == wx.ID_OK:
-                self.datasource_glider_card = None
-                try:
-                    fullpath = abspath( dlg.GetPath() )
-                    Import(fullpath)
-                finally:
-                    self.datasource_glider_card = self.BASE_QUERY.all()
-        finally:
-            dlg.Destroy()
+            dlg = wx.FileDialog( self, defaultDir=settings.USER_DIR, message=_("Import data"),
+                                 wildcard=_("TAR files")+" (*.tar)|*.tar;*.TAR",
+                                 style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST )
+            try:
+                if dlg.ShowModal() == wx.ID_OK:
+                    self.datasource_glider_card = None
+                    try:
+                        fullpath = abspath( dlg.GetPath() )
+                        Import(fullpath)
+                        info_message_dialog( self, _("Data were succesfully imported") )
+                    finally:
+                        self.datasource_glider_card = self.BASE_QUERY.all()
+            finally:
+                dlg.Destroy()
+        except Exception, e:
+            error_message_dialog( self, _("Import data error"), e )
+            if settings.DEBUG:
+                raise
     
     def Export(self, evt):
         " Export(self, Event evt) - export data into archive file "
-        dlg = wx.FileDialog( self, defaultDir=settings.USER_DIR, message=_("Export data"),
-                             wildcard=_("TAR files")+" (*.tar)|*.tar;*.TAR",
-                             style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT )
         try:
-            if dlg.ShowModal() == wx.ID_OK:
-                fullpath = abspath( dlg.GetPath() )
-                if not patternt_tar.search(fullpath):
-                    fullpath = "%s.tar" % fullpath
-                Export(fullpath)
-        finally:
-            dlg.Destroy()
+            dlg = wx.FileDialog( self, defaultDir=settings.USER_DIR, message=_("Export data"),
+                                 wildcard=_("TAR files")+" (*.tar)|*.tar;*.TAR",
+                                 style=wx.FD_SAVE|wx.FD_OVERWRITE_PROMPT )
+            try:
+                if dlg.ShowModal() == wx.ID_OK:
+                    fullpath = abspath( dlg.GetPath() )
+                    if not patternt_tar.search(fullpath):
+                        fullpath = "%s.tar" % fullpath
+                    Export(fullpath)
+                    info_message_dialog( self, _("Data were succesfully exported") )
+            finally:
+                dlg.Destroy()
+        except Exception, e:
+            error_message_dialog( self, _("Export data error"), e )
+            if settings.DEBUG:
+                raise
     
     def Exit(self, evt=None):
         " Exit(self, Event evt=None) - exit application event handler "
@@ -596,6 +608,7 @@ class Main(wx.Frame):
         dlg = IgcHandicapList(self)
         try:
             dlg.ShowModal()
+            self.RefreshGliderCard()
         finally:
             dlg.Destroy()
 
@@ -604,6 +617,7 @@ class Main(wx.Frame):
         dlg = PilotList(self)
         try:
             dlg.ShowModal()
+            self.RefreshGliderCard()
         finally:
             dlg.Destroy()
 
@@ -612,6 +626,7 @@ class Main(wx.Frame):
         dlg = OrganizationList(self)
         try:
             dlg.ShowModal()
+            self.RefreshGliderCard()
         finally:
             dlg.Destroy()
 
@@ -661,6 +676,7 @@ class Main(wx.Frame):
                             session.add(record)
                             session.commit()
 # TODO:                           self.__delete_photos(dlg.deleted_photos)
+                            self.list_glider_card.DeleteAllItems()
                             self.datasource_glider_card.append(record)
                             count = len(self.datasource_glider_card)
                             self.list_glider_card.SetItemCount(count)
@@ -715,6 +731,7 @@ class Main(wx.Frame):
                     photos_path = [ photo.full_path for photo in record.photos ]
                     session.delete(record)
                     session.commit()
+                    self.list_glider_card.DeleteAllItems()
                     self.__delete_photos(photos_path)
                     del( self.datasource_glider_card[i] )
                     i = i - 1
@@ -750,6 +767,7 @@ class Main(wx.Frame):
                             glider_card = self.list_glider_card.current_item
                             glider_card.daily_weight.append(record)
                             session.commit()
+                            self.list_daily_weight.DeleteAllItems()
                             self.list_daily_weight.datasource = glider_card.daily_weight
                             i = glider_card.daily_weight.index(record)
                             count = len(glider_card.daily_weight)
@@ -799,10 +817,11 @@ class Main(wx.Frame):
                 glider_card = self.list_glider_card.current_item
                 i = glider_card.daily_weight.index(record)
                 try:
-                    glider_card.daily_weight.remove(record)
+                    session.delete(record)
                     session.commit()
                     i = i - 1
                     i = i >= 0 and i or 0
+                    self.list_daily_weight.DeleteAllItems()
                     self.list_daily_weight.datasource = glider_card.daily_weight
                     self.list_daily_weight.SetItemCount( len(glider_card.daily_weight) )
                     self.list_daily_weight.Select(i)
@@ -942,6 +961,7 @@ class Main(wx.Frame):
             count = len(self.__photos)
             if count > 0:
                 self.__set_photo(0)
+                self.list_glider_card.RefreshItems( 0, count-1 )
             else:
                 self.__set_photo(None)
             # Daily weight
@@ -977,6 +997,7 @@ class Main(wx.Frame):
             self.__set_status_label_data(self.text_referential_status, self.COLOR_TEXT, '')
             self.__set_status_label_data(self.text_coefficient_status, self.COLOR_TEXT, '')
             self.__set_photo(None)
+            self.list_daily_weight.DeleteAllItems()
             self.list_daily_weight.SetItemCount(0)
             self.list_daily_weight.datasource = None
             self.__set_enabled_disabled_daily()

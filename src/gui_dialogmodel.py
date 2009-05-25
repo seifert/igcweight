@@ -155,6 +155,7 @@ class DialogModel(gui_forms.DialogModel):
                             record = dlg.GetData()
                             session.add(record)
                             session.commit()
+                            self.list_ctrl.DeleteAllItems()
                             self.datasource.append(record)
                             count = len(self.datasource)
                             self.list_ctrl.SetItemCount(count)
@@ -211,6 +212,7 @@ class DialogModel(gui_forms.DialogModel):
                 try:
                     session.delete(record)
                     session.commit()
+                    self.list_ctrl.DeleteAllItems()
                     del( self.datasource[i] )
                     i = i - 1
                     i = i >= 0 and i or 0
