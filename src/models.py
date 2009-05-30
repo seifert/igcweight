@@ -167,7 +167,7 @@ class Pilot(Base, Conversion):
         return "<Pilot: #%s, '%s'>" % ( str(self.id), self.fullname )
     
     def __unicode__(self):
-        return self.fullname
+        return self.fullname_rev
     
     @property
     def fullname(self):
