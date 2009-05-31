@@ -51,7 +51,7 @@ class Main(wx.Frame):
     COEFFICIENT = _("Competition coefficient is %(coefficient)s at weight %(weight)d kg.")
     COEFFICIENT_NO_DATA = _("No data for count coefficient.")
     TOW_BAR_OK = _("* In the limit")
-    TOW_BAR_OVERWEIGHT = _("! Overweight by %d kg !")
+    TOW_BAR_OVERWEIGHT = _("! Overweight by %d kg")
     TOW_BAR_UNDERWEIGHT = _("! Underweight by %d kg")
     TOW_BAR_NO_DATA = _("? No data")
     COLOR_TEXT = wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOWTEXT)
@@ -106,6 +106,11 @@ class Main(wx.Frame):
         self.menu_glider_card.AppendSeparator()
         self.menu_glider_card_show_photo = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Show photo"), _("Show photo in the external application"), wx.ITEM_NORMAL)
         self.menu_glider_card.AppendItem(self.menu_glider_card_show_photo)
+        self.menu_glider_card.AppendSeparator()
+        self.menu_glider_card_print = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Print...\tCtrl+P"), _("Print glider card"), wx.ITEM_NORMAL)
+        self.menu_glider_card.AppendItem(self.menu_glider_card_print)
+        self.menu_glider_card_print_preview = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("Print pre&view..."), _("Print preview"), wx.ITEM_NORMAL)
+        self.menu_glider_card.AppendItem(self.menu_glider_card_print_preview)
         self.main_menu.Append(self.menu_glider_card, _("&Glider card"))
         self.menu_daily_weight = wx.Menu()
         self.menu_daily_weight_new = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&New..."), _("Add new daily weight"), wx.ITEM_NORMAL)
@@ -227,6 +232,8 @@ class Main(wx.Frame):
         self.Bind(wx.EVT_MENU, self.GliderCardNew, self.menu_glider_card_new)
         self.Bind(wx.EVT_MENU, self.GliderCardProperties, self.menu_glider_card_properties)
         self.Bind(wx.EVT_MENU, self.GliderCardDelete, self.menu_glider_card_delete)
+        self.Bind(wx.EVT_MENU, self.GliderCardPrint, self.menu_glider_card_print)
+        self.Bind(wx.EVT_MENU, self.GliderCardPrintPreview, self.menu_glider_card_print_preview)
         self.Bind(wx.EVT_MENU, self.ShowPhoto, self.menu_glider_card_show_photo)
         self.Bind(wx.EVT_MENU, self.DailyWeightNew, self.menu_daily_weight_new)
         self.Bind(wx.EVT_MENU, self.DailyWeightProperties, self.menu_daily_weight_properties)
@@ -486,6 +493,8 @@ class Main(wx.Frame):
         self.menu_daily_weight_properties.Enable(daily_weight_properties)
         self.button_daily_weight_delete.Enable(daily_weight_delete)
         self.menu_daily_weight_delete.Enable(daily_weight_delete)
+        self.menu_glider_card_print.Enable(glider_card_print)
+        self.menu_glider_card_print_preview.Enable(glider_card_print)
         self.button_glider_card_print.Enable(glider_card_print)
     
     def __list_glider_card_popup_menu(self, evt):
@@ -544,7 +553,6 @@ class Main(wx.Frame):
         if difference_abs <= settings.configuration.allowed_difference:
             return wx.ListItemAttr(colText=self.COLOR_OK)
         else:
-#            return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT, font=self.fontbold)
             return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT)
     
     def SortGliderCardList(self, col):
@@ -780,13 +788,40 @@ class Main(wx.Frame):
             return
         self.RefreshGliderCard()
 
-    def GliderCardPrint(self, evt=None):
-        " GliderCardPrint(self, Event evt=None) - print glider card "
+    def __glider_card_print(self, preview=False):
+        " __glider_card_print(self, preview=False) - print glider card "
         record = self.list_glider_card.current_item
+        coefficient = record.coefficient
+        if coefficient != None:
+            coefficient_status = self.COEFFICIENT % {'coefficient': record.column_as_str('coefficient'), 'weight': record.referential_weight}
+        else:
+            coefficient_status = self.COEFFICIENT_NO_DATA
+        daily_weight = []
+        for i, item in enumerate( record.daily_weight ):
+            daily_weight.append(
+                                 {
+                                   'date': self.__list_daily_weigh_get_item_text(i, 'date'),
+                                   'tow_bar_weight': self.__list_daily_weigh_get_item_text(i, 'tow_bar_weight'),
+                                   'status': self.__list_daily_weigh_get_item_text(i, 'status')
+                                 }
+                               )
+        print daily_weight
         report = HtmlEasyPrinting( name=_("Glider card"), parentWindow=self )
         t = Template( filename=joinpath(settings.TEMPLATES_DIR, 'glider-card.html'), imports=['from wx import GetTranslation as _'] )
-        html = t.render_unicode( glider_card=record )
-        report.PreviewText(html)
+        html = t.render_unicode( glider_card=record, coefficient_status=coefficient_status, daily_weight=daily_weight, allowed_difference=settings.configuration.allowed_difference )
+        
+        if preview:
+            report.PreviewText(html)
+        else:
+            report.PrintText(html)
+
+    def GliderCardPrint(self, evt=None):
+        " GliderCardPrint(self, Event evt=None) - print glider card event handler "
+        self.__glider_card_print()
+
+    def GliderCardPrintPreview(self, evt=None):
+        " GliderCardPrintPreview(self, Event evt=None) - print glider card event handler "
+        self.__glider_card_print(True)
 
     def DailyWeightNew(self, evt=None):
         " DailyWeightNew(self, Event evt=None) - add new daily weight event handler "

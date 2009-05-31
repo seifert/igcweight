@@ -1,25 +1,64 @@
 <html>
     <title>${_('Glider card')}</title>
 <body>
-    ## % for name in row:
-    ##     <td>${name}</td>
-    ## % endfor
-    <h1>${_('Glider card')}</h1>
+
+    <h1><u>${_('Glider card')}</u></h1>
+    
     <table>
-    <tr><td>${_('Competition number')}:<br><b>${glider_card.competition_number}</b></td><td width="10mm">&nbsp;</td><td>${_('Registration')}:<br><b>${glider_card.registration}</b></td></tr>
-    <tr><td colspan="3">${_('Glider type')}:<br><b>${glider_card.glider_type.name}</b></td></tr>
-    <tr><td colspan="3">${_('Pilot')}:<br><b>${glider_card.pilot.fullname}</b></td></tr>
-    <tr><td colspan="3">${_('Organization or country')}:<br><b>${glider_card.organization.name}</b></td></tr>
-    <tr><td>${_('Landing gear')}:<br><b>${_(glider_card.column_as_str('landing_gear'))}</b></td><td></td><td>${_('Winglets')}:<br><b>${_(glider_card.column_as_str('winglets'))}</b></td></tr>
+        <tr><td valign="top">${_('Competition number')}:<br><b>${glider_card.competition_number}</b></td><td width="10mm">&nbsp;</td><td>${_('Registration')}:<br><b>${glider_card.registration}</b></td></tr>
+        <tr><td valign="top" colspan="3">${_('Glider type')}:<br><b>${glider_card.glider_type.name}</b></td></tr>
+        <tr><td valign="top" colspan="3">${_('Pilot')}:<br><b>${glider_card.pilot.fullname}</b></td></tr>
+        <tr><td valign="top" colspan="3">${_('Organization or country')}:<br><b>${glider_card.organization.name}</b></td></tr>
+        <tr><td>${_('Landing gear')}:<br><b>${_(glider_card.column_as_str('landing_gear'))}</b></td><td></td><td>${_('Winglets')}:<br><b>${_(glider_card.column_as_str('winglets'))}</b></td></tr>
     </table>
-    <!--
-    <table>
-    <tr><td>${_('')}:<br><b>${glider_card.competition_number}</b></td><td width="10mm">&nbsp;</td><td>${_('Registration')}:<br><b>${glider_card.registration}</b></td></tr>
-    <tr><td colspan="3">${_('Glider type')}:<br><b>${glider_card.glider_type.name}</b></td></tr>
-    <tr><td colspan="3">${_('Pilot')}:<br><b>${glider_card.pilot.fullname}</b></td></tr>
-    <tr><td colspan="3">${_('Organization or country')}:<br><b>${glider_card.organization.name}</b></td></tr>
-    <tr><td>${_('Landing gear')}:<br><b>${_(glider_card.column_as_str('landing_gear'))}</b></td><td></td><td>${_('Winglets')}:<br><b>${_(glider_card.column_as_str('winglets'))}</b></td></tr>
+    
+    <table width="100%">
+        <tr><td valign="top" colspan="4"><b><u>${_('Certified weights')}</u></b></td></tr>
+        <tr>
+            <td valign="top" width="25%">${_('Non-lifting parts')}:</td>
+            <td valign="top" width="25%">${_('Empty glider')}:</td>
+            <td valign="top" width="25%">${_('Seat min.')}:</td>
+            <td valign="top" width="25%">${_('Seat max.')}:</td>
+        </tr>
+        <tr>
+            <td valign="top"><b>${glider_card.certified_weight_non_lifting}</b></td>
+            <td valign="top"><b>${glider_card.certified_empty_weight}</b></td>
+            <td valign="top"><b>${glider_card.certified_min_seat_weight}</b></td>
+            <td valign="top"><b>${glider_card.certified_max_seat_weight}</b></td>
+        </tr>
+        <tr><td valign="top" colspan="4"><b><u>${_('Measured weights')}</u></b></td></tr>
+        <tr>
+            <td valign="top">${_('Glider weight')}:</td>
+            <td valign="top">${_('Pilot weight')}:</td>
+            <td valign="top" colspan="2">${_('Tow bar weight')}:</td>
+        </tr>
+        <tr>
+            <td valign="top"><b>${glider_card.glider_weight}</b></td>
+            <td valign="top"><b>${glider_card.pilot_weight}</b></td>
+            <td valign="top" colspan="2"><b>${glider_card.tow_bar_weight}</b></td>
+        </tr>
+        <tr><td valign="top" colspan="4"><b><u>${_('Coefficient')}</u></b></td></tr>
+        <tr><td valign="top" colspan="4"><b>${coefficient_status}</b></td></tr>
     </table>
-    -->
+    
+    <div>&nbsp;</div>
+    
+    <table width="100%">
+        <tr><td valign="top" colspan="3"><b><u>${_('Daily tow bar weight')}</u></b></td></tr>
+        <tr><td valign="top" colspan="3">${_('Allowed difference:')} ${allowed_difference} kg</td></tr>
+        <tr>
+            <td valign="top"><b>${_('Date')}</b></td>
+            <td valign="top"><b>${_('Weight')}</b></td>
+            <td valign="top"><b>${_('Status')}</b></td>
+        </tr>
+        % for dw in daily_weight:
+        <tr>
+            <td valign="top">${dw['date']}</td>
+            <td valign="top">${dw['tow_bar_weight']}</td>
+            <td valign="top">${dw['status']}</td>
+        </tr>
+        % endfor
+    </table>
+    
 </body>
 </html>
