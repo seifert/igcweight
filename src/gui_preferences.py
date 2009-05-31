@@ -42,7 +42,7 @@ class Preferences(wx.Dialog):
 
     def __do_layout(self):
         sizer_main = wx.BoxSizer(wx.VERTICAL)
-        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_buttons = wx.StdDialogButtonSizer()
         grid_sizer = wx.FlexGridSizer(5, 2, 4, 4)
         sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
         grid_sizer.Add(self.label_gear_handicap, 0, wx.RIGHT|wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 4)
@@ -59,8 +59,9 @@ class Preferences(wx.Dialog):
         grid_sizer.Add(self.text_allowed_difference, 0, wx.EXPAND, 0)
         grid_sizer.AddGrowableCol(1)
         sizer_main.Add(grid_sizer, 1, wx.ALL|wx.EXPAND, 4)
-        sizer_buttons.Add(self.button_ok, 0, wx.RIGHT, 2)
-        sizer_buttons.Add(self.button_cancel, 0, wx.LEFT, 2)
+        sizer_buttons.AddButton(self.button_ok)
+        sizer_buttons.AddButton(self.button_cancel)
+        sizer_buttons.Realize()
         sizer_main.Add(sizer_buttons, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.TOP|wx.ALIGN_RIGHT, 4)
         
         self.SetSizer(sizer_main)

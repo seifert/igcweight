@@ -5,6 +5,7 @@ import sys
 
 from os import remove, system
 from os.path import isfile, splitext, abspath, dirname
+from os.path import join as joinpath
 from shutil import copy
 from hashlib import md5
 from datetime import datetime
@@ -12,10 +13,13 @@ from math import fabs
 
 import wx
 from wx.lib.multisash import EmptyChild
+from wx.html import HtmlEasyPrinting
 from wx import GetTranslation as _
 
 from sqlalchemy import or_, desc
 from sqlalchemy.orm import eagerload, join
+
+from mako.template import Template
 
 import settings
 
@@ -178,6 +182,8 @@ class Main(wx.Frame):
         self.button_daily_weight_new = wx.Button(self.panel_card, wx.ID_NEW, "")
         self.button_daily_weight_properties = wx.Button(self.panel_card, wx.ID_EDIT, "")
         self.button_daily_weight_delete = wx.Button(self.panel_card, wx.ID_DELETE, "")
+        # Print button
+        self.button_glider_card_print = wx.Button(self.panel_card, wx.ID_PRINT, "")
 
         self.__set_properties()
         self.__do_layout()
@@ -231,6 +237,7 @@ class Main(wx.Frame):
         self.button_glider_card_new.Bind(wx.EVT_BUTTON, self.GliderCardNew)
         self.button_glider_card_properties.Bind(wx.EVT_BUTTON, self.GliderCardProperties)
         self.button_glider_card_delete.Bind(wx.EVT_BUTTON, self.GliderCardDelete)
+        self.button_glider_card_print.Bind(wx.EVT_BUTTON, self.GliderCardPrint)
         self.button_daily_weight_new.Bind(wx.EVT_BUTTON, self.DailyWeightNew)
         self.button_daily_weight_properties.Bind(wx.EVT_BUTTON, self.DailyWeightProperties)
         self.button_daily_weight_delete.Bind(wx.EVT_BUTTON, self.DailyWeightDelete)
@@ -263,6 +270,8 @@ class Main(wx.Frame):
         self.button_daily_weight_properties.Enable(False)
         self.button_daily_weight_delete.SetToolTipString(_("Delete daily weight"))
         self.button_daily_weight_delete.Enable(False)
+        self.button_glider_card_print.SetToolTipString(_("Print glider card"))
+        self.button_glider_card_print.Enable(False)
         
         fontbold = self.label_certified_weights.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
@@ -370,14 +379,17 @@ class Main(wx.Frame):
         sizer_weights.AddGrowableCol(3, 1)
         # Daily weight sizer
         sizer_daily_weight = wx.GridBagSizer(2, 2)
-        sizer_daily_weight.Add(self.label_daily_weight, (0, 0), (1, 3), wx.EXPAND, 2)
-        sizer_daily_weight.Add(self.list_daily_weight, (1, 0), (1, 3), wx.BOTTOM|wx.EXPAND, 2)
+        sizer_daily_weight.Add(self.label_daily_weight, (0, 0), (1, 5), wx.EXPAND, 2)
+        sizer_daily_weight.Add(self.list_daily_weight, (1, 0), (1, 5), wx.BOTTOM|wx.EXPAND, 2)
         sizer_daily_weight.Add(self.button_daily_weight_new, (2, 0), (1, 1), wx.EXPAND, 2)
         sizer_daily_weight.Add(self.button_daily_weight_properties, (2, 1), (1, 1), wx.EXPAND, 2)
         sizer_daily_weight.Add(self.button_daily_weight_delete, (2, 2), (1, 1), wx.EXPAND, 2)
+        sizer_daily_weight.Add(EmptyChild(self.panel_card), (2, 3), (1, 1), wx.EXPAND|wx.LEFT|wx.RIGHT, 0)
+        sizer_daily_weight.Add(self.button_glider_card_print, (2, 4), (1, 1), wx.EXPAND, 2)
         sizer_daily_weight.AddGrowableCol(0, 1)
         sizer_daily_weight.AddGrowableCol(1, 1)
         sizer_daily_weight.AddGrowableCol(2, 1)
+        sizer_daily_weight.AddGrowableCol(4, 1)
         sizer_daily_weight.AddGrowableRow(1, 1)
         # Card sizer
         sizer_card = wx.BoxSizer(wx.VERTICAL)
@@ -442,6 +454,7 @@ class Main(wx.Frame):
         datasource = getattr( self.list_daily_weight, 'datasource', None)
         if datasource != None:
             daily_weight_new = True
+            glider_card_print = True
             count = len(datasource)
             if count > 0 and self.list_glider_card.current_item:            
                 daily_weight_properties = True
@@ -453,6 +466,7 @@ class Main(wx.Frame):
             daily_weight_new = False
             daily_weight_properties = False
             daily_weight_delete = False
+            glider_card_print = False
         
         self.button_daily_weight_new.Enable(daily_weight_new)
         self.menu_daily_weight_new.Enable(daily_weight_new)
@@ -460,6 +474,7 @@ class Main(wx.Frame):
         self.menu_daily_weight_properties.Enable(daily_weight_properties)
         self.button_daily_weight_delete.Enable(daily_weight_delete)
         self.menu_daily_weight_delete.Enable(daily_weight_delete)
+        self.button_glider_card_print.Enable(glider_card_print)
     
     def __list_glider_card_popup_menu(self, evt):
         " __list_glider_popup_menu(self, Event evt) - show pop-up menu "
@@ -752,6 +767,14 @@ class Main(wx.Frame):
         if record == self.__old_record:
             return
         self.RefreshGliderCard()
+
+    def GliderCardPrint(self, evt=None):
+        " GliderCardPrint(self, Event evt=None) - print glider card "
+        record = self.list_glider_card.current_item
+        report = HtmlEasyPrinting( name=_("Glider card"), parentWindow=self )
+        t = Template( filename=joinpath(settings.TEMPLATES_DIR, 'glider-card.html'), imports=['from wx import GetTranslation as _'] )
+        html = t.render_unicode( glider_card=record )
+        report.PreviewText(html)
 
     def DailyWeightNew(self, evt=None):
         " DailyWeightNew(self, Event evt=None) - add new daily weight event handler "
@@ -1351,7 +1374,7 @@ class GliderCardForm(wx.Dialog):
                 src_fullpath = abspath( dlg.GetPath() )
                 settings.LAST_OPEN_FILE_PATH = dirname( src_fullpath )
                 # Sum MD5
-                f = open( src_fullpath, 'r' )
+                f = open( src_fullpath, 'rb' )
                 try:
                     photo_md5 = md5( f.read() ).hexdigest()
                 finally:
@@ -1540,9 +1563,10 @@ class DailyWeightForm(wx.Dialog):
         grid_sizer.AddGrowableCol(0, 1)
         grid_sizer.AddGrowableCol(2, 1)
 
-        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_buttons.Add(self.button_ok, 0, wx.RIGHT, 2)
-        sizer_buttons.Add(self.button_cancel, 0, wx.LEFT, 2)
+        sizer_buttons = wx.StdDialogButtonSizer()
+        sizer_buttons.AddButton(self.button_ok)
+        sizer_buttons.AddButton(self.button_cancel)
+        sizer_buttons.Realize()
 
         sizer_main = wx.BoxSizer(wx.VERTICAL)
         sizer_main.Add(grid_sizer, 0, wx.ALL|wx.EXPAND, 4)

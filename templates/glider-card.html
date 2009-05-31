@@ -1,0 +1,25 @@
+<html>
+    <title>${_('Glider card')}</title>
+<body>
+    ## % for name in row:
+    ##     <td>${name}</td>
+    ## % endfor
+    <h1>${_('Glider card')}</h1>
+    <table>
+    <tr><td>${_('Competition number')}:<br><b>${glider_card.competition_number}</b></td><td width="10mm">&nbsp;</td><td>${_('Registration')}:<br><b>${glider_card.registration}</b></td></tr>
+    <tr><td colspan="3">${_('Glider type')}:<br><b>${glider_card.glider_type.name}</b></td></tr>
+    <tr><td colspan="3">${_('Pilot')}:<br><b>${glider_card.pilot.fullname}</b></td></tr>
+    <tr><td colspan="3">${_('Organization or country')}:<br><b>${glider_card.organization.name}</b></td></tr>
+    <tr><td>${_('Landing gear')}:<br><b>${_(glider_card.column_as_str('landing_gear'))}</b></td><td></td><td>${_('Winglets')}:<br><b>${_(glider_card.column_as_str('winglets'))}</b></td></tr>
+    </table>
+    <!--
+    <table>
+    <tr><td>${_('')}:<br><b>${glider_card.competition_number}</b></td><td width="10mm">&nbsp;</td><td>${_('Registration')}:<br><b>${glider_card.registration}</b></td></tr>
+    <tr><td colspan="3">${_('Glider type')}:<br><b>${glider_card.glider_type.name}</b></td></tr>
+    <tr><td colspan="3">${_('Pilot')}:<br><b>${glider_card.pilot.fullname}</b></td></tr>
+    <tr><td colspan="3">${_('Organization or country')}:<br><b>${glider_card.organization.name}</b></td></tr>
+    <tr><td>${_('Landing gear')}:<br><b>${_(glider_card.column_as_str('landing_gear'))}</b></td><td></td><td>${_('Winglets')}:<br><b>${_(glider_card.column_as_str('winglets'))}</b></td></tr>
+    </table>
+    -->
+</body>
+</html>

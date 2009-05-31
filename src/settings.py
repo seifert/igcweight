@@ -28,13 +28,14 @@ except ImportError:
 
 LAST_OPEN_FILE_PATH = USER_DIR
 
-#HOME_DIR    = HOME_DIR == None and join( USER_DIR, '.igcweight' ) or HOME_DIR
-HOME_DIR    = HOME_DIR == None and join( USER_DIR, 'igcweight-%s' % "".join( str(s) for s in VERSION_DB ) ) or HOME_DIR
-PHOTOS_DIR  = join( HOME_DIR, 'photos' )
-BASE_DIR    = abspath( join(dirname(__file__), '..') )
-IMAGES_DIR  = join( BASE_DIR, 'images' )
-CONFIG_FILE = join( HOME_DIR, 'igcweight.conf' )
-XML_DATA    = join( HOME_DIR, 'igcweight.xml' )
+#HOME_DIR       = HOME_DIR == None and join( USER_DIR, '.igcweight' ) or HOME_DIR
+HOME_DIR       = HOME_DIR == None and join( USER_DIR, 'igcweight-%s' % "".join( str(s) for s in VERSION_DB ) ) or HOME_DIR
+PHOTOS_DIR     = join( HOME_DIR, 'photos' )
+BASE_DIR       = abspath( join(dirname(__file__), '..') )
+IMAGES_DIR     = join( BASE_DIR, 'images' )
+TEMPLATES_DIR  = join( BASE_DIR, 'templates' )
+CONFIG_FILE    = join( HOME_DIR, 'igcweight.conf' )
+XML_DATA       = join( HOME_DIR, 'igcweight.xml' )
 
 if not isdir(HOME_DIR):
     mkdir(HOME_DIR)
