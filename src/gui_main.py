@@ -125,7 +125,14 @@ class Main(wx.Frame):
         self.statusbar = self.CreateStatusBar(1, wx.ST_SIZEGRIP)
         
         # Gliders list
+        find_choices = (
+            _('Competition number'),
+            _('Registration'),
+            _('Glider type'),
+            _('Surname'),
+        )
         self.text_find = wx.SearchCtrl(self.panel_gliders, -1, style=wx.TE_PROCESS_ENTER)
+        self.combo_find = wx.ComboBox(self.panel_gliders, -1, choices=(find_choices), style=wx.CB_READONLY)
         self.list_glider_card = VirtualListCtrl(self.panel_gliders, -1)
         self.button_glider_card_new = wx.Button(self.panel_gliders, wx.ID_NEW, "")
         self.button_glider_card_properties = wx.Button(self.panel_gliders, wx.ID_EDIT, "")
@@ -254,6 +261,7 @@ class Main(wx.Frame):
 
         self.text_find.ShowSearchButton(True)
         self.text_find.ShowCancelButton(True)
+        self.combo_find.SetSelection(0)
         
         self.button_glider_card_new.SetToolTipString(_("Add new glider"))
         self.button_glider_card_new.Enable(False)
@@ -309,8 +317,12 @@ class Main(wx.Frame):
         sizer_gliders_buttons.Add(self.button_glider_card_properties, 1, wx.LEFT|wx.RIGHT, 2)
         sizer_gliders_buttons.Add(self.button_glider_card_delete, 1, wx.LEFT, 2)
         # Glider (left panel) sizer
+        sizer_find = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_find.Add(self.text_find, 3, wx.RIGHT|wx.EXPAND, 2)
+        sizer_find.Add(self.combo_find, 2, wx.LEFT|wx.EXPAND, 2)
+        # Glider (left panel) sizer
         sizer_gliders = wx.BoxSizer(wx.VERTICAL)
-        sizer_gliders.Add(self.text_find, 0, wx.LEFT|wx.TOP|wx.EXPAND, 4)
+        sizer_gliders.Add(sizer_find, 0, wx.LEFT|wx.TOP|wx.EXPAND, 4)
         sizer_gliders.Add(self.list_glider_card, 1, wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
         sizer_gliders.Add(sizer_gliders_buttons, 0, wx.LEFT|wx.BOTTOM|wx.EXPAND, 4)
         self.panel_gliders.SetSizer(sizer_gliders)
@@ -858,15 +870,16 @@ class Main(wx.Frame):
     def SearchGliderCard(self, evt=None):
         " SearchGliderCard(self, Event evt=None) - filter glider card according to competition number or registration "
         value = self.text_find.Value
-        if value != '':
-            value = '%%%s%%' % value
-            self.datasource_glider_card = self.BASE_QUERY.filter(or_(
-                    GliderCard.competition_number.ilike(value),
-                    GliderCard.registration.ilike(value),
-                    GliderType.name.ilike(value),
-                    Pilot.firstname.ilike(value),
-                    Pilot.surname.ilike(value)
-                )).all()
+        field = self.combo_find.GetSelection()
+        if value != '' and field != wx.NOT_FOUND:
+            if   field == 0:
+                self.datasource_glider_card = self.BASE_QUERY.filter( GliderCard.competition_number.ilike(value) ).all()
+            elif field == 1:
+                self.datasource_glider_card = self.BASE_QUERY.filter( GliderCard.registration.ilike('%%%s%%' % value) ).all()
+            elif field == 2:
+                self.datasource_glider_card = self.BASE_QUERY.filter( GliderType.name.ilike('%%%s%%' % value) ).all()
+            elif field == 3:
+                self.datasource_glider_card = self.BASE_QUERY.filter( Pilot.surname.ilike('%s%%' % value) ).all()
             self.__filtered = True
             self.RefreshGliderCard()
         else:
