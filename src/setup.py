@@ -15,5 +15,5 @@ setup(
                   'script': 'igcweight.py'
                  }
                 ],
-      options = { 'py2exe': {'packages': 'sqlite3, decimal', 'includes': ['sqlalchemy.databases.sqlite',]} }
+      options = { 'py2exe': {'packages': 'sqlite3, decimal, mako', 'includes': ['sqlalchemy.databases.sqlite',]} }
 )

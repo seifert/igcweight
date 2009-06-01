@@ -805,7 +805,6 @@ class Main(wx.Frame):
                                    'status': self.__list_daily_weigh_get_item_text(i, 'status')
                                  }
                                )
-        print daily_weight
         report = HtmlEasyPrinting( name=_("Glider card"), parentWindow=self )
         t = Template( filename=joinpath(settings.TEMPLATES_DIR, 'glider-card.html'), imports=['from wx import GetTranslation as _'] )
         html = t.render_unicode( glider_card=record, coefficient_status=coefficient_status, daily_weight=daily_weight, allowed_difference=settings.configuration.allowed_difference )
