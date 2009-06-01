@@ -931,7 +931,7 @@ class Main(wx.Frame):
         " __set_photo(self, int index) - show photo thumbnail or empty photo and enable or disable buttons "
         self.__current_photo_index = index
         if index != None:
-            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, self.__photos[index].full_path ) )
+            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, self.__photos[index] ) )
         else:
             self.photo.SetBitmap( GetPhotoBitmap(self.photo.ClientSize) )
         # Enable or disable prev and next buttons
@@ -1485,13 +1485,13 @@ class GliderCardForm(wx.Dialog):
             self.__current_photo_index = [ p.md5 for p in self.glidercard.photos ].index( photo.md5 )
             self.button_photo_set_main.Enable( not photo.main )
             self.button_photo_delete.Enable(True)
-            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, photo.full_path ) )
+            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, photo ) )
         elif index != None:
             self.__current_photo_index = index
             photo = self.glidercard.photos[index]
             self.button_photo_set_main.Enable( not photo.main )
             self.button_photo_delete.Enable(True)
-            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, photo.full_path ) )
+            self.photo.SetBitmap( GetPhotoBitmap( self.photo.ClientSize, photo ) )
         else:
             self.__current_photo_index = None
             self.button_photo_set_main.Enable(False)
