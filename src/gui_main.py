@@ -791,11 +791,15 @@ class Main(wx.Frame):
     def __glider_card_print(self, preview=False):
         " __glider_card_print(self, preview=False) - print glider card "
         record = self.list_glider_card.current_item
-        coefficient = record.coefficient
-        if coefficient != None:
-            coefficient_status = self.COEFFICIENT % {'coefficient': record.column_as_str('coefficient'), 'weight': record.referential_weight}
-        else:
-            coefficient_status = self.COEFFICIENT_NO_DATA
+        
+        status = [
+            self.text_non_lifting_status.Label,
+            self.text_mtow_status.Label,
+            self.text_seat_status.Label,
+            self.text_referential_status.Label,
+        ]
+        coefficient_status = self.text_coefficient_status.Label
+        
         daily_weight = []
         for i, item in enumerate( record.daily_weight ):
             daily_weight.append(
@@ -807,7 +811,7 @@ class Main(wx.Frame):
                                )
         report = HtmlEasyPrinting( name=_("Glider card"), parentWindow=self )
         t = Template( filename=joinpath(settings.TEMPLATES_DIR, 'glider-card.html'), imports=['from wx import GetTranslation as _'] )
-        html = t.render_unicode( glider_card=record, coefficient_status=coefficient_status, daily_weight=daily_weight, allowed_difference=settings.configuration.allowed_difference )
+        html = t.render_unicode( glider_card=record, status=status, coefficient_status=coefficient_status, daily_weight=daily_weight, allowed_difference=settings.configuration.allowed_difference )
         
         if preview:
             report.PreviewText(html)
