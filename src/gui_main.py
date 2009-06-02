@@ -834,7 +834,11 @@ class Main(wx.Frame):
                 try:
                     dlg.SetData()
                     dlg.SetNow()
-                    if dlg.ShowModal() == wx.ID_OK:
+                    if hasattr(self, 'daily_weight_position'):
+                        dlg.SetPosition(self.daily_weight_position)
+                    ret = dlg.ShowModal()
+                    self.daily_weight_position = dlg.GetPosition()
+                    if ret == wx.ID_OK:
                         try:
                             record = dlg.GetData()
                             glider_card = self.list_glider_card.current_item
@@ -865,7 +869,11 @@ class Main(wx.Frame):
             dlg.SetData(record)
             while True:
                 try:
-                    if dlg.ShowModal() == wx.ID_OK:
+                    if hasattr(self, 'daily_weight_position'):
+                        dlg.SetPosition(self.daily_weight_position)
+                    ret = dlg.ShowModal()
+                    self.daily_weight_position = dlg.GetPosition()
+                    if ret == wx.ID_OK:
                         record = dlg.GetData()
                         session.commit()
                         self.list_daily_weight.RefreshItem( self.list_daily_weight.GetFocusedItem() )
