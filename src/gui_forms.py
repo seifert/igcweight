@@ -442,7 +442,7 @@ class DialogModel(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         self.list_ctrl = VirtualListCtrl(self, -1)
         self.button_new = wx.Button(self, wx.ID_NEW, "")
-        self.button_properties = wx.Button(self, wx.ID_PROPERTIES, "")
+        self.button_properties = wx.Button(self, wx.ID_EDIT, "")
         self.button_delete = wx.Button(self, wx.ID_DELETE, "")
         self.panel_space = wx.Panel(self, -1)
         self.button_close = wx.Button(self, wx.ID_CLOSE, "")
