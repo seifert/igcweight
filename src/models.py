@@ -8,6 +8,8 @@ import types
 from os.path import join
 from datetime import date, time, datetime
 
+from wx import GetTranslation as _
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Table, MetaData, Column, ForeignKey, Sequence
 from sqlalchemy import Integer, SmallInteger, String, Text, DateTime, Numeric, Boolean, CHAR
@@ -53,7 +55,7 @@ class Conversion():
             value = use_locale == True and locale.format("%.3f", column) or str(column)
         elif column_type == types.BooleanType:
             # Boolean
-            value = column == True and "True" or "False"
+            value = column == True and _("True") or _("False")
         elif column_type == date:
             # date
             value = use_locale == True and column.strftime('%x') or column.strftime('%Y-%m-%d')
@@ -201,6 +203,7 @@ class GliderType(Base, Conversion):
     __table__ = Table('glider_type', Base.metadata,
         Column( 'glider_type_id', Integer, Sequence('glider_type_seq', optional=True), key='id', nullable=False ),
         Column( 'name', String(50), nullable=False ),
+        Column( 'club_class', Boolean, nullable=False ),
         Column( 'coefficient', Numeric(precision=3, scale=2), nullable=False ),
         Column( 'weight_non_lifting', SmallInteger ),
         Column( 'mtow_without_water', SmallInteger ),
@@ -212,8 +215,9 @@ class GliderType(Base, Conversion):
     )
     
     def __init__(self, **kwargs):
-        """ GliderType(self, str name=None, Decimal coefficient=None, int weight_non_lifting=None,
+        """ GliderType(self, str name=None, bool club_class=False, Decimal coefficient=None, int weight_non_lifting=None,
         int mtow_without_water=None, int mtow=None, int weight_referential=None, str description=None """
+        kwargs.setdefault('club_class', False)
         for key in kwargs.keys():
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])

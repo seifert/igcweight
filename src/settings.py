@@ -7,8 +7,8 @@ from getopt import getopt
 
 from configuration import Configuration
 
-VERSION_APP = (0, 8)
-VERSION_DB  = (0, 8)
+VERSION_APP = (0, 9)
+VERSION_DB  = (0, 9)
 VERSION = ".".join( str(s) for s in VERSION_APP )
 
 DEBUG = True
