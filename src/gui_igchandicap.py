@@ -22,11 +22,12 @@ class IgcHandicapList(gui_dialogmodel.DialogModel):
         
         # Set grid columns
         self.list_ctrl.InsertColumn(0, _("Name"), 'name', proportion=2)
-        self.list_ctrl.InsertColumn(1, _("Coefficient"), 'coefficient', format=wx.LIST_FORMAT_RIGHT, proportion=1)
-        self.list_ctrl.InsertColumn(2, _("Non lifting w."), 'weight_non_lifting', format=wx.LIST_FORMAT_RIGHT, proportion=1)
-        self.list_ctrl.InsertColumn(3, _("Without water"), 'mtow_without_water', format=wx.LIST_FORMAT_RIGHT, proportion=1)
-        self.list_ctrl.InsertColumn(4, _("MTOW"), 'mtow', format=wx.LIST_FORMAT_RIGHT, proportion=1)
-        self.list_ctrl.InsertColumn(5, _("Referential w."), 'weight_referential', format=wx.LIST_FORMAT_RIGHT, proportion=1)
+        self.list_ctrl.InsertColumn(1, _("Club class"), 'club_class', format=wx.LIST_FORMAT_RIGHT, proportion=1)
+        self.list_ctrl.InsertColumn(2, _("Coefficient"), 'coefficient', format=wx.LIST_FORMAT_RIGHT, proportion=1)
+        self.list_ctrl.InsertColumn(3, _("Non lifting w."), 'weight_non_lifting', format=wx.LIST_FORMAT_RIGHT, proportion=1)
+        self.list_ctrl.InsertColumn(4, _("Without water"), 'mtow_without_water', format=wx.LIST_FORMAT_RIGHT, proportion=1)
+        self.list_ctrl.InsertColumn(5, _("MTOW"), 'mtow', format=wx.LIST_FORMAT_RIGHT, proportion=1)
+        self.list_ctrl.InsertColumn(6, _("Referential w."), 'weight_referential', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         
         # Open data source
         self.datasource = session.query( GliderType ).all()
@@ -50,6 +51,7 @@ class IgcHandicapForm(wx.Dialog):
         self.label_name = wx.StaticText(self, -1, _("Name"))
         self.label_coefficient = wx.StaticText(self, -1, _("Coefficient"))
         self.text_name = wx.TextCtrl(self, -1, "")
+        self.checkbox_club = wx.CheckBox(self, -1, _("Club class"))
         self.text_coefficient = wx.TextCtrl(self, -1, "")
         self.label_weight_non_lifting = wx.StaticText(self, -1, _("Weight non-lifting"))
         self.label_mtow_without_water = wx.StaticText(self, -1, _("MTOW without water"))
@@ -63,6 +65,9 @@ class IgcHandicapForm(wx.Dialog):
         self.text_description = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE|wx.TE_WORDWRAP)
         self.button_ok = wx.Button(self, wx.ID_OK, "")
         self.button_cancel = wx.Button(self, wx.ID_CANCEL, "")
+
+        # Bind events
+        self.Bind(wx.EVT_CHECKBOX, self.ClubClassChange, self.checkbox_club)
 
         self.__set_properties()
         self.__do_layout()
@@ -89,9 +94,10 @@ class IgcHandicapForm(wx.Dialog):
         sizer_main = wx.BoxSizer(wx.VERTICAL)
         sizer_buttons = wx.StdDialogButtonSizer()
         grid_sizer = wx.GridBagSizer(2, 2)
-        grid_sizer.Add(self.label_name, (0, 0), (1, 3), wx.RIGHT|wx.EXPAND, 2)
+        grid_sizer.Add(self.label_name, (0, 0), (1, 2), wx.RIGHT|wx.EXPAND, 2)
         grid_sizer.Add(self.label_coefficient, (0, 3), (1, 1), wx.LEFT|wx.EXPAND, 2)
-        grid_sizer.Add(self.text_name, (1, 0), (1, 3), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        grid_sizer.Add(self.text_name, (1, 0), (1, 2), wx.RIGHT|wx.BOTTOM|wx.EXPAND, 2)
+        grid_sizer.Add(self.checkbox_club, (1, 2), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
         grid_sizer.Add(self.text_coefficient, (1, 3), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
         grid_sizer.Add(self.label_weight_non_lifting, (2, 0), (1, 1), wx.RIGHT|wx.EXPAND, 2)
         grid_sizer.Add(self.label_mtow_without_water, (2, 1), (1, 1), wx.LEFT|wx.RIGHT|wx.EXPAND, 2)
@@ -132,6 +138,7 @@ class IgcHandicapForm(wx.Dialog):
         glidertype.str_to_column( 'mtow', self.text_mtow.Value )
         glidertype.str_to_column( 'weight_referential', self.text_weight_referential.Value )
         glidertype.str_to_column( 'description', self.text_description.Value )
+        glidertype.club_class = self.checkbox_club.Value
         return glidertype
     
     def SetData(self, glidertype):
@@ -144,3 +151,16 @@ class IgcHandicapForm(wx.Dialog):
         self.text_mtow.Value = glidertype.column_as_str('mtow')
         self.text_weight_referential.Value = glidertype.column_as_str('weight_referential')
         self.text_description.Value = glidertype.column_as_str('description')
+        self.checkbox_club.Value = glidertype.club_class != None and glidertype.club_class or False
+        self.ClubClassChange()
+
+    def ClubClassChange(self, evt=None):
+        " ClubClassChange(self) - enable or disable controls "
+        if not self.checkbox_club.Value:
+            self.text_weight_non_lifting.Enable(False)
+            self.text_mtow_without_water.Enable(False)
+            self.text_weight_referential.Enable(False)
+        else:
+            self.text_weight_non_lifting.Enable(True)
+            self.text_mtow_without_water.Enable(True)
+            self.text_weight_referential.Enable(True)
