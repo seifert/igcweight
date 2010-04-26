@@ -22,7 +22,7 @@ class IgcHandicapList(gui_dialogmodel.DialogModel):
         
         # Set grid columns
         self.list_ctrl.InsertColumn(0, _("Name"), 'name', proportion=2)
-        self.list_ctrl.InsertColumn(1, _("Club class"), 'club_class', format=wx.LIST_FORMAT_RIGHT, proportion=1)
+        self.list_ctrl.InsertColumn(1, _("Class"), 'club_class_str', proportion=1)
         self.list_ctrl.InsertColumn(2, _("Coefficient"), 'coefficient', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         self.list_ctrl.InsertColumn(3, _("Non lifting w."), 'weight_non_lifting', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         self.list_ctrl.InsertColumn(4, _("Without water"), 'mtow_without_water', format=wx.LIST_FORMAT_RIGHT, proportion=1)

@@ -55,7 +55,7 @@ class Conversion():
             value = use_locale == True and locale.format("%.3f", column) or str(column)
         elif column_type == types.BooleanType:
             # Boolean
-            value = column == True and _("True") or _("False")
+            value = column == True and "True" or "False"
         elif column_type == date:
             # date
             value = use_locale == True and column.strftime('%x') or column.strftime('%Y-%m-%d')
@@ -238,6 +238,11 @@ class GliderType(Base, Conversion):
     def short_description(self):
         " Return short description, max. length is 50 chars "
         return self.GetDescription()
+
+    @property
+    def club_class_str(self):
+        " Return club class attribute as str "
+        return self.club_class and _("Club") or ""
 
 
 class Photo(Base, Conversion):
