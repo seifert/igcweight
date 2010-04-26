@@ -7,12 +7,11 @@ from os.path import isfile
 import wx
 
 from wx import GetTranslation as _
-from lrucache import LRUCache
 
 import settings
 
 
-thumbnails_cache = LRUCache( size=512 )
+_thumbnails_cache = {}
 
 
 def error_message_dialog(parent, message, exception=None):
@@ -30,43 +29,43 @@ def GetPhotoBitmap(max_size, photo=None):
     " GetPhotoBitmap(self, Size max_size, Photo photo=None) -> Bitmap - load photo and return bitmap "
     ctrl_w, ctrl_h = max_size
     key_name = photo != None and '%dx%d-%s' % (ctrl_w, ctrl_h, photo.md5) or 'empty-photo'
-    
-    if key_name in thumbnails_cache:
-        return thumbnails_cache[key_name]
-    
-    # Create bitmap from file
-    if photo != None:
-        thumbnail_path = os.path.join( settings.IMG_CACHE_DIR, '%s.jpg' % key_name )
-        if not isfile(thumbnail_path):
-            # if thumbnail doesn't exist, create it
-            image = wx.Image( photo.full_path, type=wx.BITMAP_TYPE_JPEG )
-            image_w, image_h =  image.GetSize()
-            if image_w > ctrl_w or image_h > ctrl_h:
-                # Count thumbnail size
-                image_proportion = float(image_w) / image_h
-                image_w = ctrl_w
-                image_h = int( image_w / image_proportion )
-                if image_h > ctrl_h:
-                    image_h = ctrl_h
-                    image_w = int( image_h * image_proportion )
-                # Scale photo thumbnail
-                image.Rescale( image_w, image_h, quality=wx.IMAGE_QUALITY_HIGH )
-                image.SaveFile( thumbnail_path, wx.BITMAP_TYPE_JPEG )
-        else:
-            # Load thumbnail from file
-            image = wx.Image( thumbnail_path, type=wx.BITMAP_TYPE_JPEG )
-            image_w, image_h =  image.GetSize()
-    else:
-        # Load empty photo
-        image = wx.Image( os.path.join(settings.IMAGES_DIR, 'lphoto.png'), type=wx.BITMAP_TYPE_PNG )
-        image_w, image_h =  image.GetSize()
-    
-    # Resize photo thumbnail
-    image.Resize( (ctrl_w, ctrl_h), ( (ctrl_w-image_w)/2, (ctrl_h-image_h)/2 ) )
+    bitmap = None
 
-    bitmap = image.ConvertToBitmap()
-    thumbnails_cache[key_name] = bitmap
-    return bitmap
+    if not key_name in _thumbnails_cache:
+        # Not cached, create bitmap from file
+        if photo != None:
+            thumbnail_path = os.path.join( settings.IMG_CACHE_DIR, '%s.jpg' % key_name )
+            if not isfile(thumbnail_path):
+                # if thumbnail doesn't exist, create it
+                image = wx.Image( photo.full_path, type=wx.BITMAP_TYPE_JPEG )
+                image_w, image_h =  image.GetSize()
+                if image_w > ctrl_w or image_h > ctrl_h:
+                    # Count thumbnail size
+                    image_proportion = float(image_w) / image_h
+                    image_w = ctrl_w
+                    image_h = int( image_w / image_proportion )
+                    if image_h > ctrl_h:
+                        image_h = ctrl_h
+                        image_w = int( image_h * image_proportion )
+                    # Scale photo thumbnail
+                    image.Rescale( image_w, image_h, quality=wx.IMAGE_QUALITY_HIGH )
+                    image.SaveFile( thumbnail_path, wx.BITMAP_TYPE_JPEG )
+            else:
+                # Load thumbnail from file
+                image = wx.Image( thumbnail_path, type=wx.BITMAP_TYPE_JPEG )
+                image_w, image_h =  image.GetSize()
+        else:
+            # Load empty photo
+            image = wx.Image( os.path.join(settings.IMAGES_DIR, 'lphoto.png'), type=wx.BITMAP_TYPE_PNG )
+            image_w, image_h =  image.GetSize()
+
+        # Resize photo thumbnail
+        image.Resize( (ctrl_w, ctrl_h), ( (ctrl_w-image_w)/2, (ctrl_h-image_h)/2 ) )
+
+        bitmap = image.ConvertToBitmap()
+
+    # Cache and return bitmap
+    return _thumbnails_cache.setdefault(key_name, bitmap)
 
 class VirtualListCtrl(wx.ListCtrl):
     " VirtualListCtrl(self, Window parent, int id=-1) "
