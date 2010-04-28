@@ -28,7 +28,13 @@ class PilotList(gui_dialogmodel.DialogModel):
         self.list_ctrl.InsertColumn(4, _("Sex"), 'sex', proportion=1)
         
         # Open data source
-        self.datasource = session.query( Pilot ).order_by( Pilot.surname, Pilot.firstname, Pilot.degree ).all()
+        self.datasource = session.query( Pilot ).all()
+        count = len(self.datasource)
+        if count > 0:
+            self.Sort(2)
+            self.list_ctrl.SetItemCount(count)
+            self.list_ctrl.Select(0)
+            self.list_ctrl.Focus(0)
         # Assign edit dialog
         self.edit_dialog = PilotForm
         # Assign error messages

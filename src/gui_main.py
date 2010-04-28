@@ -2,6 +2,7 @@
 
 import os
 import sys
+import locale
 
 from os import remove, system
 from os.path import isfile, splitext, abspath, dirname
@@ -568,7 +569,7 @@ class Main(wx.Frame):
                 colname = self.list_glider_card.GetColumnFieldName( col )
                 current_item = self.list_glider_card.current_item
                 self.list_glider_card.SetItemCount(0)
-                self.datasource_glider_card.sort( lambda a, b: cmp( a.column_as_str(colname).upper(), b.column_as_str(colname).upper() ) )
+                self.datasource_glider_card.sort( lambda a, b: locale.strcoll( a.column_as_str(colname), b.column_as_str(colname) ) )
                 if current_item == None:
                     i = 0
                 else:

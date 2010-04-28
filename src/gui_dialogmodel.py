@@ -1,5 +1,7 @@
 " GUI - DialogModel ancestor "
 
+import locale
+
 import wx
 from wx import GetTranslation as _
 
@@ -122,7 +124,7 @@ class DialogModel(gui_forms.DialogModel):
                 colname = self.list_ctrl.GetColumnFieldName( col )
                 current_item = self.list_ctrl.current_item
                 self.list_ctrl.SetItemCount(0)
-                self.datasource.sort( lambda a, b: cmp( a.column_as_str(colname).upper(), b.column_as_str(colname).upper() ) )
+                self.datasource.sort( lambda a, b: locale.strcoll( a.column_as_str(colname), b.column_as_str(colname) ) )
                 if current_item == None:
                     i = 0
                 else:

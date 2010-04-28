@@ -25,7 +25,7 @@ class OrganizationList(gui_dialogmodel.DialogModel):
         self.list_ctrl.InsertColumn(1, _("Code"), 'code', proportion=1)
         
         # Open data source
-        self.datasource = session.query( Organization ).order_by( Organization.name ).all()
+        self.datasource = session.query( Organization ).all()
         # Assign edit dialog
         self.edit_dialog = OrganizationForm
         # Assign error messages
