@@ -156,11 +156,15 @@ class IgcHandicapForm(wx.Dialog):
 
     def ClubClassChange(self, evt=None):
         " ClubClassChange(self) - enable or disable controls "
-        if not self.checkbox_club.Value:
-            self.text_weight_non_lifting.Enable(False)
-            self.text_mtow_without_water.Enable(False)
-            self.text_weight_referential.Enable(False)
-        else:
+        if self.checkbox_club.Value:
             self.text_weight_non_lifting.Enable(True)
             self.text_mtow_without_water.Enable(True)
             self.text_weight_referential.Enable(True)
+            self.text_coefficient.Enable(True)
+            self.text_mtow.Enable(False)
+        else:
+            self.text_weight_non_lifting.Enable(False)
+            self.text_mtow_without_water.Enable(False)
+            self.text_weight_referential.Enable(False)
+            self.text_coefficient.Enable(False)
+            self.text_mtow.Enable(True)
