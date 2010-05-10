@@ -35,7 +35,7 @@ from importexport import patternt_tar, Export, Import
 
 class Main(wx.Frame):
     " Main application window "
-    
+
     NON_LIFTING_OK = _("Non-lifting parts weight is OK.")
     NON_LIFTING_OVERWEIGHT = _("Non-lifting parts are overweight by %d kg!")
     NON_LIFTING_NO_DATA = _("No data for check non-lifting parts weight.")
@@ -59,22 +59,22 @@ class Main(wx.Frame):
     COLOR_OK = 'DARK GREEN'
     COLOR_OVERWEIGHT = 'RED'
     COLOR_NO_DATA = 'BLUE'
-    
+
     def __init__(self, *args, **kwds):
         " __init__(self, Window parent, int id=-1) "
-        
+
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
-        
+
         self.__old_record = None
         self.__current_photo_index = None
         self.__photos = None
-        
+
         self.split_main = wx.SplitterWindow(self, -1, style=wx.SP_3D|wx.SP_BORDER)
         self.panel_card = wx.Panel(self.split_main, -1)
         self.sizer_photo_staticbox = wx.StaticBox(self.panel_card, -1, _("Photo"))
         self.panel_gliders = wx.Panel(self.split_main, -1)
-        
+
         # Menu Bar
         self.main_menu = wx.MenuBar()
         self.menu_file = wx.Menu()
@@ -126,10 +126,10 @@ class Main(wx.Frame):
         self.menu_help.AppendItem(self.menu_about)
         self.main_menu.Append(self.menu_help, _("&Help"))
         self.SetMenuBar(self.main_menu)
-        
+
         # Status bar
         self.statusbar = self.CreateStatusBar(1, wx.ST_SIZEGRIP)
-        
+
         # Gliders list
         find_choices = (
             _('Competition number'),
@@ -143,7 +143,7 @@ class Main(wx.Frame):
         self.button_glider_card_new = wx.Button(self.panel_gliders, wx.ID_NEW, "")
         self.button_glider_card_properties = wx.Button(self.panel_gliders, wx.ID_EDIT, "")
         self.button_glider_card_delete = wx.Button(self.panel_gliders, wx.ID_DELETE, "")
-        
+
         # Glider card
         self.label_registration = wx.StaticText(self.panel_card, -1, _("Registration"))
         self.label_competition_number = wx.StaticText(self.panel_card, -1, _("Competition number"))
@@ -205,7 +205,7 @@ class Main(wx.Frame):
 
         self.__sort_glider_card = 0
         self.__filtered = False
-        
+
         # Set grid columns
         self.list_glider_card.InsertColumn(0, _("Nr."), 'competition_number', proportion=1)
         self.list_glider_card.InsertColumn(1, _("Registration"), 'registration', proportion=3)
@@ -266,13 +266,13 @@ class Main(wx.Frame):
         statusbar_fields = [""]
         for i in range(len(statusbar_fields)):
             self.statusbar.SetStatusText(statusbar_fields[i], i)
-        
+
         self.list_glider_card.SetFocus()
 
         self.text_find.ShowSearchButton(True)
         self.text_find.ShowCancelButton(True)
         self.combo_find.SetSelection(0)
-        
+
         self.button_glider_card_new.SetToolTipString(_("Add new glider"))
         self.button_glider_card_new.Enable(False)
         self.button_glider_card_properties.SetToolTipString(_("Edit glider properties"))
@@ -290,7 +290,7 @@ class Main(wx.Frame):
         self.button_daily_weight_delete.Enable(False)
         self.button_glider_card_print.SetToolTipString(_("Print glider card"))
         self.button_glider_card_print.Enable(False)
-        
+
         fontbold = self.label_certified_weights.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
         self.fontbold = fontbold
@@ -314,7 +314,7 @@ class Main(wx.Frame):
         self.text_pilot_weight.SetFont(fontbold)
         self.text_tow_bar_weight.SetFont(fontbold)
         self.label_daily_weight.SetFont(fontbold)
-        
+
         self.photo.SetMinSize((180, -1))
         self.split_main.SetSashGravity(0.33)
         self.split_main.SetMinimumPaneSize(375)
@@ -337,7 +337,7 @@ class Main(wx.Frame):
         sizer_gliders.Add(self.list_glider_card, 1, wx.LEFT|wx.TOP|wx.BOTTOM|wx.EXPAND, 4)
         sizer_gliders.Add(sizer_gliders_buttons, 0, wx.LEFT|wx.BOTTOM|wx.EXPAND, 4)
         self.panel_gliders.SetSizer(sizer_gliders)
-        
+
         # Glider card base sizer
         sizer_card_base = wx.GridBagSizer(0, 0)
         sizer_card_base.Add(self.label_competition_number, (0, 0), (1, 1), wx.LEFT|wx.BOTTOM|wx.EXPAND, 2)
@@ -431,7 +431,7 @@ class Main(wx.Frame):
         self.Layout()
         self.SetSize( (950, 700) )
         self.split_main.SetSashPosition(375)
-    
+
     def get_datasource_glider_card(self):
         " datasource_glider_card(self) -> list of db items (SQLAlchemy query) "
         return getattr(self.list_glider_card, 'datasource', None)
@@ -450,7 +450,7 @@ class Main(wx.Frame):
         self.__set_enabled_disabled()
         self.RefreshGliderCard()
     datasource_glider_card = property(get_datasource_glider_card, set_datasource_glider_card)
-    
+
     def __set_enabled_disabled(self):
         " __set_enabled_disabled(self) - enable or disable controls "
         if self.datasource_glider_card != None:
@@ -466,14 +466,14 @@ class Main(wx.Frame):
             glider_card_new = False
             glider_card_properties = False
             glider_card_delete = False
-        
+
         self.button_glider_card_new.Enable(glider_card_new)
         self.menu_glider_card_new.Enable(glider_card_new)
         self.button_glider_card_properties.Enable(glider_card_properties)
         self.menu_glider_card_properties.Enable(glider_card_properties)
         self.button_glider_card_delete.Enable(glider_card_delete)
         self.menu_glider_card_delete.Enable(glider_card_delete)
-    
+
     def __set_enabled_disabled_daily(self):
         " __set_enabled_disabled_daily(self) - enable or disable daily weight controls "
         datasource = getattr( self.list_daily_weight, 'datasource', None)
@@ -492,7 +492,7 @@ class Main(wx.Frame):
             daily_weight_properties = False
             daily_weight_delete = False
             glider_card_print = False
-        
+
         self.button_daily_weight_new.Enable(daily_weight_new)
         self.menu_daily_weight_new.Enable(daily_weight_new)
         self.button_daily_weight_properties.Enable(daily_weight_properties)
@@ -502,13 +502,13 @@ class Main(wx.Frame):
         self.menu_glider_card_print.Enable(glider_card_print)
         self.menu_glider_card_print_preview.Enable(glider_card_print)
         self.button_glider_card_print.Enable(glider_card_print)
-    
+
     def __list_glider_card_popup_menu(self, evt):
         " __list_glider_popup_menu(self, Event evt) - show pop-up menu "
         pos = evt.GetPosition()
         pos = self.ScreenToClient(pos)
         self.PopupMenu( self.menu_glider_card, pos )
-    
+
     def __list_daily_weight_popup_menu(self, evt):
         " __list_daily_weight_menu(self, Event evt) - show pop-up menu "
         pos = evt.GetPosition()
@@ -560,7 +560,7 @@ class Main(wx.Frame):
             return wx.ListItemAttr(colText=self.COLOR_OK)
         else:
             return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT)
-    
+
     def SortGliderCardList(self, col):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
         if self.datasource_glider_card != None:
@@ -577,7 +577,7 @@ class Main(wx.Frame):
                 self.list_glider_card.SetItemCount(count)
                 self.list_glider_card.Select(i)
                 self.list_glider_card.Focus(i)
-    
+
     def Import(self, evt):
         " Import(self, Event evt) - import data from archive file "
         try:
@@ -599,7 +599,7 @@ class Main(wx.Frame):
             error_message_dialog( self, _("Import data error"), e )
             if settings.DEBUG:
                 raise
-    
+
     def Export(self, evt):
         " Export(self, Event evt) - export data into archive file "
         try:
@@ -619,7 +619,7 @@ class Main(wx.Frame):
             error_message_dialog( self, _("Export data error"), e )
             if settings.DEBUG:
                 raise
-    
+
     def Exit(self, evt=None):
         " Exit(self, Event evt=None) - exit application event handler "
         app = wx.GetApp()
@@ -634,7 +634,7 @@ class Main(wx.Frame):
                     wx.GetApp().Exit()
             finally:
                 dlg.Destroy()
-    
+
     def About(self, evt=None):
         " About(self, Event evt=None) - show about dialog window event handler "
         about = wx.AboutDialogInfo()
@@ -703,7 +703,7 @@ class Main(wx.Frame):
                 remove(p)
             except:
                 pass
-    
+
     def GliderCardNew(self, evt=None):
         " GliderCardNew(self, Event evt=None) - add new glider card event handler "
         dlg = GliderCardForm(self)
@@ -797,7 +797,7 @@ class Main(wx.Frame):
     def __glider_card_print(self, preview=False):
         " __glider_card_print(self, preview=False) - print glider card "
         record = self.list_glider_card.current_item
-        
+
         status = [
             self.text_non_lifting_status.Label,
             self.text_mtow_status.Label,
@@ -805,7 +805,7 @@ class Main(wx.Frame):
             self.text_referential_status.Label,
         ]
         coefficient_status = self.text_coefficient_status.Label
-        
+
         daily_weight = []
         for i, item in enumerate( record.daily_weight ):
             daily_weight.append(
@@ -818,7 +818,7 @@ class Main(wx.Frame):
         report = HtmlEasyPrinting( name=_("Glider card"), parentWindow=self )
         t = Template( filename=joinpath(settings.TEMPLATES_DIR, 'glider-card.html'), imports=['from wx import GetTranslation as _'] )
         html = t.render_unicode( glider_card=record, status=status, coefficient_status=coefficient_status, daily_weight=daily_weight, allowed_difference=settings.configuration.allowed_difference )
-        
+
         if preview:
             report.PreviewText(html)
         else:
@@ -918,7 +918,7 @@ class Main(wx.Frame):
             except Exception, e:
                 session.rollback()
                 error_message_dialog( self, _("Daily weight delete error"), e )
-    
+
     def SearchGliderCard(self, evt=None):
         " SearchGliderCard(self, Event evt=None) - filter glider card according to competition number or registration "
         value = self.text_find.Value
@@ -979,7 +979,7 @@ class Main(wx.Frame):
         " RefreshGliderCard(self) - refresh data in the glider card "
         record = self.list_glider_card.current_item
         self.__old_record = record
-        
+
         if record != None:
             # Base data
             self.text_registration.SetLabel( record.column_as_str('registration') )
@@ -1111,7 +1111,7 @@ class Main(wx.Frame):
     def ShowPhoto(self, evt=None):
         " ShowPhoto(self, Event evt=None) - show photo in associated application "
         full_path = self.__photos[ self.__current_photo_index ].full_path
-        
+
         try:
             os.startfile(full_path)
             return
@@ -1149,10 +1149,10 @@ class GliderCardForm(wx.Dialog):
     def __init__(self, *args, **kwds):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER|wx.THICK_FRAME
         wx.Dialog.__init__(self, *args, **kwds)
-        
+
         self.__current_photo_index = None
         self.deleted_photos = []
-        
+
         # Base data
         self.staticbox_picture = wx.StaticBox(self, -1, _("Photo"))
         self.staticbox_certified_weights = wx.StaticBox(self, -1, _("Certified weights"))
@@ -1227,7 +1227,7 @@ class GliderCardForm(wx.Dialog):
 
     def __set_properties(self):
         self.SetTitle(_("Glider card"))
-        
+
         fontbold = self.label_registration.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
         self.label_registration.SetFont(fontbold)
@@ -1235,7 +1235,7 @@ class GliderCardForm(wx.Dialog):
         self.label_glider_type.SetFont(fontbold)
         self.label_pilot.SetFont(fontbold)
         self.label_organization.SetFont(fontbold)
-        
+
         self.text_registration.SetMaxLength(10)
         self.text_competition_number.SetMaxLength(5)
 
@@ -1247,7 +1247,7 @@ class GliderCardForm(wx.Dialog):
         self.button_photo_set_main.SetToolTipString(_("Set as a main photo"))
         self.button_photo_delete.SetToolTipString(_("Delete photo"))
         self.button_photo_next.SetToolTipString(_("Next photo"))
-        
+
         self.text_competition_number.SetFocus()
         self.button_ok.SetDefault()
 
@@ -1336,7 +1336,7 @@ class GliderCardForm(wx.Dialog):
         sizer_main.Add(sizer_measured_weights_staticbox, 0, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
         sizer_main.Add(sizer_description, 1, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 4)
         sizer_main.Add(sizer_buttons, 0, wx.ALL|wx.ALIGN_RIGHT, 4)
-        
+
         self.SetSizer(sizer_main)
         self.SetMinSize( (750, self.GetBestSize().height) )
         sizer_main.Fit(self)
@@ -1368,7 +1368,7 @@ class GliderCardForm(wx.Dialog):
             ctrl.ChangeValue(new)
             ctrl.SetInsertionPointEnd()
         evt.Skip()
-        
+
     def __add_glider_type(self, evt):
         " __add_glider_type(self, evt) - add new glider type event handler "
         dlg = IgcHandicapForm(self)
@@ -1388,7 +1388,7 @@ class GliderCardForm(wx.Dialog):
                     error_message_dialog( self, GLIDER_TYPE_INSERT_ERROR, e )
         finally:
             dlg.Destroy()
-        
+
     def __add_pilot(self, evt):
         " __add_pilot(self, evt) - add new pilot event handler "
         dlg = PilotForm(self)
@@ -1408,7 +1408,7 @@ class GliderCardForm(wx.Dialog):
                     error_message_dialog( self, PILOT_INSERT_ERROR, e )
         finally:
             dlg.Destroy()
-        
+
     def __add_organization(self, evt):
         " __add_organization(self, evt) - add new organization event handler "
         dlg = OrganizationForm(self)
@@ -1428,7 +1428,7 @@ class GliderCardForm(wx.Dialog):
                     error_message_dialog( self, ORGANIZATION_INSERT_ERROR, e )
         finally:
             dlg.Destroy()
-    
+
     def __photo_add(self, evt):
         " __add_photo(self, evt) - add photo event handler "
         dlg = wx.FileDialog( self, defaultDir=settings.LAST_OPEN_FILE_PATH, message=_("Open file"),
@@ -1473,7 +1473,7 @@ class GliderCardForm(wx.Dialog):
             self.__set_photo( index = index >= 0 and index or 0 )
         else:
             self.__set_photo( index = None )
-    
+
     def __photo_set_main(self, evt):
         " __photo_set(self, evt) - set current photo as a main photo "
         for i, p in enumerate(self.glidercard.photos):
@@ -1482,14 +1482,14 @@ class GliderCardForm(wx.Dialog):
             else:
                 p.main = False
         self.__set_photo( index=self.__current_photo_index )
-    
+
     def __photo_prev(self, evt):
         " __photo_prev(self, evt) - show prev photo "
         index = self.__current_photo_index - 1
         if index < 0:
             index = 0
         self.__set_photo( index=index )
-    
+
     def __photo_next(self, evt):
         " __photo_next(self, evt) - show next photo "
         index = self.__current_photo_index + 1
@@ -1534,7 +1534,7 @@ class GliderCardForm(wx.Dialog):
             else:
                 self.button_photo_prev.Enable(True)
                 self.button_photo_next.Enable(True)
-    
+
     def GetData(self):
         " GetData(self) -> GliderCard - get cleaned form data "
         glidercard = getattr( self, 'glidercard', GliderCard() )
@@ -1554,7 +1554,7 @@ class GliderCardForm(wx.Dialog):
         glidercard.pilot = self.combo_pilot.CurrentSelection >= 0 and self.pilot_items[ self.combo_pilot.CurrentSelection ] or None
         glidercard.organization = self.combo_organization.CurrentSelection >= 0 and self.organization_items[ self.combo_organization.CurrentSelection ] or None
         return glidercard
-    
+
     def SetData(self, glidercard=None):
         " SetData(self, glidercard=None) - set form data "
         if glidercard != None:
@@ -1587,7 +1587,24 @@ class GliderCardForm(wx.Dialog):
                 self.__set_photo()
         else:
             self.__set_photo()
+        self.SetEnabledDisabled()
 
+    def SetEnabledDisabled(self):
+        " SetEnabledDisabled(self) - enable or disable controls "
+        if hasattr(self, 'glidercard') and self.glidercard.glider_type.club_class:
+            self.text_non_lifting_weight.Enable(True)
+            self.text_empty_weight.Enable(True)
+            self.text_seat_min_weight.Enable(True)
+            self.text_seat_max_weight.Enable(True)
+            self.checkbox_gear.Enable(True)
+            self.checkbox_winglets.Enable(True)
+        else:
+            self.text_non_lifting_weight.Enable(False)
+            self.text_empty_weight.Enable(False)
+            self.text_seat_min_weight.Enable(False)
+            self.text_seat_max_weight.Enable(False)
+            self.checkbox_gear.Enable(False)
+            self.checkbox_winglets.Enable(False)
 
 class DailyWeightForm(wx.Dialog):
     def __init__(self, *args, **kwds):
@@ -1614,7 +1631,7 @@ class DailyWeightForm(wx.Dialog):
         self.label_tow_bar_weight.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
         self.text_date.SetFocus()
         self.button_ok.SetDefault()
-        
+
         self.text_date.SetEditable(False)
         self.text_date.Enable(False)
         self.button_now.Enable(False)
@@ -1641,24 +1658,24 @@ class DailyWeightForm(wx.Dialog):
         self.SetSizer(sizer_main)
         self.SetMinSize( (self.GetSize().width, self.GetBestSize().height) )
         self.SetMaxSize( (-1, self.GetBestSize().height) )
-        
+
         sizer_main.Fit(self)
         self.Layout()
         self.SetMinSize( (500 ,-1) )
         self.CenterOnParent()
-    
+
     def SetNow(self, evt=None):
         " SetNow(self, evt=None) - put current date into text_date control "
         self.text_date.Value = datetime.now().strftime('%x %X')
         self.text_tow_bar_weight.SetFocus()
-    
+
     def GetData(self):
         " GetData(self) -> DailyWeight - get cleaned form data "
         dailyweight = getattr( self, 'dailyweight', DailyWeight() )
         dailyweight.str_to_column( 'date', self.text_date.Value )
         dailyweight.str_to_column( 'tow_bar_weight', self.text_tow_bar_weight.Value )
         return dailyweight
-    
+
     def SetData(self, dailyweight=None):
         " SetData(self, DailyWeight dailyweight=None) - set form data "
         if dailyweight != None:
