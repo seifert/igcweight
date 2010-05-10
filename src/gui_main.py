@@ -1215,6 +1215,7 @@ class GliderCardForm(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.__photo_set_main, self.button_photo_set_main)
         self.Bind(wx.EVT_BUTTON, self.__photo_delete, self.button_photo_delete)
         self.Bind(wx.EVT_BUTTON, self.__photo_next, self.button_photo_next)
+        self.Bind(wx.EVT_COMBOBOX, self.GliderTypeChange, self.combo_glider_type)
 
         # Init combo-box data sources
         self.glider_type_items = session.query( GliderType ).all()
@@ -1587,11 +1588,12 @@ class GliderCardForm(wx.Dialog):
                 self.__set_photo()
         else:
             self.__set_photo()
-        self.SetEnabledDisabled()
+        self.GliderTypeChange()
 
-    def SetEnabledDisabled(self):
+    def GliderTypeChange(self, evt=None):
         " SetEnabledDisabled(self) - enable or disable controls "
-        if hasattr(self, 'glidercard') and self.glidercard.glider_type.club_class:
+        glider_type = self.combo_glider_type.CurrentSelection >= 0 and self.glider_type_items[ self.combo_glider_type.CurrentSelection ] or None
+        if glider_type and glider_type.club_class:
             self.text_non_lifting_weight.Enable(True)
             self.text_empty_weight.Enable(True)
             self.text_seat_min_weight.Enable(True)
