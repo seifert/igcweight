@@ -1346,18 +1346,18 @@ class GliderCardForm(wx.Dialog):
 
     def __init_combo_glider_type(self):
         " __init_combo_glider_type(self) - load data into combo_box_glider_type "
-        self.glider_type_items.sort( lambda a, b: cmp( a.name.upper(), b.name.upper() ) )
+        self.glider_type_items.sort( lambda a, b: locale.strcoll( a.name, b.name ) )
         self.combo_glider_type.Clear()
         self.combo_glider_type.SetItems( [ i.name for i in self.glider_type_items ] )
 
     def __init_combo_pilot(self):
         " __init_combo_pilot(self) - load data into combo_box_pilot "
-        self.pilot_items.sort( lambda a, b: cmp( a.fullname_rev.upper(), b.fullname_rev.upper() ) )
+        self.pilot_items.sort( lambda a, b: locale.strcoll( a.fullname_rev.upper(), b.fullname_rev.upper() ) )
         self.combo_pilot.SetItems( [ i.fullname for i in self.pilot_items ] )
 
     def __init_combo_organization(self):
         " __init_combo_organization(self) - load data into combo_box_organization "
-        self.organization_items.sort( lambda a, b: cmp( a.name.upper(), b.name.upper() ) )
+        self.organization_items.sort( lambda a, b: locale.strcoll( a.name, b.name ) )
         self.combo_organization.SetItems( [ "%s, %s" % (i.name, i.code,) for i in self.organization_items ] )
 
     def __text_ctrl_change(self, evt):
