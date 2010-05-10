@@ -19,7 +19,7 @@ class IgcHandicapList(gui_dialogmodel.DialogModel):
         gui_dialogmodel.DialogModel.__init__(self, *args, **kwargs)
 
         self.SetTitle( _("IGC handicap list") )
-        
+
         # Set grid columns
         self.list_ctrl.InsertColumn(0, _("Name"), 'name', proportion=2)
         self.list_ctrl.InsertColumn(1, _("Class"), 'club_class_str', proportion=1)
@@ -28,7 +28,7 @@ class IgcHandicapList(gui_dialogmodel.DialogModel):
         self.list_ctrl.InsertColumn(4, _("Without water"), 'mtow_without_water', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         self.list_ctrl.InsertColumn(5, _("MTOW"), 'mtow', format=wx.LIST_FORMAT_RIGHT, proportion=1)
         self.list_ctrl.InsertColumn(6, _("Referential w."), 'weight_referential', format=wx.LIST_FORMAT_RIGHT, proportion=1)
-        
+
         # Open data source
         self.datasource = session.query( GliderType ).all()
         # Assign edit dialog
@@ -41,7 +41,7 @@ class IgcHandicapList(gui_dialogmodel.DialogModel):
         self.SetSize( (750, 450) )
         self.SetMinSize( self.GetSize() )
         self.CenterOnParent()
-    
+
 class IgcHandicapForm(wx.Dialog):
     " IGC handicat insert/edit dialog "
     def __init__(self, *args, **kwds):
@@ -71,15 +71,15 @@ class IgcHandicapForm(wx.Dialog):
 
         self.__set_properties()
         self.__do_layout()
-        
+
     def __set_properties(self):
         self.SetTitle(_("Glider type"))
-        
+
         fontbold = self.label_name.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
         self.label_name.SetFont(fontbold)
         self.label_coefficient.SetFont(fontbold)
-        
+
         self.text_weight_non_lifting.SetMinSize((150,-1))
         self.text_mtow_without_water.SetMinSize((150,-1))
         self.text_mtow.SetMinSize((150,-1))
@@ -89,6 +89,7 @@ class IgcHandicapForm(wx.Dialog):
 
         self.text_name.SetFocus()
         self.button_ok.SetDefault()
+        self.ClubClassChange()
 
     def __do_layout(self):
         sizer_main = wx.BoxSizer(wx.VERTICAL)
@@ -124,7 +125,7 @@ class IgcHandicapForm(wx.Dialog):
         self.Layout()
         self.SetMinSize(self.GetSize())
         self.CenterOnParent()
-    
+
     def GetData(self):
         " GetData(self) -> GliderType - get cleaned form data "
         if hasattr(self, 'glidertype'):
@@ -140,7 +141,7 @@ class IgcHandicapForm(wx.Dialog):
         glidertype.str_to_column( 'description', self.text_description.Value )
         glidertype.club_class = self.checkbox_club.Value
         return glidertype
-    
+
     def SetData(self, glidertype):
         " SetData(self, glidertype) - set form data "
         self.glidertype = glidertype
