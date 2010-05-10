@@ -204,7 +204,7 @@ class GliderType(Base, Conversion):
         Column( 'glider_type_id', Integer, Sequence('glider_type_seq', optional=True), key='id', nullable=False ),
         Column( 'name', String(50), nullable=False ),
         Column( 'club_class', Boolean, nullable=False ),
-        Column( 'coefficient', Numeric(precision=3, scale=2), nullable=False ),
+        Column( 'coefficient', Numeric(precision=3, scale=2) ),
         Column( 'weight_non_lifting', SmallInteger ),
         Column( 'mtow_without_water', SmallInteger ),
         Column( 'mtow', SmallInteger ),
