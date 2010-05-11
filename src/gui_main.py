@@ -1352,7 +1352,7 @@ class GliderCardForm(wx.Dialog):
 
     def __init_combo_pilot(self):
         " __init_combo_pilot(self) - load data into combo_box_pilot "
-        self.pilot_items.sort( lambda a, b: locale.strcoll( a.fullname_rev.upper(), b.fullname_rev.upper() ) )
+        self.pilot_items.sort( lambda a, b: locale.strcoll( a.fullname_rev, b.fullname_rev ) )
         self.combo_pilot.SetItems( [ i.fullname for i in self.pilot_items ] )
 
     def __init_combo_organization(self):
