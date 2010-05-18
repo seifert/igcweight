@@ -55,6 +55,7 @@ class Main(wx.Frame):
     TOW_BAR_OVERWEIGHT = _("! Overweight by %d kg")
     TOW_BAR_UNDERWEIGHT = _("! Underweight by %d kg")
     TOW_BAR_NO_DATA = _("? No data")
+    NOT_USED = _("No club class, not used")
     COLOR_TEXT = wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOWTEXT)
     COLOR_OK = 'DARK GREEN'
     COLOR_OVERWEIGHT = 'RED'
@@ -991,10 +992,11 @@ class Main(wx.Frame):
             self.text_winglets.SetLabel( record.winglets == True and _("True") or _("False") )
             self.text_landing_gear.SetLabel( record.landing_gear == True and _("True") or _("False") )
             # Certified weights
-            self.text_non_lifting_weight.SetLabel( record.column_as_str('certified_weight_non_lifting') )
-            self.text_empty_weight.SetLabel( record.column_as_str('certified_empty_weight') )
-            self.text_seat_min_weight.SetLabel( record.column_as_str('certified_min_seat_weight') )
-            self.text_seat_max_weight.SetLabel( record.column_as_str('certified_max_seat_weight') )
+            if record.glider_type.club_class:
+                self.text_non_lifting_weight.SetLabel( record.column_as_str('certified_weight_non_lifting') )
+                self.text_empty_weight.SetLabel( record.column_as_str('certified_empty_weight') )
+                self.text_seat_min_weight.SetLabel( record.column_as_str('certified_min_seat_weight') )
+                self.text_seat_max_weight.SetLabel( record.column_as_str('certified_max_seat_weight') )
             # Measured weights
             self.text_glider_weight.SetLabel( record.column_as_str('glider_weight') )
             self.text_pilot_weight.SetLabel( record.column_as_str('pilot_weight') )
@@ -1038,13 +1040,14 @@ class Main(wx.Frame):
             else:
                 self.__set_status_label_data(self.text_referential_status, self.COLOR_NO_DATA, self.REFERENTIAL_NO_DATA)
             # Coefficient status
-            coefficient = record.coefficient
-            if coefficient != None:
-                self.__set_status_label_data(self.text_coefficient_status, self.COLOR_TEXT, self.COEFFICIENT, {'coefficient': record.column_as_str('coefficient'), 'weight': record.referential_weight})
-                self.text_coefficient_status.SetFont(self.fontbold)
-            else:
-                self.__set_status_label_data(self.text_coefficient_status, self.COLOR_NO_DATA, self.COEFFICIENT_NO_DATA)
-                self.text_coefficient_status.SetFont(self.fontnormal)
+            if record.glider_type.club_class:
+                coefficient = record.coefficient
+                if coefficient != None:
+                    self.__set_status_label_data(self.text_coefficient_status, self.COLOR_TEXT, self.COEFFICIENT, {'coefficient': record.column_as_str('coefficient'), 'weight': record.referential_weight})
+                    self.text_coefficient_status.SetFont(self.fontbold)
+                else:
+                    self.__set_status_label_data(self.text_coefficient_status, self.COLOR_NO_DATA, self.COEFFICIENT_NO_DATA)
+                    self.text_coefficient_status.SetFont(self.fontnormal)
             # Photo
             self.__photos = session.query(Photo).filter( Photo.glider_card==record ).order_by( desc(Photo.main) ).order_by( Photo.id ).all()
             count = len(self.__photos)
@@ -1053,6 +1056,26 @@ class Main(wx.Frame):
                 self.list_glider_card.RefreshItems( 0, count-1 )
             else:
                 self.__set_photo(None)
+            # Enable or disable controls according to class
+            ctrls = [
+                'label_certified_weights', 'label_non_lifting_weight', 'label_empty_weight',
+                'label_seat_min_weight', 'label_seat_max_weight', 'text_empty_weight',
+                'text_non_lifting_weight', 'text_seat_min_weight', 'text_seat_max_weight',
+                'label_winglets', 'label_landing_gear', 'text_winglets', 'text_landing_gear',
+                'text_non_lifting_status', 'text_seat_status', 'text_referential_status',
+                'text_coefficient_status',
+            ]
+            for ctrl_name in ctrls:
+                ctrl = getattr(self, ctrl_name)
+                if record.glider_type.club_class:
+                    ctrl.Enable(True)
+                else:
+                    ctrl.Enable(False)
+                    if ctrl_name == 'text_coefficient_status':
+                        self.__set_status_label_data(ctrl, self.COLOR_NO_DATA, self.NOT_USED)
+                        self.text_coefficient_status.SetFont(self.fontnormal)
+                    elif ctrl_name.startswith('text'):
+                        ctrl.SetLabel(self.NOT_USED if ctrl_name.endswith('status') else '')
             # Daily weight
             self.list_daily_weight.datasource = record.daily_weight
             count = len(record.daily_weight)
