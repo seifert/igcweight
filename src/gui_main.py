@@ -54,6 +54,7 @@ class Main(wx.Frame):
     TOW_BAR_OK = _("* In the limit")
     TOW_BAR_OVERWEIGHT = _("! Overweight by %d kg")
     TOW_BAR_UNDERWEIGHT = _("! Underweight by %d kg")
+    TOW_BAR_UNDERWEIGHT_NO_CLUB = _("* Underweight by %d kg, OK")
     TOW_BAR_NO_DATA = _("? No data")
     NOT_USED = _("No club class, not used")
     COLOR_TEXT = wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOWTEXT)
@@ -535,7 +536,9 @@ class Main(wx.Frame):
 
     def __list_daily_weigh_get_item_text(self, item, colname):
         " __list_daily_weigh_get_item_text(self, int item, str colname) -> str - get column data as text "
-        daily_weight = self.list_glider_card.current_item.daily_weight[item]
+        record = self.list_glider_card.current_item
+        daily_weight = record.daily_weight[item]
+
         if colname == 'status':
             difference = daily_weight.tow_bar_difference
             if difference == None:
@@ -546,21 +549,27 @@ class Main(wx.Frame):
             elif difference > 0:
                 return self.TOW_BAR_OVERWEIGHT % difference_abs
             elif difference < 0:
-                return self.TOW_BAR_UNDERWEIGHT % difference_abs
+                t = self.TOW_BAR_UNDERWEIGHT if record.glider_type.club_class else self.TOW_BAR_UNDERWEIGHT_NO_CLUB
+                return t % difference_abs
         else:
             return daily_weight.column_as_str(colname)
 
     def __list_daily_weigh_get_item_attr(self, item):
         " __list_daily_weigh_get_item_text(self, int item, str colname) -> str - get column data as text "
-        daily_weight = self.list_glider_card.current_item.daily_weight[item]
+        record = self.list_glider_card.current_item
+        daily_weight = record.daily_weight[item]
         difference = daily_weight.tow_bar_difference
+
         if difference == None:
             return wx.ListItemAttr(colText=self.COLOR_NO_DATA)
         difference_abs = fabs(difference)
         if difference_abs <= settings.configuration.allowed_difference:
             return wx.ListItemAttr(colText=self.COLOR_OK)
-        else:
+        elif difference > 0:
             return wx.ListItemAttr(colText=self.COLOR_OVERWEIGHT)
+        elif difference < 0:
+            c = self.COLOR_OVERWEIGHT if record.glider_type.club_class else self.COLOR_OK
+            return wx.ListItemAttr(colText=c)
 
     def SortGliderCardList(self, col):
         " __sort_glider_card(self, evt) - sort glider cards, left-click column tile event handler "
