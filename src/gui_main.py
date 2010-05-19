@@ -33,6 +33,8 @@ from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
 from gui_preferences import Preferences
 from importexport import patternt_tar, Export, Import
 
+_fake_variable_1 = _('Glider card - club class')
+
 class Main(wx.Frame):
     " Main application window "
 
@@ -826,8 +828,15 @@ class Main(wx.Frame):
                                  }
                                )
         report = HtmlEasyPrinting( name=_("Glider card"), parentWindow=self )
-        t = Template( filename=joinpath(settings.TEMPLATES_DIR, 'glider-card.html'), imports=['from wx import GetTranslation as _'] )
-        html = t.render_unicode( glider_card=record, status=status, coefficient_status=coefficient_status, daily_weight=daily_weight, allowed_difference=settings.configuration.allowed_difference )
+        template_name = 'glider-card-club.html' if record.glider_type.club_class else 'glider-card.html'
+        t = Template( filename=joinpath(settings.TEMPLATES_DIR, template_name), imports=['from wx import GetTranslation as _'] )
+        html = t.render_unicode(
+            glider_card=record,
+            status=status,
+            coefficient_status=coefficient_status,
+            daily_weight=daily_weight,
+            allowed_difference=settings.configuration.allowed_difference
+        )
 
         if preview:
             report.PreviewText(html)

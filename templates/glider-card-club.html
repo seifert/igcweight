@@ -2,15 +2,23 @@
     <title>${_('Glider card')}</title>
 <body>
 
-    <h3><u>${_('Glider card')}</u></h3>
+    <h3><u>${_('Glider card - club class')}</u></h3>
 
     <table>
         <tr><td valign="top">${_('Competition number')}:<br><font size="7"><b>${glider_card.competition_number}</b></font></td><td width="10mm">&nbsp;</td><td>${_('Registration')}:<br><font size="7"><b>${glider_card.registration}</b></font></td></tr>
         <tr><td valign="top">${_('Pilot')}:<br><b>${glider_card.pilot.fullname}</b></td><td>&nbsp;</td><td>${_('Glider type')}:<br><b>${glider_card.glider_type.name}</b></td></tr>
         <tr><td valign="top" colspan="3">${_('Organization or country')}:<br><b>${glider_card.organization.name}</b></td></tr>
+        <tr><td>${_('Landing gear')}: <b>${_(glider_card.column_as_str('landing_gear'))}</b></td>&nbsp;<td></td><td>${_('Winglets')}: <b>${_(glider_card.column_as_str('winglets'))}</b></td></tr>
     </table>
 
     <table width="100%">
+        <tr><td valign="top" colspan="4"><b><u>${_('Certified weights')}</u></b></td></tr>
+        <tr>
+            <td valign="top" width="25%">${_('Non-lifting parts')}:<br><b>${glider_card.certified_weight_non_lifting}</b></td>
+            <td valign="top" width="25%">${_('Empty glider')}:<br><b>${glider_card.certified_empty_weight}</b></td>
+            <td valign="top" width="25%">${_('Seat min.')}:<br><b>${glider_card.certified_min_seat_weight}</b></td>
+            <td valign="top" width="25%">${_('Seat max.')}:<br><b>${glider_card.certified_max_seat_weight}</b></td>
+        </tr>
         <tr><td valign="top" colspan="4"><b><u>${_('Measured weights')}</u></b></td></tr>
         <tr>
             <td valign="top">${_('Glider weight')}:<br><b>${glider_card.glider_weight}</b></td>
@@ -18,7 +26,10 @@
             <td valign="top" colspan="2">${_('Tow bar weight')}:<br><b>${glider_card.tow_bar_weight}</b></td>
         </tr>
         <tr><td valign="top" colspan="4">&nbsp;<br>
-        ${status[1]}<br>&nbsp;
+        % for s in status:
+        ${s}<br>
+        % endfor
+        <b>${coefficient_status}</b><br>&nbsp;
         </td></tr>
     </table>
 
