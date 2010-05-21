@@ -78,7 +78,6 @@ class IgcHandicapForm(wx.Dialog):
         fontbold = self.label_name.GetFont()
         fontbold.SetWeight(wx.FONTWEIGHT_BOLD)
         self.label_name.SetFont(fontbold)
-        self.label_coefficient.SetFont(fontbold)
 
         self.text_weight_non_lifting.SetMinSize((150,-1))
         self.text_mtow_without_water.SetMinSize((150,-1))
