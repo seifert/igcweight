@@ -428,7 +428,7 @@ class GliderCard(Base, Conversion):
             return self.certified_weight_non_lifting - self.glider_type.weight_non_lifting
         else:
             return None
-    
+
     @property
     def mtow_difference(self):
         " mtow_difference -> int or None - return difference between measured and igc mtow "
@@ -441,10 +441,10 @@ class GliderCard(Base, Conversion):
                 mtow = None
         referential_weight = self.referential_weight
         if referential_weight != None and mtow != None:
-            return referential_weight - self.glider_type.mtow
+            return referential_weight - mtow
         else:
             return None
-    
+
     @property
     def seat_weight_difference(self):
         " seat_weight_difference -> int or None - return difference between certified and igc non-lifting parts weight  "
