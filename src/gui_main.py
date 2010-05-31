@@ -118,7 +118,7 @@ class Main(wx.Frame):
         self.menu_glider_card.AppendItem(self.menu_glider_card_print_preview)
         self.main_menu.Append(self.menu_glider_card, _("&Glider card"))
         self.menu_daily_weight = wx.Menu()
-        self.menu_daily_weight_new = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&New..."), _("Add new daily weight"), wx.ITEM_NORMAL)
+        self.menu_daily_weight_new = wx.MenuItem(self.menu_daily_weight, wx.NewId(), "%s\t%s" % (_("&New..."), "Ctrl+Insert"), _("Add new daily weight"), wx.ITEM_NORMAL)
         self.menu_daily_weight.AppendItem(self.menu_daily_weight_new)
         self.menu_daily_weight_properties = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&Edit..."), _("Edit daily weight properties"), wx.ITEM_NORMAL)
         self.menu_daily_weight.AppendItem(self.menu_daily_weight_properties)
