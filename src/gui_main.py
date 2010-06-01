@@ -109,7 +109,10 @@ class Main(wx.Frame):
         self.menu_glider_card_delete = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Delete"), _("Delete glider"), wx.ITEM_NORMAL)
         self.menu_glider_card.AppendItem(self.menu_glider_card_delete)
         self.menu_glider_card.AppendSeparator()
-        self.menu_glider_card_show_photo = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Show photo"), _("Show photo in the external application"), wx.ITEM_NORMAL)
+        self.menu_glider_card_find = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Find\tCtrl+F"), _("Find glider"), wx.ITEM_NORMAL)
+        self.menu_glider_card.AppendItem(self.menu_glider_card_find)
+        self.menu_glider_card.AppendSeparator()
+        self.menu_glider_card_show_photo = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Show photo\tAlt+V"), _("Show photo in the external application"), wx.ITEM_NORMAL)
         self.menu_glider_card.AppendItem(self.menu_glider_card_show_photo)
         self.menu_glider_card.AppendSeparator()
         self.menu_glider_card_print = wx.MenuItem(self.menu_glider_card, wx.NewId(), _("&Print...\tCtrl+P"), _("Print glider card"), wx.ITEM_NORMAL)
@@ -118,7 +121,7 @@ class Main(wx.Frame):
         self.menu_glider_card.AppendItem(self.menu_glider_card_print_preview)
         self.main_menu.Append(self.menu_glider_card, _("&Glider card"))
         self.menu_daily_weight = wx.Menu()
-        self.menu_daily_weight_new = wx.MenuItem(self.menu_daily_weight, wx.NewId(), "%s\t%s" % (_("&New..."), "Ctrl+Insert"), _("Add new daily weight"), wx.ITEM_NORMAL)
+        self.menu_daily_weight_new = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&New...\tCtrl+Insert"), _("Add new daily weight"), wx.ITEM_NORMAL)
         self.menu_daily_weight.AppendItem(self.menu_daily_weight_new)
         self.menu_daily_weight_properties = wx.MenuItem(self.menu_daily_weight, wx.NewId(), _("&Edit..."), _("Edit daily weight properties"), wx.ITEM_NORMAL)
         self.menu_daily_weight.AppendItem(self.menu_daily_weight_properties)
@@ -239,6 +242,7 @@ class Main(wx.Frame):
         self.Bind(wx.EVT_MENU, self.GliderCardNew, self.menu_glider_card_new)
         self.Bind(wx.EVT_MENU, self.GliderCardProperties, self.menu_glider_card_properties)
         self.Bind(wx.EVT_MENU, self.GliderCardDelete, self.menu_glider_card_delete)
+        self.Bind(wx.EVT_MENU, self.GliderCardFind, self.menu_glider_card_find)
         self.Bind(wx.EVT_MENU, self.GliderCardPrint, self.menu_glider_card_print)
         self.Bind(wx.EVT_MENU, self.GliderCardPrintPreview, self.menu_glider_card_print_preview)
         self.Bind(wx.EVT_MENU, self.ShowPhoto, self.menu_glider_card_show_photo)
@@ -842,6 +846,10 @@ class Main(wx.Frame):
             report.PreviewText(html)
         else:
             report.PrintText(html)
+
+    def GliderCardFind(self, evt=None):
+        " GliderCardFind(self, Event evt=None) - set text_find as active control "
+        self.text_find.SetFocus()
 
     def GliderCardPrint(self, evt=None):
         " GliderCardPrint(self, Event evt=None) - print glider card event handler "
