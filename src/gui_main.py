@@ -1167,13 +1167,19 @@ class Main(wx.Frame):
         except:
             pass
 
-        mime_man = wx.MimeTypesManager()
-        mime_type = mime_man.GetFileTypeFromExtension( splitext(full_path)[1].replace('.', '') )
-        command = mime_type.GetOpenCommand(full_path) 
+        try:
+            mime_man = wx.MimeTypesManager()
+            mime_type = mime_man.GetFileTypeFromExtension( splitext(full_path)[1].replace('.', '') )
+            command = mime_type.GetOpenCommand(full_path)
+        except:
+            command = None
+
         if command == None:
             if settings.SHOW_PHOTO_APP == None:
                 dlg = wx.MessageBox(
-                                    _("No application is associated to open %s MIME type. Please, choose the program.") % mime_type.MimeType,
+                                    # TODO: mime_type can be None
+#                                    _("No application is associated to open %s MIME type. Please, choose the program.") % mime_type.MimeType,
+                                    _("No application is associated to open image. Please, choose the program."),
                                     _("Show photo"), wx.OK | wx.CANCEL | wx.ICON_QUESTION, self
                                    )
                 if dlg == wx.OK:
