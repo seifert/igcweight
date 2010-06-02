@@ -963,6 +963,7 @@ class Main(wx.Frame):
             self.RefreshGliderCard()
         else:
             self.AllGliderCard()
+        self.list_glider_card.SetFocus()
 
     def AllGliderCard(self, evt=None):
         " AllGliderCard(self, Event evt=None) - cancel filter glider card and show all data "
