@@ -15,6 +15,7 @@ from sqlalchemy import Table, MetaData, Column, ForeignKey, Sequence
 from sqlalchemy import Integer, SmallInteger, String, Text, DateTime, Numeric, Boolean, CHAR
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy import desc
+from sqlalchemy.orm import MapperExtension
 from sqlalchemy.orm import relation, backref
 from sqlalchemy import types as sqltypes
 
@@ -104,6 +105,12 @@ class Conversion():
 Base = declarative_base()
 
 
+class OrganizationExtensions(MapperExtension):
+    def before_delete(self, mapper, connection, instance):
+        if instance.glider_card:
+            raise Exception(_("Organization is being used in the glider card!"))
+
+
 class Organization(Base, Conversion):
     " Model Organization "
     
@@ -116,7 +123,9 @@ class Organization(Base, Conversion):
         UniqueConstraint( 'name', name='uq_organization_name' ),
         UniqueConstraint( 'code', name='uq_organization_code' )
     )
-    
+
+    __mapper_args__ = {'extension': OrganizationExtensions()}
+
     def __init__(self, **kwargs):
         " Organization(self, str name=None, str description=None "
         for key in kwargs.keys():
@@ -141,6 +150,12 @@ class Organization(Base, Conversion):
         return self.GetDescription()
 
 
+class PilotExtensions(MapperExtension):
+    def before_delete(self, mapper, connection, instance):
+        if instance.glider_card:
+            raise Exception(_("Pilot is being used in the glider card!"))
+
+
 class Pilot(Base, Conversion):
     " Model Pilot "
 
@@ -155,7 +170,9 @@ class Pilot(Base, Conversion):
         PrimaryKeyConstraint( 'id', name='pk_pilot' ),
         UniqueConstraint( 'surname', 'firstname', 'degree', name='uq_pilot_name' )
     )
-    
+
+    __mapper_args__ = {'extension': PilotExtensions()}
+
     def __init__(self, **kwargs):
         """ Pilot(self, str degree=None, str firstname=None, str surname=None,
         int year_of_birth=None, str sex=None, str description=None """
@@ -197,6 +214,12 @@ class Pilot(Base, Conversion):
         return self.GetDescription()
 
 
+class GliderTypeExtensions(MapperExtension):
+    def before_delete(self, mapper, connection, instance):
+        if instance.glider_card:
+            raise Exception(_("Glider type is being used in the glider card!"))
+
+
 class GliderType(Base, Conversion):
     " Model GliderType "
 
@@ -213,7 +236,9 @@ class GliderType(Base, Conversion):
         PrimaryKeyConstraint( 'id', name='pk_glider_type' ),
         UniqueConstraint( 'name', name='uq_glider_type_name' )
     )
-    
+
+    __mapper_args__ = {'extension': GliderTypeExtensions()}
+
     def __init__(self, **kwargs):
         """ GliderType(self, str name=None, bool club_class=False, Decimal coefficient=None, int weight_non_lifting=None,
         int mtow_without_water=None, int mtow=None, int weight_referential=None, str description=None """
@@ -349,7 +374,7 @@ class GliderCard(Base, Conversion):
     )
 
     glider_type = relation( GliderType, order_by=GliderType.name )
-    pilot = relation( Pilot, order_by=Pilot.surname )
+    pilot = relation( Pilot, order_by=Pilot.surname, backref='glider_card' )
     organization = relation( Organization, order_by=Organization.name )
     photos = relation( Photo, order_by=Photo.id, backref='glider_card', cascade='all' )
     daily_weight = relation(DailyWeight, order_by=desc(DailyWeight.date), backref='glider_card', cascade='all' )
