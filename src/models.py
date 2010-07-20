@@ -15,7 +15,7 @@ from sqlalchemy import Table, MetaData, Column, ForeignKey, Sequence
 from sqlalchemy import Integer, SmallInteger, String, Text, DateTime, Numeric, Boolean, CHAR
 from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy import desc
-from sqlalchemy.orm import MapperExtension
+from sqlalchemy.orm import MapperExtension, EXT_CONTINUE
 from sqlalchemy.orm import relation, backref
 from sqlalchemy import types as sqltypes
 
@@ -109,7 +109,7 @@ class OrganizationExtensions(MapperExtension):
     def before_delete(self, mapper, connection, instance):
         if instance.glider_card:
             raise Exception(_("Organization is being used in the glider card!"))
-
+        return EXT_CONTINUE
 
 class Organization(Base, Conversion):
     " Model Organization "
@@ -154,7 +154,7 @@ class PilotExtensions(MapperExtension):
     def before_delete(self, mapper, connection, instance):
         if instance.glider_card:
             raise Exception(_("Pilot is being used in the glider card!"))
-
+        return EXT_CONTINUE
 
 class Pilot(Base, Conversion):
     " Model Pilot "
@@ -218,7 +218,7 @@ class GliderTypeExtensions(MapperExtension):
     def before_delete(self, mapper, connection, instance):
         if instance.glider_card:
             raise Exception(_("Glider type is being used in the glider card!"))
-
+        return EXT_CONTINUE
 
 class GliderType(Base, Conversion):
     " Model GliderType "
@@ -373,9 +373,9 @@ class GliderCard(Base, Conversion):
         UniqueConstraint( 'pilot_id', name='uq_glider_card_pilot' )
     )
 
-    glider_type = relation( GliderType, order_by=GliderType.name )
+    glider_type = relation( GliderType, order_by=GliderType.name, backref='glider_card' )
     pilot = relation( Pilot, order_by=Pilot.surname, backref='glider_card' )
-    organization = relation( Organization, order_by=Organization.name )
+    organization = relation( Organization, order_by=Organization.name, backref='glider_card' )
     photos = relation( Photo, order_by=Photo.id, backref='glider_card', cascade='all' )
     daily_weight = relation(DailyWeight, order_by=desc(DailyWeight.date), backref='glider_card', cascade='all' )
 
