@@ -3,6 +3,7 @@
 from sqlalchemy.engine.url import URL
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.interfaces import PoolListener
 
 import settings
 
@@ -13,7 +14,16 @@ if settings.DB_HOST != '': __engine_url['host'] = settings.DB_HOST
 if settings.DB_PORT != '': __engine_url['port'] = settings.DB_PORT
 if settings.DB_DATABASE != '': __engine_url['database'] = settings.DB_DATABASE
 
-engine = create_engine( URL(**__engine_url), echo=settings.DEBUG, convert_unicode=True )
+class ForeignKeysListener(PoolListener):
+    def connect(self, dbapi_con, con_record):
+        dbapi_con.execute('pragma foreign_keys=ON')
+
+engine = create_engine(
+    URL(**__engine_url),
+    echo=settings.DEBUG,
+    convert_unicode=True,
+    listeners=[ForeignKeysListener()]
+)
 
 Session = sessionmaker(bind=engine, autoflush=True)
 session = Session()
