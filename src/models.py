@@ -170,7 +170,7 @@ class Pilot(Base, Conversion):
         Column( 'sex', CHAR(1) ),
         Column( 'description', Text ),
         PrimaryKeyConstraint( 'id', name='pk_pilot' ),
-        UniqueConstraint( 'surname', 'firstname', 'degree', name='uq_pilot_name' )
+        UniqueConstraint( 'surname', 'firstname', 'degree', 'year_of_birth', 'sex', name='uq_pilot_name' )
     )
 
     __mapper_args__ = {'extension': PilotExtensions()}
