@@ -107,7 +107,8 @@ Base = declarative_base()
 
 class OrganizationExtensions(MapperExtension):
     def before_delete(self, mapper, connection, instance):
-        if instance.glider_card:
+        from database import session
+        if session.query(GliderCard).filter(GliderCard.organization==instance).all():
             raise Exception(_("Organization is being used in the glider card!"))
         return EXT_CONTINUE
 
@@ -152,7 +153,8 @@ class Organization(Base, Conversion):
 
 class PilotExtensions(MapperExtension):
     def before_delete(self, mapper, connection, instance):
-        if instance.glider_card:
+        from database import session
+        if session.query(GliderCard).filter(GliderCard.pilot==instance).all():
             raise Exception(_("Pilot is being used in the glider card!"))
         return EXT_CONTINUE
 
@@ -216,7 +218,8 @@ class Pilot(Base, Conversion):
 
 class GliderTypeExtensions(MapperExtension):
     def before_delete(self, mapper, connection, instance):
-        if instance.glider_card:
+        from database import session
+        if session.query(GliderCard).filter(GliderCard.glider_type==instance).all():
             raise Exception(_("Glider type is being used in the glider card!"))
         return EXT_CONTINUE
 
@@ -373,9 +376,9 @@ class GliderCard(Base, Conversion):
         UniqueConstraint( 'pilot_id', name='uq_glider_card_pilot' )
     )
 
-    glider_type = relation( GliderType, order_by=GliderType.name, backref='glider_card' )
-    pilot = relation( Pilot, order_by=Pilot.surname, backref='glider_card' )
-    organization = relation( Organization, order_by=Organization.name, backref='glider_card' )
+    glider_type = relation( GliderType, order_by=GliderType.name )
+    pilot = relation( Pilot, order_by=Pilot.surname )
+    organization = relation( Organization, order_by=Organization.name )
     photos = relation( Photo, order_by=Photo.id, backref='glider_card', cascade='all' )
     daily_weight = relation(DailyWeight, order_by=desc(DailyWeight.date), backref='glider_card', cascade='all' )
 
