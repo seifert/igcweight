@@ -86,6 +86,8 @@ class Main(wx.Frame):
         self.menu_file.AppendItem(self.menu_import)
         self.menu_export = wx.MenuItem(self.menu_file, wx.NewId(), _("&Export..."), _("Export data into archive file"), wx.ITEM_NORMAL)
         self.menu_file.AppendItem(self.menu_export)
+        self.menu_clean = wx.MenuItem(self.menu_file, wx.NewId(), _("&Clean database..."), _("Clean old data from database"), wx.ITEM_NORMAL)
+        self.menu_file.AppendItem(self.menu_clean)
         self.menu_file.AppendSeparator()
         self.menu_exit = wx.MenuItem(self.menu_file, wx.NewId(), _("E&xit\tAlt-F4"), _("Exit application"), wx.ITEM_NORMAL)
         self.menu_file.AppendItem(self.menu_exit)
@@ -233,6 +235,7 @@ class Main(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.Exit, self)
         self.Bind(wx.EVT_MENU, self.Import, self.menu_import)
         self.Bind(wx.EVT_MENU, self.Export, self.menu_export)
+        self.Bind(wx.EVT_MENU, self.CleanDb, self.menu_clean)
         self.Bind(wx.EVT_MENU, self.Exit, self.menu_exit)
         self.Bind(wx.EVT_MENU, self.About, self.menu_about)
         self.Bind(wx.EVT_MENU, self.IgcHandicapList, self.menu_coefficients)
@@ -635,6 +638,18 @@ class Main(wx.Frame):
             error_message_dialog( self, _("Export data error"), e )
             if settings.DEBUG:
                 raise
+
+    def CleanDb(self, evt):
+        " CleanDb(self, Event evt) - clean old data from database "
+        dlg = wx.MessageDialog(self, _("Do you really want clean database?"\
+            "\n\nWARNING! This option is undoable!"), _("Clean database?"),
+            wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
+        try:
+            if dlg.ShowModal() == wx.ID_YES:
+                # TODO: clean database
+                pass
+        finally:
+            dlg.Destroy()
 
     def Exit(self, evt=None):
         " Exit(self, Event evt=None) - exit application event handler "
