@@ -31,7 +31,7 @@ from gui_igchandicap import IgcHandicapList, IgcHandicapForm, GLIDER_TYPE_INSERT
 from gui_organizations import OrganizationList, OrganizationForm, ORGANIZATION_INSERT_ERROR
 from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
 from gui_preferences import Preferences
-from importexport import patternt_tar, Export, Import
+from importexport import patternt_tar, Export, Import, CleanDb
 
 _fake_variable_1 = _('Glider card - club class')
 
@@ -653,9 +653,21 @@ class Main(wx.Frame):
 
         dlg = CleanDatabaseForm(self)
         try:
-            if dlg.ShowModal() == wx.ID_YES:
-                # TODO: clean database
-                pass
+            if dlg.ShowModal() == wx.ID_OK:
+                models = []
+
+                if dlg.cb_daily_weights.Value:
+                    models.append(DailyWeight)
+                if dlg.cb_glider_cards.Value:
+                    models.append(GliderCard)
+                if dlg.cb_organizations.Value:
+                    models.append(Organization)
+                if dlg.cb_pilots.Value:
+                    models.append(Pilot)
+                if dlg.cb_igc_handicaps.Value:
+                    models.append(GliderType)
+
+                CleanDb(models, dlg.cb_preferences.Value)
         finally:
             dlg.Destroy()
 

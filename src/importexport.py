@@ -155,3 +155,9 @@ def Import(fullpath, overwrite=False):
                     dst.close()
     finally:
         tar.close()
+
+
+def CleanDb(models, preferences):
+    " CleanDb(list models, bool preferences) - clean db models and settings "
+
+    raise NotImplementedError
