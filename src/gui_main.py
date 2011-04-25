@@ -642,7 +642,8 @@ class Main(wx.Frame):
     def CleanDb(self, evt):
         " CleanDb(self, Event evt) - clean old data from database "
         dlg = wx.MessageDialog(self, _("Do you really want clean database?"\
-            "\n\nWARNING! This option is undoable!"), _("Clean database?"),
+            "\n\nWARNING! This option is undoable! Backup your data "\
+            "before database cleaning!"), _("Clean database?"),
             wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
         try:
             if dlg.ShowModal() == wx.ID_YES:
