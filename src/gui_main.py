@@ -1780,7 +1780,7 @@ class CleanDatabaseForm(wx.Dialog):
     def __init__(self, *args, **kwds):
         wx.Dialog.__init__(self, *args, **kwds)
 
-        self.label = wx.StaticText(self, -1, _("Select which tables do you "\
+        self.label = wx.StaticText(self, -1, _("Please, select what do you "\
                                                "want to clean:"))
         self.cb_daily_weights = wx.CheckBox(self, -1, _("Daily weights"))
         self.cb_glider_cards = wx.CheckBox(self, -1, _("Glider cards"))
@@ -1805,6 +1805,7 @@ class CleanDatabaseForm(wx.Dialog):
     def __set_properties(self):
         self.SetTitle(_("Clean database"))
         self.button_ok.SetDefault()
+        self.__cb_changed(None)
 
     def __do_layout(self):
         sizer_buttons = wx.StdDialogButtonSizer()
@@ -1830,6 +1831,13 @@ class CleanDatabaseForm(wx.Dialog):
         self.CenterOnParent()
 
     def __cb_changed(self, evt):
+        if not (self.cb_igc_handicaps.Value or self.cb_pilots.Value or \
+                self.cb_organizations.Value or self.cb_glider_cards.Value or \
+                self.cb_daily_weights.Value or self.cb_preferences.Value):
+            self.button_ok.Enable(False)
+        else:
+            self.button_ok.Enable(True)
+
         if self.cb_igc_handicaps.Value or self.cb_pilots.Value or \
                                         self.cb_organizations.Value:
             self.cb_daily_weights.Value = True
