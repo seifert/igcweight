@@ -1764,7 +1764,6 @@ class DailyWeightForm(wx.Dialog):
             self.text_date.Value = dailyweight.column_as_str('date')
             self.text_tow_bar_weight.Value = dailyweight.column_as_str('tow_bar_weight')
 
-
 class CleanDatabaseForm(wx.Dialog):
     def __init__(self, *args, **kwds):
         wx.Dialog.__init__(self, *args, **kwds)
@@ -1815,6 +1814,7 @@ class CleanDatabaseForm(wx.Dialog):
 
         sizer_main.Fit(self)
         self.Layout()
+        self.SetMinSize((self.GetSize().width * 1.1, self.GetSize().height))
         self.CenterOnParent()
 
     def __cb_changed(self, evt):
