@@ -50,7 +50,12 @@ def _excepthook(etype, value, tb):
     else:
         message = unicode(value)
 
-    wx.MessageBox(message, _("IGC Weight error"), wx.OK | wx.ICON_ERROR, None)
+    dlg = wx.MessageDialog(wx.GetApp().GetTopWindow(), message,
+                           _("IGC Weight error"), wx.OK | wx.ICON_ERROR)
+    try:
+        dlg.ShowModal()
+    finally:
+        dlg.Close()
 
     if DEBUG:
         sys.__excepthook__(etype, value, tb)
