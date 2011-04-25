@@ -646,6 +646,13 @@ class Main(wx.Frame):
             "before database cleaning!"), _("Clean database?"),
             wx.YES_NO | wx.NO_DEFAULT | wx.ICON_WARNING)
         try:
+            if dlg.ShowModal() != wx.ID_YES:
+                return
+        finally:
+            dlg.Destroy()
+
+        dlg = CleanDatabaseForm(self)
+        try:
             if dlg.ShowModal() == wx.ID_YES:
                 # TODO: clean database
                 pass
@@ -1756,3 +1763,67 @@ class DailyWeightForm(wx.Dialog):
             self.dailyweight = dailyweight
             self.text_date.Value = dailyweight.column_as_str('date')
             self.text_tow_bar_weight.Value = dailyweight.column_as_str('tow_bar_weight')
+
+
+class CleanDatabaseForm(wx.Dialog):
+    def __init__(self, *args, **kwds):
+        wx.Dialog.__init__(self, *args, **kwds)
+
+        self.label = wx.StaticText(self, -1, _("Select which tables do you "\
+                                               "want to clean:"))
+        self.cb_daily_weights = wx.CheckBox(self, -1, _("Daily weights"))
+        self.cb_glider_cards = wx.CheckBox(self, -1, _("Glider cards"))
+        self.cb_igc_handicaps = wx.CheckBox(self, -1, _("IGC handicap list"))
+        self.cb_pilots = wx.CheckBox(self, -1, _("Pilots"))
+        self.cb_organizations = wx.CheckBox(self, -1, _("Organizations"))
+        self.cb_preferences = wx.CheckBox(self, -1, _("Preferences"))
+        self.button_ok = wx.Button(self, wx.ID_OK, "")
+        self.button_cancel = wx.Button(self, wx.ID_CANCEL, "")
+
+        self.__set_properties()
+        self.__do_layout()
+
+        # Bind events
+        self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_daily_weights)
+        self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_glider_cards)
+        self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_igc_handicaps)
+        self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_pilots)
+        self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_organizations)
+        self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_preferences)
+
+    def __set_properties(self):
+        self.SetTitle(_("Clean database"))
+        self.button_ok.SetDefault()
+
+    def __do_layout(self):
+        sizer_buttons = wx.StdDialogButtonSizer()
+        sizer_buttons.AddButton(self.button_ok)
+        sizer_buttons.AddButton(self.button_cancel)
+        sizer_buttons.Realize()
+
+        sizer_main = wx.BoxSizer(wx.VERTICAL)
+        sizer_main.Add(self.label, 0, wx.ALL, 4)
+        sizer_main.Add(self.cb_daily_weights, 0, wx.ALL, 4)
+        sizer_main.Add(self.cb_glider_cards, 0, wx.ALL, 4)
+        sizer_main.Add(self.cb_igc_handicaps, 0, wx.ALL, 4)
+        sizer_main.Add(self.cb_pilots, 0, wx.ALL, 4)
+        sizer_main.Add(self.cb_organizations, 0, wx.ALL, 4)
+        sizer_main.Add(self.cb_preferences, 0, wx.ALL, 4)
+        sizer_main.Add(sizer_buttons, 0, wx.ALL|wx.ALIGN_RIGHT, 4)
+
+        self.SetSizer(sizer_main)
+
+        sizer_main.Fit(self)
+        self.Layout()
+        self.CenterOnParent()
+
+    def __cb_changed(self, evt):
+        if self.cb_igc_handicaps.Value or self.cb_pilots.Value or \
+                                        self.cb_organizations.Value:
+            self.cb_daily_weights.Value = True
+            self.cb_glider_cards.Value = True
+            self.cb_daily_weights.Enable(False)
+            self.cb_glider_cards.Enable(False)
+        else:
+            self.cb_daily_weights.Enable(True)
+            self.cb_glider_cards.Enable(True)
