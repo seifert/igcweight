@@ -7,11 +7,11 @@ import decimal
 import wx
 from wx import GetTranslation as _
 
-pat = re.compile( locale.localeconv()['decimal_point'] )
+pat = re.compile(r"\%s" % locale.localeconv()['decimal_point'])
 
 def str_to_decimal(val):
     " str_to_decimal(str val) -> Decimal - convert string to Decimal "
-    return decimal.Decimal( pat.sub('.', val) )
+    return decimal.Decimal(pat.sub('.', val))
 
 class Preferences(wx.Dialog):
     def __init__(self, *args, **kwds):
