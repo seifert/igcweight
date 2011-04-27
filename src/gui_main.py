@@ -659,6 +659,7 @@ class Main(wx.Frame):
                 if dlg.cb_daily_weights.Value:
                     models.append(DailyWeight)
                 if dlg.cb_glider_cards.Value:
+                    models.append(Photo)
                     models.append(GliderCard)
                 if dlg.cb_organizations.Value:
                     models.append(Organization)
@@ -668,6 +669,10 @@ class Main(wx.Frame):
                     models.append(GliderType)
 
                 CleanDb(models, dlg.cb_preferences.Value)
+
+                self.list_glider_card.SetItemCount(0)
+                self.datasource_glider_card = self.BASE_QUERY.all()
+                self.RefreshGliderCard()
         finally:
             dlg.Destroy()
 
@@ -726,6 +731,7 @@ class Main(wx.Frame):
         " Preferences(self, Event evt=None) - open preferences window event handler "
         dlg = Preferences(self)
         try:
+            settings.configuration.read()
             dlg.gear_handicap = settings.configuration.gear_handicap
             dlg.winglets_handicap = settings.configuration.winglets_handicap
             dlg.overweight_handicap = settings.configuration.overweight_handicap
@@ -1831,13 +1837,6 @@ class CleanDatabaseForm(wx.Dialog):
         self.CenterOnParent()
 
     def __cb_changed(self, evt):
-        if not (self.cb_igc_handicaps.Value or self.cb_pilots.Value or \
-                self.cb_organizations.Value or self.cb_glider_cards.Value or \
-                self.cb_daily_weights.Value or self.cb_preferences.Value):
-            self.button_ok.Enable(False)
-        else:
-            self.button_ok.Enable(True)
-
         if self.cb_igc_handicaps.Value or self.cb_pilots.Value or \
                                         self.cb_organizations.Value:
             self.cb_daily_weights.Value = True
@@ -1847,3 +1846,15 @@ class CleanDatabaseForm(wx.Dialog):
         else:
             self.cb_daily_weights.Enable(True)
             self.cb_glider_cards.Enable(True)
+        if self.cb_glider_cards.Value:
+            self.cb_daily_weights.Value = True
+            self.cb_daily_weights.Enable(False)
+        else:
+            self.cb_daily_weights.Enable(True)
+
+        if not (self.cb_igc_handicaps.Value or self.cb_pilots.Value or \
+                self.cb_organizations.Value or self.cb_glider_cards.Value or \
+                self.cb_daily_weights.Value or self.cb_preferences.Value):
+            self.button_ok.Enable(False)
+        else:
+            self.button_ok.Enable(True)
