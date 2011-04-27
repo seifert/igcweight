@@ -3,8 +3,9 @@
 import re
 import codecs
 
-from os.path import join
-from shutil import copyfileobj
+from os.path import join, isdir
+from os import mkdir
+from shutil import copyfileobj, rmtree
 from datetime import datetime
 from tarfile import open as taropen
 from xml.dom.minidom import getDOMImplementation, parse, Node
@@ -13,6 +14,7 @@ import settings
 
 from database import session
 from models import GliderCard, Pilot, Organization, GliderType, Photo , DailyWeight
+from configuration import Configuration
 
 patternt_tar = re.compile( r'^.+\.tar$', re.IGNORECASE )
 patternt_jpg = re.compile( r'^[a-z0-9]{32,32}\.jpg$', re.IGNORECASE )
@@ -159,5 +161,22 @@ def Import(fullpath, overwrite=False):
 
 def CleanDb(models, preferences):
     " CleanDb(list models, bool preferences) - clean db models and settings "
+    try:
+        for model in models:
+            session.query(model).delete()
+            session.flush()
+        session.commit()
+    except:
+        session.rollback()
+        raise
 
-    raise NotImplementedError
+    if Photo in models:
+        rmtree(settings.PHOTOS_DIR, ignore_errors=False)
+        if not isdir(settings.PHOTOS_DIR):
+            mkdir(settings.PHOTOS_DIR)
+        rmtree(settings.IMG_CACHE_DIR, ignore_errors=False)
+        if not isdir(settings.IMG_CACHE_DIR):
+            mkdir(settings.IMG_CACHE_DIR)
+
+    if preferences:
+        Configuration(settings.CONFIG_FILE, force_defaults=True)
