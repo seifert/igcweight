@@ -21,7 +21,7 @@ from sqlalchemy import types as sqltypes
 
 import settings
 
-pat = re.compile( locale.localeconv()['decimal_point'] )
+pat = re.compile(r"\%s" % locale.localeconv()['decimal_point'])
 
 def str_to_decimal(val):
     " str_to_decimal(str val) -> Decimal - convert string to Decimal "
