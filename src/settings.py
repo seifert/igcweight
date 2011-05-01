@@ -9,7 +9,11 @@ from configuration import Configuration
 
 VERSION_APP = (0, 9, 4)
 VERSION_DB  = (0, 9)
-VERSION = ".".join( str(s) for s in VERSION_APP )
+VERSION_GIT = ""
+VERSION = ".".join(str(s) for s in VERSION_APP)
+
+if VERSION_GIT:
+    VERSION = "%s-%s" % (VERSION, VERSION_GIT)
 
 DEBUG = True
 
