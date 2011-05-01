@@ -7,7 +7,7 @@ from getopt import getopt
 
 from configuration import Configuration
 
-VERSION_APP = (0, 9, 4)
+VERSION_APP = (0, 9, 5)
 VERSION_DB  = (0, 9)
 VERSION_GIT = ""
 VERSION = ".".join(str(s) for s in VERSION_APP)
