@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGC Weight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-01 13:21+0200\n"
-"PO-Revision-Date: 2011-05-01 13:30+0100\n"
+"POT-Creation-Date: 2011-05-02 20:52+0200\n"
+"PO-Revision-Date: 2011-05-02 20:54+0100\n"
 "Last-Translator: Jan Seifert <jan.seifert@fotkyzcest.net>\n"
 "Language-Team: Jan Seifert <jan.seifert@fotkyzcest.net>\n"
 "Language: \n"
@@ -47,34 +47,34 @@ msgid "&Delete\tCtrl+Delete"
 msgstr "&Smazat\tCtrl+Delete"
 
 #: src/gui_dialogmodel.py:208
-#: src/gui_main.py:822
-#: src/gui_main.py:967
+#: src/gui_main.py:829
+#: src/gui_main.py:974
 #, python-format
 msgid "Are you sure to delete %s?"
 msgstr "Chcete opravdu smazat %s?"
 
 #: src/gui_dialogmodel.py:209
-#: src/gui_main.py:823
-#: src/gui_main.py:968
+#: src/gui_main.py:830
+#: src/gui_main.py:975
 #, python-format
 msgid "Delete %s?"
 msgstr "Smazat %s?"
 
 #: src/gui_forms.py:16
 #: src/gui_main.py:224
-#: src/gui_main.py:1712
+#: src/gui_main.py:1719
 msgid "Date"
 msgstr "Datum"
 
 #: src/gui_forms.py:17
 #: src/gui_main.py:194
-#: src/gui_main.py:1292
-#: src/gui_main.py:1713
+#: src/gui_main.py:1299
+#: src/gui_main.py:1720
 msgid "Tow bar weight"
 msgstr "Hmotnost na vlečné tyči"
 
 #: src/gui_forms.py:29
-#: src/gui_main.py:1727
+#: src/gui_main.py:1734
 msgid "Daily weight"
 msgstr "Denní vážení"
 
@@ -109,7 +109,7 @@ msgid "Allowed difference:"
 msgstr "Povolený rozdíl:"
 
 #: src/gui_forms.py:81
-#: src/gui_main.py:1796
+#: src/gui_main.py:1805
 #: src/gui_preferences.py:38
 msgid "Preferences"
 msgstr "Nastavení"
@@ -117,7 +117,7 @@ msgstr "Nastavení"
 #: src/gui_forms.py:137
 #: src/gui_forms.py:299
 #: src/gui_main.py:79
-#: src/gui_main.py:1254
+#: src/gui_main.py:1261
 msgid "Photo"
 msgstr "Obrázek"
 
@@ -126,7 +126,7 @@ msgstr "Obrázek"
 #: src/gui_main.py:145
 #: src/gui_main.py:157
 #: src/gui_main.py:220
-#: src/gui_main.py:1258
+#: src/gui_main.py:1265
 msgid "Registration"
 msgstr "Imatrikulace"
 
@@ -134,7 +134,7 @@ msgstr "Imatrikulace"
 #: src/gui_forms.py:337
 #: src/gui_main.py:144
 #: src/gui_main.py:158
-#: src/gui_main.py:1257
+#: src/gui_main.py:1264
 msgid "Competition number"
 msgstr "Startovní číslo"
 
@@ -145,16 +145,16 @@ msgstr "Startovní číslo"
 #: src/gui_main.py:146
 #: src/gui_main.py:161
 #: src/gui_main.py:221
-#: src/gui_main.py:1261
+#: src/gui_main.py:1268
 msgid "Glider type"
 msgstr "Typ kluzáku"
 
 #: src/gui_forms.py:144
 #: src/gui_forms.py:147
 #: src/gui_forms.py:150
-#: src/gui_main.py:1263
-#: src/gui_main.py:1266
-#: src/gui_main.py:1269
+#: src/gui_main.py:1270
+#: src/gui_main.py:1273
+#: src/gui_main.py:1276
 msgid "Add..."
 msgstr "Přidat..."
 
@@ -163,7 +163,7 @@ msgstr "Přidat..."
 #: src/gui_forms.py:342
 #: src/gui_main.py:165
 #: src/gui_main.py:222
-#: src/gui_main.py:1264
+#: src/gui_main.py:1271
 #: src/gui_pilots.py:77
 msgid "Pilot"
 msgstr "Pilot"
@@ -171,7 +171,7 @@ msgstr "Pilot"
 #: src/gui_forms.py:148
 #: src/gui_forms.py:344
 #: src/gui_main.py:167
-#: src/gui_main.py:1267
+#: src/gui_main.py:1274
 #: src/gui_organizations.py:62
 msgid "Organization or country"
 msgstr "Organizace/země"
@@ -179,14 +179,14 @@ msgstr "Organizace/země"
 #: src/gui_forms.py:151
 #: src/gui_forms.py:346
 #: src/gui_main.py:169
-#: src/gui_main.py:1271
+#: src/gui_main.py:1278
 msgid "Winglets"
 msgstr "Winglety"
 
 #: src/gui_forms.py:152
 #: src/gui_forms.py:347
 #: src/gui_main.py:170
-#: src/gui_main.py:1270
+#: src/gui_main.py:1277
 msgid "Landing gear"
 msgstr "Zatahovací podvozek"
 
@@ -195,30 +195,30 @@ msgstr "Zatahovací podvozek"
 #: src/gui_forms.py:348
 #: src/gui_forms.py:509
 #: src/gui_igchandicap.py:64
-#: src/gui_main.py:1295
+#: src/gui_main.py:1302
 #: src/gui_organizations.py:50
 #: src/gui_pilots.py:65
 msgid "Description"
 msgstr "Popis"
 
 #: src/gui_forms.py:167
-#: src/gui_main.py:875
-#: src/gui_main.py:1327
+#: src/gui_main.py:882
+#: src/gui_main.py:1334
 msgid "Glider card"
 msgstr "Karta kluzáku"
 
 #: src/gui_forms.py:169
-#: src/gui_main.py:1340
+#: src/gui_main.py:1347
 msgid "Add glider type"
 msgstr "Přidat nový typ kluzáku"
 
 #: src/gui_forms.py:170
-#: src/gui_main.py:1341
+#: src/gui_main.py:1348
 msgid "Add pilot"
 msgstr "Přidat nového pilota"
 
 #: src/gui_forms.py:171
-#: src/gui_main.py:1342
+#: src/gui_main.py:1349
 msgid "Add organization or country"
 msgstr "Přidat novou organizaci nebo stát"
 
@@ -373,7 +373,7 @@ msgstr ""
 
 #: src/gui_forms.py:386
 #: src/gui_main.py:294
-#: src/gui_main.py:1225
+#: src/gui_main.py:1232
 msgid "Show photo"
 msgstr "Zobrazit fotografii"
 
@@ -442,7 +442,7 @@ msgid "Glider type delete error"
 msgstr "Došlo k chybě při mazání typu kluzáku"
 
 #: src/gui_igchandicap.py:21
-#: src/gui_main.py:1793
+#: src/gui_main.py:1802
 msgid "IGC handicap list"
 msgstr "IGC seznam koeficientů"
 
@@ -685,12 +685,12 @@ msgid "Measured weights:"
 msgstr "Vážení:"
 
 #: src/gui_main.py:190
-#: src/gui_main.py:1288
+#: src/gui_main.py:1295
 msgid "Glider weight"
 msgstr "Kluzák"
 
 #: src/gui_main.py:192
-#: src/gui_main.py:1290
+#: src/gui_main.py:1297
 msgid "Pilot weight"
 msgstr "Pilot s padákem"
 
@@ -711,12 +711,12 @@ msgid "Status"
 msgstr "Stav"
 
 #: src/gui_main.py:293
-#: src/gui_main.py:1343
+#: src/gui_main.py:1350
 msgid "Previous photo"
 msgstr "Předchozí fotografie"
 
 #: src/gui_main.py:295
-#: src/gui_main.py:1347
+#: src/gui_main.py:1354
 msgid "Next photo"
 msgstr "Další fotografie"
 
@@ -763,139 +763,147 @@ msgstr ""
 msgid "Clean database?"
 msgstr "Vyčistit databázi?"
 
-#: src/gui_main.py:687
+#: src/gui_main.py:694
 msgid "Exit application?"
 msgstr "Chcete opravdu ukončit aplikaci?"
 
-#: src/gui_main.py:687
+#: src/gui_main.py:694
 msgid "Exit?"
 msgstr "Ukončit?"
 
-#: src/gui_main.py:699
+#: src/gui_main.py:706
 msgid "Final version will be released under open source license"
 msgstr "Finální verze bude uvolněna pod open source licencí"
 
-#: src/gui_main.py:752
+#: src/gui_main.py:759
 msgid "Preferences save error"
 msgstr "Došlo k chybě při ukládání nastavení!"
 
-#: src/gui_main.py:789
+#: src/gui_main.py:796
 msgid "Glider card insert error"
 msgstr "Došlo k chybě při vkládání nové karty kluzáku"
 
-#: src/gui_main.py:814
+#: src/gui_main.py:821
 msgid "Glider card edit error"
 msgstr "Došlo k chybě při editaci karty kluzáku"
 
-#: src/gui_main.py:845
+#: src/gui_main.py:852
 msgid "Glider card delete error"
 msgstr "Došlo k chybě při mazání karty kluzáku"
 
-#: src/gui_main.py:933
+#: src/gui_main.py:940
 msgid "Daily weight insert error"
 msgstr "Došlo k chybě při vkládání denního vážení"
 
-#: src/gui_main.py:959
+#: src/gui_main.py:966
 msgid "Daily weight edit error"
 msgstr "Došlo k chybě při změně denního vážení"
 
-#: src/gui_main.py:988
+#: src/gui_main.py:995
 msgid "Daily weight delete error"
 msgstr "Došlo k chybě při mazání denního vážení"
 
-#: src/gui_main.py:1060
-#: src/gui_main.py:1061
+#: src/gui_main.py:1067
+#: src/gui_main.py:1068
 msgid "True"
 msgstr "Ano"
 
-#: src/gui_main.py:1060
-#: src/gui_main.py:1061
+#: src/gui_main.py:1067
+#: src/gui_main.py:1068
 msgid "False"
 msgstr "Ne"
 
-#: src/gui_main.py:1224
+#: src/gui_main.py:1231
 msgid "No application is associated to open image. Please, choose the program."
 msgstr "Pro zobrazení obrázku není asociován žádný program, vyberte jej ručně."
 
-#: src/gui_main.py:1229
-#: src/gui_main.py:1532
+#: src/gui_main.py:1236
+#: src/gui_main.py:1539
 msgid "Open file"
 msgstr "Otevřít soubor"
 
-#: src/gui_main.py:1255
+#: src/gui_main.py:1262
 msgid "Certified weights"
 msgstr "Protokol o vážení"
 
-#: src/gui_main.py:1256
+#: src/gui_main.py:1263
 msgid "Measured weights"
 msgstr "Vážení"
 
-#: src/gui_main.py:1280
+#: src/gui_main.py:1287
 msgid "Non-lifting parts weight"
 msgstr "Nevztlakové části"
 
-#: src/gui_main.py:1282
+#: src/gui_main.py:1289
 msgid "Empty glider weight"
 msgstr "Prázdný kluzák"
 
-#: src/gui_main.py:1284
+#: src/gui_main.py:1291
 msgid "Seat minimum weight"
 msgstr "Zatížení sedačky min."
 
-#: src/gui_main.py:1286
+#: src/gui_main.py:1293
 msgid "Seat maximum weight"
 msgstr "Zatížení sedačky max."
 
-#: src/gui_main.py:1344
+#: src/gui_main.py:1351
 msgid "Add new photo from file"
 msgstr "Přidat fotografii ze souboru"
 
-#: src/gui_main.py:1345
+#: src/gui_main.py:1352
 msgid "Set as a main photo"
 msgstr "Nastavit jako hlavní fotografii"
 
-#: src/gui_main.py:1346
+#: src/gui_main.py:1353
 msgid "Delete photo"
 msgstr "Smazat fotografii"
 
-#: src/gui_main.py:1533
+#: src/gui_main.py:1540
 msgid "JPEG files"
 msgstr "obrázky JPEG"
 
-#: src/gui_main.py:1549
+#: src/gui_main.py:1556
 msgid "Photo already exists!"
 msgstr "Fotografie již existuje!"
 
-#: src/gui_main.py:1715
+#: src/gui_main.py:1722
 msgid "Today"
 msgstr "Dnes"
 
-#: src/gui_main.py:1728
+#: src/gui_main.py:1735
 msgid "Set today date"
 msgstr "Nastavit dnešní datum"
 
-#: src/gui_main.py:1789
+#: src/gui_main.py:1796
 msgid "Please, select what do you want to clean:"
 msgstr "Vyberte, co chcete vyčistit:"
 
-#: src/gui_main.py:1791
+#: src/gui_main.py:1798
 msgid "Daily weights"
 msgstr "Denní vážení"
 
-#: src/gui_main.py:1792
+#: src/gui_main.py:1799
+msgid "Photos"
+msgstr "Obrázky"
+
+#: src/gui_main.py:1800
+msgid "Initial measurements"
+msgstr "Úvodní vážení"
+
+#: src/gui_main.py:1801
 msgid "Glider cards"
 msgstr "Karty kluzáku"
 
-#: src/gui_main.py:1794
+#: src/gui_main.py:1803
 #: src/gui_pilots.py:21
 msgid "Pilots"
 msgstr "Piloti"
 
-#: src/gui_main.py:1795
+#: src/gui_main.py:1804
 msgid "Organizations"
 msgstr "Organizace/země"
 
-#: src/gui_main.py:1812
+#: src/gui_main.py:1823
 msgid "Clean database"
 msgstr "Vyčistit databázi"
 
