@@ -159,12 +159,19 @@ def Import(fullpath, overwrite=False):
         tar.close()
 
 
-def CleanDb(models, preferences):
-    " CleanDb(list models, bool preferences) - clean db models and settings "
+def CleanDb(models, preferences, measured_weights):
+    " CleanDb(list models, bool preferences, bool measured_weights) -" \
+    " clean db models, photos and settings "
     try:
         for model in models:
             session.query(model).delete()
             session.flush()
+
+        if measured_weights:
+            session.query(GliderCard).update({'glider_weight': None,
+                'pilot_weight': None, 'tow_bar_weight': None,},
+                synchronize_session=False)
+
         session.commit()
     except:
         session.rollback()

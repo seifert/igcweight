@@ -658,8 +658,9 @@ class Main(wx.Frame):
 
                 if dlg.cb_daily_weights.Value:
                     models.append(DailyWeight)
-                if dlg.cb_glider_cards.Value:
+                if dlg.cb_photos.Value:
                     models.append(Photo)
+                if dlg.cb_glider_cards.Value:
                     models.append(GliderCard)
                 if dlg.cb_organizations.Value:
                     models.append(Organization)
@@ -668,7 +669,13 @@ class Main(wx.Frame):
                 if dlg.cb_igc_handicaps.Value:
                     models.append(GliderType)
 
-                CleanDb(models, dlg.cb_preferences.Value)
+                if dlg.cb_measured_weights.Value and \
+                                            not dlg.cb_glider_cards.Value:
+                    measured_weights = True
+                else:
+                    measured_weights = False
+
+                CleanDb(models, dlg.cb_preferences.Value, measured_weights)
 
                 self.list_glider_card.SetItemCount(0)
                 self.datasource_glider_card = self.BASE_QUERY.all()
@@ -1789,6 +1796,8 @@ class CleanDatabaseForm(wx.Dialog):
         self.label = wx.StaticText(self, -1, _("Please, select what do you "\
                                                "want to clean:"))
         self.cb_daily_weights = wx.CheckBox(self, -1, _("Daily weights"))
+        self.cb_photos = wx.CheckBox(self, -1, _("Photos"))
+        self.cb_measured_weights = wx.CheckBox(self, -1, _("Initial measurements"))
         self.cb_glider_cards = wx.CheckBox(self, -1, _("Glider cards"))
         self.cb_igc_handicaps = wx.CheckBox(self, -1, _("IGC handicap list"))
         self.cb_pilots = wx.CheckBox(self, -1, _("Pilots"))
@@ -1802,6 +1811,8 @@ class CleanDatabaseForm(wx.Dialog):
 
         # Bind events
         self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_daily_weights)
+        self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_photos)
+        self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_measured_weights)
         self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_glider_cards)
         self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_igc_handicaps)
         self.Bind(wx.EVT_CHECKBOX, self.__cb_changed, self.cb_pilots)
@@ -1822,6 +1833,8 @@ class CleanDatabaseForm(wx.Dialog):
         sizer_main = wx.BoxSizer(wx.VERTICAL)
         sizer_main.Add(self.label, 0, wx.ALL, 4)
         sizer_main.Add(self.cb_daily_weights, 0, wx.ALL, 4)
+        sizer_main.Add(self.cb_photos, 0, wx.ALL, 4)
+        sizer_main.Add(self.cb_measured_weights, 0, wx.ALL, 4)
         sizer_main.Add(self.cb_glider_cards, 0, wx.ALL, 4)
         sizer_main.Add(self.cb_igc_handicaps, 0, wx.ALL, 4)
         sizer_main.Add(self.cb_pilots, 0, wx.ALL, 4)
@@ -1840,20 +1853,34 @@ class CleanDatabaseForm(wx.Dialog):
         if self.cb_igc_handicaps.Value or self.cb_pilots.Value or \
                                         self.cb_organizations.Value:
             self.cb_daily_weights.Value = True
+            self.cb_photos.Value = True
+            self.cb_measured_weights.Value = True
             self.cb_glider_cards.Value = True
+            self.cb_photos.Value = True
             self.cb_daily_weights.Enable(False)
+            self.cb_photos.Enable(False)
+            self.cb_measured_weights.Enable(False)
             self.cb_glider_cards.Enable(False)
         else:
             self.cb_daily_weights.Enable(True)
+            self.cb_photos.Enable(True)
+            self.cb_measured_weights.Enable(True)
             self.cb_glider_cards.Enable(True)
         if self.cb_glider_cards.Value:
             self.cb_daily_weights.Value = True
+            self.cb_photos.Value = True
+            self.cb_measured_weights.Value = True
             self.cb_daily_weights.Enable(False)
+            self.cb_photos.Enable(False)
+            self.cb_measured_weights.Enable(False)
         else:
             self.cb_daily_weights.Enable(True)
+            self.cb_photos.Enable(True)
+            self.cb_measured_weights.Enable(True)
 
         if not (self.cb_igc_handicaps.Value or self.cb_pilots.Value or \
                 self.cb_organizations.Value or self.cb_glider_cards.Value or \
+                self.cb_photos.Value or self.cb_measured_weights.Value or \
                 self.cb_daily_weights.Value or self.cb_preferences.Value):
             self.button_ok.Enable(False)
         else:
