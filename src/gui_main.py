@@ -1,11 +1,10 @@
 " GUI - Main window "
 
 import os
-import sys
 import locale
 
 from os import remove, system
-from os.path import isfile, splitext, abspath, dirname
+from os.path import splitext, abspath, dirname
 from os.path import join as joinpath
 from shutil import copy
 from hashlib import md5
@@ -20,7 +19,10 @@ from wx import GetTranslation as _
 from sqlalchemy import or_, desc
 from sqlalchemy.orm import eagerload, join
 
-from mako.template import Template
+try:
+    from mako.template import Template
+except ImportError:
+    Template = None
 
 import settings
 
@@ -860,6 +862,9 @@ class Main(wx.Frame):
 
     def __glider_card_print(self, preview=False):
         " __glider_card_print(self, preview=False) - print glider card "
+        if Template is None:
+            raise Exception( _("Python Mako is not installed") )
+
         record = self.list_glider_card.current_item
 
         status = [
