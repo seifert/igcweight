@@ -1,11 +1,16 @@
-" Read and write configuration "
+"""
+Read and write configuration
+"""
 
 from os.path import isfile
 from decimal import Decimal
 from ConfigParser import ConfigParser, DEFAULTSECT
 
-class Configuration():
-    " Parse config file "
+
+class Configuration(object):
+    """
+    Parse config file
+    """
 
     __defaults__ = {
         'gear_handicap': Decimal('0.02'),
@@ -16,7 +21,9 @@ class Configuration():
     }
 
     def __init__(self, fullpath, force_defaults=False):
-        " __init__(self, str fullpath, bool force_defaults=False) "
+        """
+        __init__(self, str fullpath, bool force_defaults=False)
+        """
         self.__fullpath = fullpath
         self.__force_defaults = force_defaults
 
@@ -27,7 +34,9 @@ class Configuration():
         self.save()
 
     def read(self):
-        " read(self) - read configuration "
+        """
+        read(self) - read configuration
+        """
         defaults = {}
         for k in self.__defaults__.keys():
             defaults[k] = str(self.__defaults__[k])
@@ -41,21 +50,33 @@ class Configuration():
             finally:
                 f.close()
 
-        self.set_gear_handicap(config.get(DEFAULTSECT, "gear_handicap"))
-        self.set_winglets_handicap(config.get(DEFAULTSECT, "winglets_handicap"))
-        self.set_overweight_handicap(config.get(DEFAULTSECT, "overweight_handicap"))
-        self.set_overweight_step(config.get(DEFAULTSECT, "overweight_step"))
-        self.set_allowed_difference(config.get(DEFAULTSECT, "allowed_difference"))
+        self.set_gear_handicap(
+            config.get(DEFAULTSECT, "gear_handicap"))
+        self.set_winglets_handicap(
+            config.get(DEFAULTSECT, "winglets_handicap"))
+        self.set_overweight_handicap(
+            config.get(DEFAULTSECT, "overweight_handicap"))
+        self.set_overweight_step(
+            config.get(DEFAULTSECT, "overweight_step"))
+        self.set_allowed_difference(
+            config.get(DEFAULTSECT, "allowed_difference"))
 
     def save(self):
-        " save(self) - save configuration "
+        """
+        save(self) - save configuration
+        """
         config = ConfigParser()
 
-        config.set(DEFAULTSECT, "gear_handicap", str(self.gear_handicap))
-        config.set(DEFAULTSECT, "winglets_handicap", str(self.winglets_handicap))
-        config.set(DEFAULTSECT, "overweight_handicap", str(self.overweight_handicap))
-        config.set(DEFAULTSECT, "overweight_step", str(self.overweight_step))
-        config.set(DEFAULTSECT, "allowed_difference", str(self.allowed_difference))
+        config.set(
+            DEFAULTSECT, "gear_handicap", str(self.gear_handicap))
+        config.set(
+            DEFAULTSECT, "winglets_handicap", str(self.winglets_handicap))
+        config.set(
+            DEFAULTSECT, "overweight_handicap", str(self.overweight_handicap))
+        config.set(
+            DEFAULTSECT, "overweight_step", str(self.overweight_step))
+        config.set(
+            DEFAULTSECT, "allowed_difference", str(self.allowed_difference))
 
         f = open(self.__fullpath, 'wb')
         try:

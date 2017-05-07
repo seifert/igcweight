@@ -1,4 +1,6 @@
-" Import and export data module "
+"""
+Import and export data module
+"""
 
 import re
 import codecs
@@ -13,17 +15,20 @@ from xml.dom.minidom import getDOMImplementation, parse, Node
 import settings
 
 from database import session
-from models import GliderCard, Pilot, Organization, GliderType, Photo , DailyWeight
+from models import (
+    GliderCard, Pilot, Organization, GliderType, Photo, DailyWeight)
 from configuration import Configuration
 
-patternt_tar = re.compile( r'^.+\.tar$', re.IGNORECASE )
-patternt_jpg = re.compile( r'^[a-z0-9]{32,32}\.jpg$', re.IGNORECASE )
+patternt_tar = re.compile(r'^.+\.tar$', re.IGNORECASE)
+patternt_jpg = re.compile(r'^[a-z0-9]{32,32}\.jpg$', re.IGNORECASE)
 
-MODELS = ( Organization, Pilot, GliderType, GliderCard, Photo, DailyWeight )
+MODELS = (Organization, Pilot, GliderType, GliderCard, Photo, DailyWeight)
+
 
 def Export(fullpath):
-    " Export(str fullpath) - export data into archive file "
-    
+    """
+    Export(str fullpath) - export data into archive file
+    """
     # Create XML
     impl = getDOMImplementation()
     xml = impl.createDocument(None, "igcweight", None)
@@ -31,32 +36,39 @@ def Export(fullpath):
     # Add metadata into XML
     meta = xml.createElement('meta')
     element = xml.createElement('date')
-    element.appendChild( xml.createTextNode( datetime.now().strftime('%Y-%m-%d %H:%M:%S') ) )
+    element.appendChild(
+        xml.createTextNode(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
     meta.appendChild(element)
     element = xml.createElement('version')
-    element.appendChild( xml.createTextNode( ".".join( str(s) for s in settings.VERSION_DB ) ) )
+    element.appendChild(
+        xml.createTextNode(".".join(str(s) for s in settings.VERSION_DB)))
     meta.appendChild(element)
     top_element.appendChild(meta)
     # Add preferences into XML
     preferences = xml.createElement('preferences')
     element = xml.createElement('gear_handicap')
-    element.appendChild( xml.createTextNode( str(settings.configuration.gear_handicap) ) )
+    element.appendChild(
+        xml.createTextNode(str(settings.configuration.gear_handicap)))
     preferences.appendChild(element)
     element = xml.createElement('winglets_handicap')
-    element.appendChild( xml.createTextNode( str(settings.configuration.winglets_handicap) ) )
+    element.appendChild(
+        xml.createTextNode(str(settings.configuration.winglets_handicap)))
     preferences.appendChild(element)
     element = xml.createElement('overweight_handicap')
-    element.appendChild( xml.createTextNode( str(settings.configuration.overweight_handicap) ) )
+    element.appendChild(
+        xml.createTextNode(str(settings.configuration.overweight_handicap)))
     preferences.appendChild(element)
     element = xml.createElement('overweight_step')
-    element.appendChild( xml.createTextNode( str(settings.configuration.overweight_step) ) )
+    element.appendChild(
+        xml.createTextNode(str(settings.configuration.overweight_step)))
     preferences.appendChild(element)
     element = xml.createElement('allowed_difference')
-    element.appendChild( xml.createTextNode( str(settings.configuration.allowed_difference) ) )
+    element.appendChild(
+        xml.createTextNode(str(settings.configuration.allowed_difference)))
     preferences.appendChild(element)
     top_element.appendChild(preferences)
     # Add models data into XML
-    for model  in MODELS:
+    for model in MODELS:
         model_name = model.__name__
         table_name = model.__table__.name
         element_table = xml.createElement('model')
@@ -72,30 +84,33 @@ def Export(fullpath):
             for column in model.__table__.columns:
                 column_name = column.key
                 element = xml.createElement(column_name)
-                element.appendChild( xml.createTextNode( row.column_as_str(column_name, False) ) )
+                element.appendChild(
+                    xml.createTextNode(row.column_as_str(column_name, False)))
                 element_row.appendChild(element)
             element_table.appendChild(element_row)
         top_element.appendChild(element_table)
     # Save XML
-    f = codecs.open( settings.XML_DATA, 'w', encoding='utf-8' )
+    f = codecs.open(settings.XML_DATA, 'w', encoding='utf-8')
     try:
         xml.writexml(f, encoding='utf-8')
     finally:
         f.close()
-    
+
     # Create TAR
     tar = taropen(fullpath, 'w')
     try:
-        tar.add( settings.XML_DATA, 'igcweight.xml' )
+        tar.add(settings.XML_DATA, 'igcweight.xml')
         query = session.query(Photo).all()
         for photo in query:
-            tar.add( str(photo.full_path), str(photo.file_name) )
+            tar.add(str(photo.full_path), str(photo.file_name))
     finally:
         tar.close()
 
+
 def Import(fullpath, overwrite=False):
-    " Import(str fullpath, overwrite=False) - import data from archive file "
-    
+    """
+    Import(str fullpath, overwrite=False) - import data from archive file
+    """
     # Open TAR
     tar = taropen(fullpath, 'r')
     try:
@@ -111,20 +126,30 @@ def Import(fullpath, overwrite=False):
                         try:
                             for element in preferences[0].childNodes:
                                 if element.nodeName == 'gear_handicap':
-                                    if element.firstChild and element.firstChild.nodeValue:
-                                        settings.configuration.set_gear_handicap(element.firstChild.nodeValue)
+                                    if (element.firstChild and
+                                            element.firstChild.nodeValue):
+                                        settings.configuration.set_gear_handicap(
+                                            element.firstChild.nodeValue)
                                 if element.nodeName == 'winglets_handicap':
-                                    if element.firstChild and element.firstChild.nodeValue:
-                                        settings.configuration.set_winglets_handicap(element.firstChild.nodeValue)
+                                    if (element.firstChild and
+                                            element.firstChild.nodeValue):
+                                        settings.configuration.set_winglets_handicap(
+                                            element.firstChild.nodeValue)
                                 if element.nodeName == 'overweight_handicap':
-                                    if element.firstChild and element.firstChild.nodeValue:
-                                        settings.configuration.set_overweight_handicap(element.firstChild.nodeValue)
+                                    if (element.firstChild and
+                                            element.firstChild.nodeValue):
+                                        settings.configuration.set_overweight_handicap(
+                                            element.firstChild.nodeValue)
                                 if element.nodeName == 'overweight_step':
-                                    if element.firstChild and element.firstChild.nodeValue:
-                                        settings.configuration.set_overweight_step(element.firstChild.nodeValue)
+                                    if (element.firstChild and
+                                            element.firstChild.nodeValue):
+                                        settings.configuration.set_overweight_step(
+                                            element.firstChild.nodeValue)
                                 if element.nodeName == 'allowed_difference':
-                                    if element.firstChild and element.firstChild.nodeValue:
-                                        settings.configuration.set_allowed_difference(element.firstChild.nodeValue)
+                                    if (element.firstChild and
+                                            element.firstChild.nodeValue):
+                                        settings.configuration.set_allowed_difference(
+                                            element.firstChild.nodeValue)
                             settings.configuration.save()
                         except:
                             settings.configuration.read()
@@ -133,12 +158,17 @@ def Import(fullpath, overwrite=False):
                     for model in document.getElementsByTagName('model'):
                         model_name = model.attributes['type'].value
                         table_name = model.attributes['name'].value
-                        model_obj  = globals()[model_name]
+                        model_obj = globals()[model_name]
                         for row in model.getElementsByTagName(table_name):
                             record = model_obj()
                             for attr in row.childNodes:
-                                if attr.firstChild and attr.firstChild.nodeValue:
-                                    record.str_to_column( attr.nodeName, attr.firstChild.nodeValue, use_locale=False )
+                                if (
+                                        attr.firstChild and
+                                        attr.firstChild.nodeValue):
+                                    record.str_to_column(
+                                        attr.nodeName,
+                                        attr.firstChild.nodeValue,
+                                        use_locale=False)
                             session.merge(record)
                             session.flush()
                     session.commit()
@@ -146,11 +176,11 @@ def Import(fullpath, overwrite=False):
                     src.close()
             if patternt_jpg.search(file):
                 # Import photos
-                dst = open( join( settings.PHOTOS_DIR, file ), 'wb' )
+                dst = open(join(settings.PHOTOS_DIR, file), 'wb')
                 try:
                     src = tar.extractfile(file)
                     try:
-                        copyfileobj( src, dst )
+                        copyfileobj(src, dst)
                     finally:
                         src.close()
                 finally:
@@ -160,16 +190,21 @@ def Import(fullpath, overwrite=False):
 
 
 def CleanDb(models, preferences, measured_weights):
-    " CleanDb(list models, bool preferences, bool measured_weights) -" \
-    " clean db models, photos and settings "
+    """
+    CleanDb(list models, bool preferences, bool measured_weights) - clean
+    db models, photos and settings
+    """
     try:
         for model in models:
             session.query(model).delete()
             session.flush()
 
         if measured_weights:
-            session.query(GliderCard).update({'glider_weight': None,
-                'pilot_weight': None, 'tow_bar_weight': None,},
+            session.query(
+                GliderCard
+            ).update(
+                {'glider_weight': None, 'pilot_weight': None,
+                 'tow_bar_weight': None},
                 synchronize_session=False)
 
         session.commit()

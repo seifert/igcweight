@@ -1,15 +1,20 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
-" Main program module "
+"""
+Main program module
+"""
 
 import sys
 import traceback
 
 import wx
 
+
 def main():
-    " main() - start application "
+    """
+    main() - start application
+    """
     # Init wx app
     app = wx.App()
 
@@ -27,18 +32,22 @@ def main():
     # Init main window and application
     from gui_main import Main
     main = Main(None, -1, "")
-    app.SetAppName( main.GetTitle() )
+    app.SetAppName(main.GetTitle())
     app.SetTopWindow(main)
     main.Show()
 
     app.MainLoop()
 
+
 def _excepthook(etype, value, tb):
-    " Process unhandled exception "
+    """
+    Process unhandled exception
+    """
     try:
         from wx import GetTranslation as _
     except:
-        _ = lambda s: s
+        def _(s):
+            return s
     try:
         from settings import DEBUG
     except:
