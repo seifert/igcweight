@@ -1539,7 +1539,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.""")
                 elif difference < 0:
                     self.__set_status_label_data(
                         self.text_referential_status, self.COLOR_UNDERWEIGHT,
-                        self.REFERENTIAL_UNDERWEIGHT, difference)
+                        self.REFERENTIAL_UNDERWEIGHT, abs(difference))
                 else:
                     self.__set_status_label_data(
                         self.text_referential_status, self.COLOR_OK,
