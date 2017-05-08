@@ -969,19 +969,7 @@ class Main(wx.Frame):
         Exit(self, Event evt=None) - exit application event handler
         """
         app = wx.GetApp()
-        if settings.DEBUG:
-            # Don't ask in DEBUG mode
-            app.Exit()
-        else:
-            # Show confirm dialog window
-            dlg = wx.MessageDialog(
-                self, _("Exit application?"), _("Exit?"),
-                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-            try:
-                if dlg.ShowModal() == wx.ID_YES:
-                    wx.GetApp().Exit()
-            finally:
-                dlg.Destroy()
+        app.Exit()
 
     def About(self, evt=None):
         """
