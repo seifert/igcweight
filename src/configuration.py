@@ -17,6 +17,8 @@ class Configuration(object):
         'winglets_handicap': Decimal('0.01'),
         'overweight_handicap': Decimal('0.005'),
         'overweight_step': 10,
+        'underweight_handicap': Decimal('0.004'),
+        'underweight_step': 10,
         'allowed_difference': 2,
     }
 
@@ -58,6 +60,10 @@ class Configuration(object):
             config.get(DEFAULTSECT, "overweight_handicap"))
         self.set_overweight_step(
             config.get(DEFAULTSECT, "overweight_step"))
+        self.set_underweight_handicap(
+            config.get(DEFAULTSECT, "underweight_handicap"))
+        self.set_underweight_step(
+            config.get(DEFAULTSECT, "underweight_step"))
         self.set_allowed_difference(
             config.get(DEFAULTSECT, "allowed_difference"))
 
@@ -75,6 +81,11 @@ class Configuration(object):
             DEFAULTSECT, "overweight_handicap", str(self.overweight_handicap))
         config.set(
             DEFAULTSECT, "overweight_step", str(self.overweight_step))
+        config.set(
+            DEFAULTSECT, "underweight_handicap",
+            str(self.underweight_handicap))
+        config.set(
+            DEFAULTSECT, "underweight_step", str(self.underweight_step))
         config.set(
             DEFAULTSECT, "allowed_difference", str(self.allowed_difference))
 
@@ -111,6 +122,20 @@ class Configuration(object):
 
     def set_overweight_step(self, value):
         self.__overweight_step = int(value)
+
+    @property
+    def underweight_handicap(self):
+        return self.__underweight_handicap
+
+    def set_underweight_handicap(self, value):
+        self.__underweight_handicap = Decimal(value)
+
+    @property
+    def underweight_step(self):
+        return self.__underweight_step
+
+    def set_underweight_step(self, value):
+        self.__underweight_step = int(value)
 
     @property
     def allowed_difference(self):

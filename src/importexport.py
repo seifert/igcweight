@@ -62,6 +62,14 @@ def Export(fullpath):
     element.appendChild(
         xml.createTextNode(str(settings.configuration.overweight_step)))
     preferences.appendChild(element)
+    element = xml.createElement('underweight_handicap')
+    element.appendChild(
+        xml.createTextNode(str(settings.configuration.underweight_handicap)))
+    preferences.appendChild(element)
+    element = xml.createElement('underweight_step')
+    element.appendChild(
+        xml.createTextNode(str(settings.configuration.underweight_step)))
+    preferences.appendChild(element)
     element = xml.createElement('allowed_difference')
     element.appendChild(
         xml.createTextNode(str(settings.configuration.allowed_difference)))
@@ -144,6 +152,16 @@ def Import(fullpath, overwrite=False):
                                     if (element.firstChild and
                                             element.firstChild.nodeValue):
                                         settings.configuration.set_overweight_step(
+                                            element.firstChild.nodeValue)
+                                if element.nodeName == 'underweight_handicap':
+                                    if (element.firstChild and
+                                            element.firstChild.nodeValue):
+                                        settings.configuration.set_underweight_handicap(
+                                            element.firstChild.nodeValue)
+                                if element.nodeName == 'underweight_step':
+                                    if (element.firstChild and
+                                            element.firstChild.nodeValue):
+                                        settings.configuration.set_underweight_step(
                                             element.firstChild.nodeValue)
                                 if element.nodeName == 'allowed_difference':
                                     if (element.firstChild and

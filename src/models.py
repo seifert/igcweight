@@ -1,4 +1,6 @@
-" Database models "
+"""
+Database models
+"""
 
 import re
 import locale
@@ -609,31 +611,34 @@ class GliderCard(Base, Conversion):
         """
         referential_difference = self.referential_difference
         if referential_difference is not None:
-            gear_handicap = (
-                self.landing_gear and
-                settings.configuration.gear_handicap or
-                0)
-            winglets_handicap = (
-                self.winglets and
-                settings.configuration.winglets_handicap or
-                0)
-            coefficient = (
-                self.glider_type.coefficient + gear_handicap +
-                winglets_handicap)
+            if self.landing_gear:
+                gear_handicap = settings.configuration.gear_handicap
+            else:
+                gear_handicap = 0
+
+            if self.winglets:
+                winglets_handicap = settings.configuration.winglets_handicap
+            else:
+                winglets_handicap = 0
+
             if referential_difference > 0:
-                overweight_handicap = (
-                    referential_difference /
-                    settings.configuration.overweight_step)
-                if (
-                        (overweight_handicap *
-                         settings.configuration.overweight_step) <
-                        referential_difference):
-                    overweight_handicap = overweight_handicap + 1
-                overweight_handicap = (
-                    overweight_handicap *
-                    settings.configuration.overweight_handicap)
-                coefficient = coefficient + overweight_handicap
-            return coefficient
+                step = settings.configuration.overweight_step
+                steps = referential_difference / step
+                if referential_difference % step != 0:
+                    steps += 1
+                weight_handicap = (
+                    steps * settings.configuration.overweight_handicap)
+            elif referential_difference < 0:
+                step = settings.configuration.underweight_step
+                steps = abs(referential_difference) / step
+                weight_handicap = 0 - (
+                    steps * settings.configuration.underweight_handicap)
+            else:
+                weight_handicap = 0
+
+            return (
+                self.glider_type.coefficient + gear_handicap +
+                winglets_handicap + weight_handicap)
         else:
             return None
 

@@ -37,6 +37,12 @@ class Preferences(wx.Dialog):
         self.label_step = wx.StaticText(self, -1, _("/"))
         self.text_overweight_step = wx.TextCtrl(self, -1, "")
         self.label_unit = wx.StaticText(self, -1, _("kg"))
+        self.label_underweight_handicap = wx.StaticText(
+            self, -1, _("Underweight handicap:"))
+        self.text_underweight_handicap = wx.TextCtrl(self, -1, "")
+        self.label_underweight_step = wx.StaticText(self, -1, _("/"))
+        self.text_underweight_step = wx.TextCtrl(self, -1, "")
+        self.label_underweight_unit = wx.StaticText(self, -1, _("kg"))
         self.label_allowed_difference = wx.StaticText(
             self, -1, _("Allowed difference:"))
         self.text_allowed_difference = wx.TextCtrl(self, -1, "")
@@ -56,20 +62,20 @@ class Preferences(wx.Dialog):
         sizer_main = wx.BoxSizer(wx.VERTICAL)
         sizer_buttons = wx.StdDialogButtonSizer()
         grid_sizer = wx.FlexGridSizer(5, 2, 4, 4)
-        sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
+
         grid_sizer.Add(
             self.label_gear_handicap, 0,
             wx.RIGHT | wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 4)
         grid_sizer.Add(
             self.text_gear_handicap, 0, wx.EXPAND, 0)
+
         grid_sizer.Add(
             self.label_winglets_handicap, 0,
             wx.RIGHT | wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 4)
         grid_sizer.Add(
             self.text_winglets_handicap, 0, wx.EXPAND, 0)
-        grid_sizer.Add(
-            self.label_overweight_handicap, 0,
-            wx.RIGHT | wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 4)
+
+        sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_1.Add(
             self.text_overweight_handicap, 1, 0, 0)
         sizer_1.Add(
@@ -80,12 +86,34 @@ class Preferences(wx.Dialog):
         sizer_1.Add(
             self.label_unit, 0, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 4)
         grid_sizer.Add(
+            self.label_overweight_handicap, 0,
+            wx.RIGHT | wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(
             sizer_1, 1, wx.EXPAND, 0)
+
+        sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_2.Add(
+            self.text_underweight_handicap, 1, 0, 0)
+        sizer_2.Add(
+            self.label_underweight_step, 0,
+            wx.LEFT | wx.RIGHT | wx.ALIGN_CENTER_VERTICAL, 4)
+        sizer_2.Add(
+            self.text_underweight_step, 1, 0, 0)
+        sizer_2.Add(
+            self.label_underweight_unit, 0,
+            wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(
+            self.label_underweight_handicap, 0,
+            wx.RIGHT | wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 4)
+        grid_sizer.Add(
+            sizer_2, 1, wx.EXPAND, 0)
+
         grid_sizer.Add(
             self.label_allowed_difference, 0,
             wx.RIGHT | wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 4)
         grid_sizer.Add(
             self.text_allowed_difference, 0, wx.EXPAND, 0)
+
         grid_sizer.AddGrowableCol(1)
         sizer_main.Add(grid_sizer, 1, wx.ALL | wx.EXPAND, 4)
         sizer_buttons.AddButton(self.button_ok)
@@ -135,6 +163,23 @@ class Preferences(wx.Dialog):
         self.text_overweight_step.Value = locale.format('%d', value)
 
     overweight_step = property(__get_overweight_step, __set_overweight_step)
+
+    def __get_underweight_handicap(self):
+        return str_to_decimal(self.text_underweight_handicap.Value)
+
+    def __set_underweight_handicap(self, value):
+        self.text_underweight_handicap.Value = locale.str(value)
+
+    underweight_handicap = property(
+        __get_underweight_handicap, __set_underweight_handicap)
+
+    def __get_underweight_step(self):
+        return int(self.text_underweight_step.Value)
+
+    def __set_underweight_step(self, value):
+        self.text_underweight_step.Value = locale.format('%d', value)
+
+    underweight_step = property(__get_underweight_step, __set_underweight_step)
 
     def __get_allowed_difference(self):
         return int(self.text_allowed_difference.Value)

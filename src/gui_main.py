@@ -61,6 +61,7 @@ class Main(wx.Frame):
     SEAT_NO_DATA = _("No data for check seat weighting.")
     REFERENTIAL_OK = _("Referential weight is OK.")
     REFERENTIAL_OVERWEIGHT = _("Referential weight is overweight by %d kg!")
+    REFERENTIAL_UNDERWEIGHT = _("Referential weight is underweight by %d kg!")
     REFERENTIAL_NO_DATA = _("No data for check referential weight.")
     COEFFICIENT = _(
         "Competition coefficient is %(coefficient)s at weight %(weight)d kg.")
@@ -74,6 +75,7 @@ class Main(wx.Frame):
     COLOR_TEXT = wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOWTEXT)
     COLOR_OK = 'DARK GREEN'
     COLOR_OVERWEIGHT = 'RED'
+    COLOR_UNDERWEIGHT = 'ORANGE'
     COLOR_NO_DATA = 'BLUE'
 
     def __init__(self, *args, **kwds):
@@ -1042,6 +1044,9 @@ class Main(wx.Frame):
             dlg.overweight_handicap = (
                 settings.configuration.overweight_handicap)
             dlg.overweight_step = settings.configuration.overweight_step
+            dlg.underweight_handicap = (
+                settings.configuration.underweight_handicap)
+            dlg.underweight_step = settings.configuration.underweight_step
             dlg.allowed_difference = settings.configuration.allowed_difference
             while True:
                 try:
@@ -1054,6 +1059,10 @@ class Main(wx.Frame):
                             dlg.overweight_handicap)
                         settings.configuration.set_overweight_step(
                             dlg.overweight_step)
+                        settings.configuration.set_underweight_handicap(
+                            dlg.underweight_handicap)
+                        settings.configuration.set_underweight_step(
+                            dlg.underweight_step)
                         settings.configuration.set_allowed_difference(
                             dlg.allowed_difference)
                         settings.configuration.save()
@@ -1511,6 +1520,10 @@ class Main(wx.Frame):
                     self.__set_status_label_data(
                         self.text_referential_status, self.COLOR_OVERWEIGHT,
                         self.REFERENTIAL_OVERWEIGHT, difference)
+                elif difference < 0:
+                    self.__set_status_label_data(
+                        self.text_referential_status, self.COLOR_UNDERWEIGHT,
+                        self.REFERENTIAL_UNDERWEIGHT, difference)
                 else:
                     self.__set_status_label_data(
                         self.text_referential_status, self.COLOR_OK,
