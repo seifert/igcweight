@@ -39,7 +39,7 @@ HOME_DIR = HOME_DIR is None and join(
     USER_DIR, 'igcweight-%s' % "".join(str(s) for s in VERSION_DB)) or HOME_DIR
 PHOTOS_DIR = join(HOME_DIR, 'photos')
 IMG_CACHE_DIR = join(HOME_DIR, 'thumbnails')
-BASE_DIR = abspath(join(dirname(__file__), '..'))
+BASE_DIR = abspath(join(dirname(__file__)))
 IMAGES_DIR = join(BASE_DIR, 'images')
 LOCALE_DIR = join(BASE_DIR, 'locale')
 TEMPLATES_DIR = join(BASE_DIR, 'templates')

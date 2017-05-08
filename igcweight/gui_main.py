@@ -671,7 +671,7 @@ class Main(wx.Frame):
 
         sizer_main.Fit(self)
         self.Layout()
-        self.SetSize((950, 700))
+        self.SetSize((950, 725))
         self.split_main.SetSashPosition(375)
 
     def get_datasource_glider_card(self):
