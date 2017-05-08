@@ -25,9 +25,8 @@ def main():
     from settings import LOCALE_DIR
     mylocale = wx.Locale(wx.LANGUAGE_DEFAULT)
     mylocale.AddCatalogLookupPathPrefix(LOCALE_DIR)
+    mylocale.AddCatalog('wxstd')  # MS Windows hack
     mylocale.AddCatalog('igcweight')
-    # MS Windows hack
-    mylocale.AddCatalog('wxstd')
 
     # Init main window and application
     from gui_main import Main
