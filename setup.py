@@ -2,6 +2,22 @@
 
 from setuptools import setup, find_packages
 
+try:
+    import py2exe
+except ImportError:
+    kwargs = {}
+else:
+    kwargs = {
+        'console': ['igcweight/main.py'],
+        'options': {
+            'py2exe': {
+                'packages': ['sqlalchemy', 'mako', 'wx'],
+                'skip_archive': True,
+            },
+        },
+    }
+
+
 setup(
     name='igcweight',
     version='0.9.7',
@@ -30,4 +46,5 @@ setup(
             'igcweight = igcweight.main:main',
         ]
     },
+    **kwargs
 )
