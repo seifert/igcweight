@@ -22,14 +22,14 @@ def main():
     sys.excepthook = _excepthook
 
     # Init locales
-    from settings import LOCALE_DIR
+    from igcweight.settings import LOCALE_DIR
     mylocale = wx.Locale(wx.LANGUAGE_DEFAULT)
     mylocale.AddCatalogLookupPathPrefix(LOCALE_DIR)
     mylocale.AddCatalog('wxstd')  # MS Windows hack
     mylocale.AddCatalog('igcweight')
 
     # Init main window and application
-    from gui_main import Main
+    from igcweight.gui_main import Main
     main = Main(None, -1, "")
     app.SetAppName(main.GetTitle())
     app.SetTopWindow(main)
@@ -44,12 +44,12 @@ def _excepthook(etype, value, tb):
     """
     try:
         from wx import GetTranslation as _
-    except:
+    except ImportError:
         def _(s):
             return s
     try:
-        from settings import DEBUG
-    except:
+        from igcweight.settings import DEBUG
+    except ImportError:
         DEBUG = True
 
     if DEBUG:
