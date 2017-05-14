@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.interfaces import PoolListener
 
-import settings
+from igcweight import settings
 
 __engine_url = {'drivername': settings.DB_ENGINE, 'query': settings.DB_ARGS}
 

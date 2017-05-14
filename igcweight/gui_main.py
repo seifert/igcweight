@@ -26,20 +26,20 @@ try:
 except ImportError:
     Template = None
 
-import settings
+from igcweight import settings
 
-from database import session
-from models import (
+from igcweight.database import session
+from igcweight.models import (
     GliderCard, Pilot, Organization, GliderType, Photo, DailyWeight)
-from gui_widgets import (
+from igcweight.gui_widgets import (
     error_message_dialog, info_message_dialog, VirtualListCtrl, GetPhotoBitmap)
-from gui_igchandicap import (
+from igcweight.gui_igchandicap import (
     IgcHandicapList, IgcHandicapForm, GLIDER_TYPE_INSERT_ERROR)
-from gui_organizations import (
+from igcweight.gui_organizations import (
     OrganizationList, OrganizationForm, ORGANIZATION_INSERT_ERROR)
-from gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
-from gui_preferences import Preferences
-from importexport import patternt_tar, Export, Import, CleanDb
+from igcweight.gui_pilots import PilotList, PilotForm, PILOT_INSERT_ERROR
+from igcweight.gui_preferences import Preferences
+from igcweight.importexport import patternt_tar, Export, Import, CleanDb
 
 _fake_variable_1 = _('Glider card - club class')
 

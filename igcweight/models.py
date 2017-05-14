@@ -13,15 +13,17 @@ from datetime import date, time, datetime
 from wx import GetTranslation as _
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, MetaData, Column, ForeignKey, Sequence
-from sqlalchemy import Integer, SmallInteger, String, Text, DateTime, Numeric, Boolean, CHAR
-from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstraint
+from sqlalchemy import Table, Column, Sequence
+from sqlalchemy import (
+    Integer, SmallInteger, String, Text, DateTime, Numeric, Boolean, CHAR)
+from sqlalchemy import (
+    PrimaryKeyConstraint, UniqueConstraint, ForeignKeyConstraint)
 from sqlalchemy import desc
 from sqlalchemy.orm import MapperExtension, EXT_CONTINUE
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.orm import relation
 from sqlalchemy import types as sqltypes
 
-import settings
+from igcweight import settings
 
 pat = re.compile(r"\%s" % locale.localeconv()['decimal_point'])
 

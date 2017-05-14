@@ -7,7 +7,7 @@ from os.path import abspath, dirname, join, expanduser, isdir
 from sys import argv
 from getopt import getopt
 
-from configuration import Configuration
+from igcweight.configuration import Configuration
 
 VERSION_APP = (0, 9, 7)
 VERSION_DB = (0, 9)

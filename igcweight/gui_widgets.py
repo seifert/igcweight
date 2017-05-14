@@ -10,7 +10,7 @@ import wx
 
 from wx import GetTranslation as _
 
-import settings
+from igcweight import settings
 
 
 _thumbnails_cache = {}

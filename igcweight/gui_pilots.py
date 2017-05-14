@@ -5,10 +5,10 @@ GUI - Pilots list
 import wx
 from wx import GetTranslation as _
 
-import gui_dialogmodel
+from igcweight import gui_dialogmodel
 
-from database import session
-from models import Pilot
+from igcweight.database import session
+from igcweight.models import Pilot
 
 PILOT_INSERT_ERROR = _("Pilot insert error")
 PILOT_EDIT_ERROR = _("Pilot edit error")

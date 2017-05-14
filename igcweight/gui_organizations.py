@@ -5,10 +5,10 @@ GUI - Organizations list
 import wx
 from wx import GetTranslation as _
 
-import gui_dialogmodel
+from igcweight import gui_dialogmodel
 
-from database import session
-from models import Organization
+from igcweight.database import session
+from igcweight.models import Organization
 
 ORGANIZATION_INSERT_ERROR = _("Organization insert error")
 ORGANIZATION_EDIT_ERROR = _("Organization edit error")

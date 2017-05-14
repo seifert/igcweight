@@ -10,14 +10,14 @@ from os import mkdir
 from shutil import copyfileobj, rmtree
 from datetime import datetime
 from tarfile import open as taropen
-from xml.dom.minidom import getDOMImplementation, parse, Node
+from xml.dom.minidom import getDOMImplementation, parse
 
-import settings
+from igcweight import settings
 
-from database import session
-from models import (
+from igcweight.database import session
+from igcweight.models import (
     GliderCard, Pilot, Organization, GliderType, Photo, DailyWeight)
-from configuration import Configuration
+from igcweight.configuration import Configuration
 
 patternt_tar = re.compile(r'^.+\.tar$', re.IGNORECASE)
 patternt_jpg = re.compile(r'^[a-z0-9]{32,32}\.jpg$', re.IGNORECASE)

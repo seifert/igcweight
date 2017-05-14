@@ -7,11 +7,10 @@ import locale
 import wx
 from wx import GetTranslation as _
 
-import settings
-import gui_forms
+from igcweight import gui_forms
 
-from database import session
-from gui_widgets import error_message_dialog
+from igcweight.database import session
+from igcweight.gui_widgets import error_message_dialog
 
 
 class DialogModel(gui_forms.DialogModel):

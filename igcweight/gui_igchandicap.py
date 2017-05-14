@@ -5,10 +5,10 @@ GUI - IGC handicap list
 import wx
 from wx import GetTranslation as _
 
-import gui_dialogmodel
+from igcweight import gui_dialogmodel
 
-from database import session
-from models import GliderType
+from igcweight.database import session
+from igcweight.models import GliderType
 
 GLIDER_TYPE_INSERT_ERROR = _("Glider type insert error")
 GLIDER_TYPE_EDIT_ERROR = _("Glider type edit error")
